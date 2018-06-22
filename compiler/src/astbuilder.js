@@ -143,7 +143,7 @@ function getFunctionCallAst(fcall){
 	}else{
 		ast.params = [];
 	}
-	return ast;
+	return {fcall: ast};
 }
 
 function astArrayExpr(expr){
@@ -497,7 +497,7 @@ function astStmt(stmt){
 		return astAssignStmt(assignStmt);
 	}else
 	if(functionCall){
-		return {fcall: getFunctionCallAst(functionCall)};
+		return getFunctionCallAst(functionCall);
 	}else
 	if(forStmt){
 		return astForStmt(forStmt);
