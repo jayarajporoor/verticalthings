@@ -390,7 +390,7 @@ function astVarDef(def){
   };
 
   for(var i=0;i<varId.length;i++){
-  	  var asdId = {id: getId(varId[i])};
+  	  var astId = {id: getId(varId[i])};
   	  var initValue = varId[i].initValue();
 	  if(initValue){
 	  	astId.init = astInitValue(initValue);
