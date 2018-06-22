@@ -74,6 +74,17 @@ if(process.argv.length <= 2) {
 }
 
 var srcpath = process.argv[2];
+
+var printAst = false;
+
+for(var i=3;i<process.argv.length;i++){
+	switch(process.argv[i]){
+		case "-ast" :
+			printAst = true;
+		break;
+	}
+}
+
 var input = fs.readFileSync(srcpath, 'utf8');
 var tree = parse(srcpath, input);
 var ast = astBuilder.buildAst(tree);
@@ -82,5 +93,7 @@ ast.modules = {};
 
 loadPipeline(ast, path.dirname(srcpath));
 
-console.log(JSON.stringify(ast, null, 4));
+if(printAst){
+	console.log(JSON.stringify(ast, null, 4));
+}	
 
