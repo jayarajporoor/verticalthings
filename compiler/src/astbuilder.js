@@ -405,7 +405,7 @@ function astFormalParam(param){
 	return {
 		is_const: param.CONST() ? true : false,
 		type: astVarType(param.varType()),
-		id: getIdentifier(param)
+		id: getId(param)
 	};
 }
 
@@ -530,8 +530,9 @@ function astFuncDef(fdef){
 	}
 	ast.id = getId(fdef);
 	ast.params = [];
-	var fparams = fdef.formalParams()
+	var fparams = fdef.formalParams();
 	if(fparams){
+		fparams = fparams.formalParam();
 		for(var i=0;i<fparams.length;i++){
 			ast.params.push(astFormalParam(fparams[i]));
 		}
