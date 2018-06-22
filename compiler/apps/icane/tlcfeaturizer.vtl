@@ -56,7 +56,7 @@ int getBucket(float[400] sensorValue1D, int[n] bucketDistribution){
 		/* This typecasting and all the further values are
 		 * scaled to optimize performance
 		 */
-		val = (int)100 *sensorValue1Dflat[i];
+		val = int(100 *sensorValue1Dflat[i]);
 		
 
 		// Serial.print("Value: "+String(val));

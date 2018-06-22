@@ -285,7 +285,7 @@ function astUseSpec(useSpec){
 
 function astNumVal(numVal){
 	var identifier = numVal.Identifier();
-	var numConstant = numVal.NumConstant();
+	var numConstant = numVal.numConstant();
 	if(identifier){
 		return {id: getId(numVal)};
 	}else
