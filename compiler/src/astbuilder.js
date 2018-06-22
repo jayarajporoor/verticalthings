@@ -235,6 +235,9 @@ function getExprAst(expr){
 		if(expr.LNOT()){//(subExpr.length == 1): right now the only UP at expr-level is !
 			ast.expr = getExprAst(subExpr[0]);
 			ast.up = '!';
+		}else
+		if(subExpr.length==1){
+			ast = getExprAst(subExpr[0]);
 		}else{
 			ast.lexpr = getExprAst(subExpr[0]);
 			ast.rexpr = getExprAst(subExpr[1]);
@@ -377,16 +380,22 @@ function astInitValue(initValue){
 }
 
 function astVarDef(def){
-  //CONST varType Identifier dimensionSpec? ASSIGN literal SEMI
+  //varId: Identifier (ASSIGN initValue)?;
   var varType = def.varType();
-  var initValue = def.initValue();
+  var varId  = def.varId();
   var ast = {
   	type : astVarType(varType),
-  	ids   : getIdList(def),
-  	is_const: def.CONST() ? true : false
+  	is_const: def.CONST() ? true : false,
+  	ids : []
   };
-  if(initValue){
-  	ast.init = astInitValue(initValue);
+
+  for(var i=0;i<varId.length;i++){
+  	  var asdId = {id: getId(varId[i])};
+  	  var initValue = varId[i].initValue();
+	  if(initValue){
+	  	astId.init = astInitValue(initValue);
+	  }
+	  ast.ids.push(astId);
   }
   return ast;
 }

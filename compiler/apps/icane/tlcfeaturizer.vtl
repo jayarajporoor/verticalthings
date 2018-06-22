@@ -1,8 +1,8 @@
 module tlcfeaturizer;
 
-default flow featurize(norm1: float[], norm2: float[], norm3: float[], 
-	     norm4: float[], norm5: float[], norm6: float[]){
-	bucketDistribution: int[xxx];
+default flow featurize(float[n] norm1, float[n] norm2, float[n] norm3, 
+	     float[n] norm4, float[n] norm5, float[n] norm6){
+	int[xxx] bucketDistribution;
 	/*
 	 * The feature vector is not really used.
 	 */
@@ -21,17 +21,17 @@ default flow featurize(norm1: float[], norm2: float[], norm3: float[],
 	// }
 	bucketIndex=4;
 	// unsigned long startMillisax = millis();
-	if((getBucket(this->ax, bucketDistribution))!=1) DEBPRINT("ERROR:1\n");
+	if((getBucket(ax, bucketDistribution))!=1){ DEBPRINT("ERROR:1\n");}
 	// unsigned long startMillisay = millis();
-	if((getBucket(this->ay, bucketDistribution))!=1) DEBPRINT("ERROR:1\n");
+	if((getBucket(ay, bucketDistribution))!=1) {DEBPRINT("ERROR:1\n");}
 	// unsigned long startMillisaz = millis();
-	if((getBucket(this->az, bucketDistribution))!=1) DEBPRINT("ERROR:1\n");
+	if((getBucket(az, bucketDistribution))!=1) {DEBPRINT("ERROR:1\n");}
 	// unsigned long startMillisgx = millis();
-	if((getBucket(this->gx, bucketDistribution))!=1) DEBPRINT("ERROR:1\n");
+	if((getBucket(gx, bucketDistribution))!=1) {DEBPRINT("ERROR:1\n");}
 	// unsigned long startMillisgy = millis();
-	if((getBucket(this->gy, bucketDistribution))!=1) DEBPRINT("ERROR:1\n");
+	if((getBucket(gy, bucketDistribution))!=1) {DEBPRINT("ERROR:1\n");}
 	// unsigned long startMillisgz = millis();
-	if((getBucket(this->gz, bucketDistribution))!=1) DEBPRINT("ERROR:1\n");
+	if((getBucket(gz, bucketDistribution))!=1) {DEBPRINT("ERROR:1\n");}
 	// unsigned long endMillis = millis();
 	// Serial.println("Time to featurize:"+String((startMillisay - startMillisax))+","
 	// 	+String((startMillisaz - startMillisay))+","
@@ -43,18 +43,20 @@ default flow featurize(norm1: float[], norm2: float[], norm3: float[],
 }
 
 
-getBucket : int (sensorValue1D: float[400], bucketDistribution: int[]){
+int getBucket(float[400] sensorValue1D, int[n] bucketDistribution){
 	// Serial.print("length:"+String(sensorValue1D->getSize())+"\n");
-	sensorValue1D->flatten(sensorValue1Dflat);
+	//sensorValue1D->flatten(sensorValue1Dflat);
 	int imax = 0, imin = 0, maxval = 0,minval = 0, maxcount = 0, mincount = 0, postemp = 0, negtemp = 0, bucketCount;
 
 	bool flagPos = false, flagNeg = false;
 	float j,k;
-	for(int i =0; i < 400; i++){
+	int val;
+
+	for i in [0,400]{
 		/* This typecasting and all the further values are
 		 * scaled to optimize performance
 		 */
-		int val = (int)100 *sensorValue1Dflat[i];
+		val = (int)100 *sensorValue1Dflat[i];
 		
 
 		// Serial.print("Value: "+String(val));
@@ -74,7 +76,7 @@ getBucket : int (sensorValue1D: float[400], bucketDistribution: int[]){
 		} 
 		
 
-		if(sensorValue1D==this->gy){
+		if(sensorValue1D==gy){
 			int thresholdCount=3;
 			//PosEdgeValues
 			if(val>62 && !flagPos){
@@ -143,6 +145,6 @@ getBucket : int (sensorValue1D: float[400], bucketDistribution: int[]){
 	 
 	bucketIndex+=bucketWidth;//Updating Bucket Index
 	// Serial.println("End of 1 instance: "+String(bucketIndex));
-	if(bucketIndex>124 || bucketIndex<23) return 0;
+	if(bucketIndex>124 || bucketIndex<23){ return 0;}
 	return 1;
 }

@@ -57,6 +57,11 @@ VerticalThingsVisitor.prototype.visitInitValue = function(ctx) {
 };
 
 
+// Visit a parse tree produced by VerticalThings#varId.
+VerticalThingsVisitor.prototype.visitVarId = function(ctx) {
+};
+
+
 // Visit a parse tree produced by VerticalThings#varDef.
 VerticalThingsVisitor.prototype.visitVarDef = function(ctx) {
 };
