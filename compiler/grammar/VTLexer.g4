@@ -49,6 +49,9 @@ WHILE: 'while';
 TRUE: 'true';
 FALSE: 'false';
 
+
+RING: 'ring';
+
 SEMI: ';';
 LP: '(';
 RP: ')';

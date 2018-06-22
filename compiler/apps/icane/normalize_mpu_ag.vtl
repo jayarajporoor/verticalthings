@@ -1,10 +1,10 @@
 module normalize_mpu_ag;
 
 
-normAX, normAY, normAZ : circular float[400]; 
-normGX, normGY, normGZ : circular float[400];
+float ring[400] normAX, normAY, normAZ; 
+float ring[400] normGX, normGY, normGZ;
 
-default flow normalizeAG(MPU6050 mpu, fifoBuffer: int[]) {
+default flow normalizeAG(MPU6050 mpu, int[N] fifoBuffer) {
 	VectorInt16 acc__, gyr__;
 	mpu1.dmpGetAccel(&acc__, fifoBuffer);
 	mpu1.dmpGetGyro(&gyr__, fifoBuffer);
@@ -44,10 +44,10 @@ default flow normalizeAG(MPU6050 mpu, fifoBuffer: int[]) {
  * @returns void
  */
 void minMaxNormalize(
-	const int16 v[3],
-	const int16 vmin[3], 
-	const int16 vmax[3],
-	float  dst[3]
+	const int16[3] v,
+	const int16[3] vmin, 
+	const int16[3] vmax,
+	float[3]  dst
 	){
 	
 	dst.x = ((float)(v.x) - (float)(vmin.x));

@@ -5,7 +5,7 @@ use arduino;
 const int N = 64;
 
 MPU6050 mpu1;
-int fifoBuffer[N];
+int[N] fifoBuffer;
 //0..N fifoPacketSize;
 
 void init(const boolean i2c_arduino) {

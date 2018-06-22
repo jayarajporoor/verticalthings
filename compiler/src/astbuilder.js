@@ -97,7 +97,7 @@ function getDimensionSpec(dimSpec){
 		}
 		dim.push(dimval);
 	}
-	return dim;
+	return {dim: dim, is_ring: dimSpec.RING() ? true: false};
 }
 
 function getStringLiteral(s){
@@ -111,6 +111,11 @@ function getActualParams(params) {
 		v={};
 		var expr = param[i].expr();
 		var strLiteral = param[i].StringLiteral();
+		var id = param[i].Identifier();
+		if(id){
+			v.name = getId(param[i]);
+		}
+
 		if(expr){
 			v.expr = getExprAst(expr);
 		}else
@@ -309,6 +314,12 @@ function astVarType(varType){
 	if(primitiveType){
 		ast = astPrimitiveType(primitiveType);
 	}
+
+	var dimensionSpec = varType.dimensionSpec();  
+	if(dimensionSpec){
+		ast.dim = getDimensionSpec(dimensionSpec);
+	}
+
 	return ast;
 }
 
@@ -358,17 +369,12 @@ function astInitValue(initValue){
 function astVarDef(def){
   //CONST varType Identifier dimensionSpec? ASSIGN literal SEMI
   var varType = def.varType();
-  var identifier = def.Identifier();
-  var dimensionSpec = def.dimensionSpec();
   var initValue = def.initValue();
   var ast = {
   	type : astVarType(varType),
-  	id   : getId(def),
+  	ids   : getIdList(def),
   	is_const: def.CONST() ? true : false
   };
-  if(dimensionSpec){
-  	ast.dim = getDimensionSpec(dimensionSpec);
-  }
   if(initValue){
   	ast.init = astInitValue(initValue);
   }
@@ -492,6 +498,13 @@ function astFuncDef(fdef){
 	if(fparams){
 		for(var i=0;i<fparams.length;i++){
 			ast.params.push(astFormalParam(fparams[i]));
+		}
+	}
+	var varDef = fdef.varDef();
+	if(varDef){
+		ast.vars = [];
+		for(var i=0;i<varDef.length;i++){
+			ast.vars.push(astVarDef(varDef[i]));
 		}
 	}
 	ast.body = astStmtBlock(fdef.stmtBlock());

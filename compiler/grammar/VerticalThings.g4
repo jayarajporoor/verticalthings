@@ -38,7 +38,7 @@ arrayLiteral
 initValue: expr | StringLiteral | arrayLiteral;
 
 varDef
-    :  CONST? varType Identifier dimensionSpec? (ASSIGN initValue)? SEMI
+    :  CONST? varType Identifier (COMMA Identifier)* (ASSIGN initValue)? SEMI
     ;
 
 dimExpr : intVal op=(PLUS|MUL) intVal;
@@ -46,7 +46,7 @@ dimExpr : intVal op=(PLUS|MUL) intVal;
 dimValue: (IntegerConstant|Identifier|dimExpr);
 
 dimensionSpec
-    : (LS dimValue RS)+
+    : RING? (LS dimValue RS)+
     ;
 
 intVal: Identifier|IntegerConstant;
@@ -62,7 +62,7 @@ primitiveType
     ;
 
 varType
-    :   (qualIdentifier | cppQualIdentifier | rangeType | primitiveType)
+    :   (qualIdentifier | cppQualIdentifier | rangeType | primitiveType) dimensionSpec?
     ;    
 
 flowType
@@ -112,7 +112,7 @@ stmt
     
 funcDef
     :  (varType | flowType)? Identifier LP formalParams? RP 
-        stmtBlock
+        varDef* stmtBlock
     ;    
 
 qualIdentifier
@@ -128,7 +128,7 @@ functionCall
 	;
 
 actualParam
-    : expr | StringLiteral
+    : (Identifier ASSIGN)? (expr | StringLiteral)
     ;
 
 actualParams
