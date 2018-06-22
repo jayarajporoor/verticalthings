@@ -3,14 +3,13 @@ module icane_test;
 pipeline icane_test {
 	mpu_acq,
 	normalize_mpu_ag,
-	tlc_featurizer,
+	tlcfeaturizer,
 	protonn,	
 	thresholding,
 	majority_vote(10),
-	if_changed,
 	{
 	    toggle_led.on,
 		ble_send(timeout=3000),
-		toggle_led.off,
+		toggle_led.off
 	}
 };

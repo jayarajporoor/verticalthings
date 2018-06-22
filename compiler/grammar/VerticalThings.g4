@@ -57,6 +57,10 @@ rangeType
     : LS numVal (COMMA|DPERIOD) numVal RS
     ;
 
+castableType
+    : INT | FLOAT | BOOLEAN
+    ;
+
 primitiveType
     : INT | FLOAT | BOOLEAN | VOID
     ;
@@ -112,7 +116,7 @@ stmt
     
 funcDef
     :  (varType | flowType)? Identifier LP formalParams? RP 
-        varDef* stmtBlock
+        LB varDef* stmt* RB
     ;    
 
 qualIdentifier
@@ -138,46 +142,38 @@ actualParams
 
 arrayExpr: Identifier dimensionSpec;
 
+
+castExpr : castableType LP basicExpr RP;
+
 basicExpr
-    :   qualIdentifier |
+    :   
+        basicExpr op=POW basicExpr |
+        castExpr |
+        qualIdentifier |        
         arrayExpr |
         functionCall |
         exprConstant |
-        basicExpr op=PLUS basicExpr |
-        basicExpr op=MINUS basicExpr |
-        basicExpr op=MUL basicExpr |
-        basicExpr op=DIV basicExpr |
-        basicExpr op=MOD basicExpr |
-        basicExpr op=POW basicExpr |
-        basicExpr op=LSHIFT basicExpr |
-        basicExpr op=RSHIFT basicExpr |
-        basicExpr op=BAND basicExpr |
-        basicExpr op=BOR basicExpr |
-        basicExpr op=BXOR basicExpr |
-        basicExpr op=HPROD basicExpr |
-        basicExpr op=CAT  basicExpr |
-        up=BNOT basicExpr |
-        up=MINUS basicExpr |
+        up=(BNOT|MINUS) basicExpr |
+        basicExpr op=(BAND|BOR|BXOR) basicExpr |
+        basicExpr op=(LSHIFT|RSHIFT) basicExpr |        
+        basicExpr op=(MUL|DIV|MOD) basicExpr |
+        basicExpr op=(PLUS|MINUS) basicExpr |
+        basicExpr op=(HPROD|CAT) basicExpr |
         LP basicExpr RP
     ;
 
 relExpr
-    :   basicExpr op=GT basicExpr |
-        basicExpr op=GTE basicExpr |
-        basicExpr op=LT basicExpr |
-        basicExpr op=LTE basicExpr |
-        basicExpr op=EQ  basicExpr |
-        basicExpr op=NEQ basicExpr |
+    :   basicExpr op=(GT|GTE|LT|LTE|EQ|NEQ) basicExpr |
         LP relExpr RP
     ;   
 
 expr
-    :   basicExpr |
+    :   
+        LNOT expr |
+        basicExpr |
         relExpr |
-        expr op=LOR expr |
-        expr op=LAND expr |
-        LP expr RP |
-        LNOT expr
+        expr op=(LOR|LAND) expr |
+        LP expr RP 
     ;     
 
 numConstant: IntegerConstant | FloatingConstant;

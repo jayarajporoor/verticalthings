@@ -155,6 +155,15 @@ VerticalThingsListener.prototype.exitRangeType = function(ctx) {
 };
 
 
+// Enter a parse tree produced by VerticalThings#castableType.
+VerticalThingsListener.prototype.enterCastableType = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#castableType.
+VerticalThingsListener.prototype.exitCastableType = function(ctx) {
+};
+
+
 // Enter a parse tree produced by VerticalThings#primitiveType.
 VerticalThingsListener.prototype.enterPrimitiveType = function(ctx) {
 };
@@ -332,6 +341,15 @@ VerticalThingsListener.prototype.enterArrayExpr = function(ctx) {
 
 // Exit a parse tree produced by VerticalThings#arrayExpr.
 VerticalThingsListener.prototype.exitArrayExpr = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#castExpr.
+VerticalThingsListener.prototype.enterCastExpr = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#castExpr.
+VerticalThingsListener.prototype.exitCastExpr = function(ctx) {
 };
 
 

@@ -81,6 +81,12 @@ EQ: '==';
 NEQ: '!=';
 ASSIGN: '=';
 
+PLUSASSIGN: "+=";
+MINUSASSIGN: "-=";
+MULASSIGN: "*=";
+INC: "++";
+DEC: "--";
+
 LAND: '&&';
 LOR: '||';
 LNOT: '!';

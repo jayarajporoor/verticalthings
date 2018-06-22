@@ -155,6 +155,12 @@ function astArrayExpr(expr){
 	return ast;
 }
 
+function getCastExprAst(expr){
+	//castExpr : castableType LP basicExpr RP;
+	return {op: 'cast', type: astPrimitiveType(expr.castableType()), expr: getBasicExprAst(expr.basicExpr())};
+}
+
+
 function getBasicExprAst(expr){
     var ast = {};
 	var qualIdentifier = expr.qualIdentifier();
@@ -162,9 +168,14 @@ function getBasicExprAst(expr){
 	var functionCall = expr.functionCall();
 	var constant = expr.exprConstant();
 	var basicSubExpr = expr.basicExpr();
+	var castExpr = expr.castExpr();
 
 	var op = expr.op ? expr.op.text : null;
 	var up = expr.up ? expr.up.text : null;//unary op
+
+	if(castExpr){
+		return getCastExprAst(castExpr);
+	}else
 	if(qualIdentifier){
 		ast = {qid: getIdList(qualIdentifier)};
 	}else
@@ -184,7 +195,7 @@ function getBasicExprAst(expr){
 	}else
 	if(up){
 		ast.up = up;
-		ast.expr = getBasicExpr(basicSubExpr[0]);
+		ast.expr = getBasicExprAst(basicSubExpr[0]);
 	}else{
 		ast = getBasicExprAst(basicSubExpr[0]);		
 	}
@@ -208,22 +219,21 @@ function getRelExprAst(expr){
 	}
 }
 
+
 function getExprAst(expr){
 	var ast = {};
 	var basicExpr = expr.basicExpr();
 	var relExpr = expr.relExpr();
 	var subExpr = expr.expr();
-	if(subExpr.length == 1){
-		return getExprAst(subExpr[0]);
-	}else
+
 	if(basicExpr){
 		ast = getBasicExprAst(basicExpr);
 	}else if(relExpr){
         ast = getRelExprAst(relExpr);
 	}else
 	if(subExpr) {
-		if(expr.LNOT()){
-			ast.lexpr = getExprAst(subExpr);
+		if(expr.LNOT()){//(subExpr.length == 1): right now the only UP at expr-level is !
+			ast.expr = getExprAst(subExpr[0]);
 			ast.up = '!';
 		}else{
 			ast.lexpr = getExprAst(subExpr[0]);
@@ -451,6 +461,8 @@ function astStmt(stmt){
 	var whileStmt = stmt.whileStmt();
 	var assignStmt = stmt.assignStmt();
 	var functionCall = stmt.functionCall();
+	var forStmt = stmt.forStmt();
+
 	if(stmtBlock){
 		return astStmtBlock(stmtBlock);
 	}else
@@ -465,6 +477,9 @@ function astStmt(stmt){
 	}else
 	if(functionCall){
 		return {fcall: getFunctionCallAst(functionCall)};
+	}else
+	if(forStmt){
+		return astForStmt(forStmt);
 	}
 }
 
@@ -507,7 +522,7 @@ function astFuncDef(fdef){
 			ast.vars.push(astVarDef(varDef[i]));
 		}
 	}
-	ast.body = astStmtBlock(fdef.stmtBlock());
+	ast.body = astStmtBlock(fdef);
 	return ast;
 }
 

@@ -92,6 +92,11 @@ VerticalThingsVisitor.prototype.visitRangeType = function(ctx) {
 };
 
 
+// Visit a parse tree produced by VerticalThings#castableType.
+VerticalThingsVisitor.prototype.visitCastableType = function(ctx) {
+};
+
+
 // Visit a parse tree produced by VerticalThings#primitiveType.
 VerticalThingsVisitor.prototype.visitPrimitiveType = function(ctx) {
 };
@@ -189,6 +194,11 @@ VerticalThingsVisitor.prototype.visitActualParams = function(ctx) {
 
 // Visit a parse tree produced by VerticalThings#arrayExpr.
 VerticalThingsVisitor.prototype.visitArrayExpr = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#castExpr.
+VerticalThingsVisitor.prototype.visitCastExpr = function(ctx) {
 };
 
 

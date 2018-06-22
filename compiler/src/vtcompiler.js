@@ -21,6 +21,10 @@ parseErrorListener.reportAmbiguity = function(offendingToken, line, column, msg,
 	//errors++;
 }
 
+parseErrorListener.reportContextSensitivity = function(offendingToken, line, column, msg, err){
+	//console.log(line, column);
+}
+
 function parse(srcpath, input) {
 	console.log("Parsing " + srcpath);
     var chars = new antlr4.InputStream(input);
