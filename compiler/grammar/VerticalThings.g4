@@ -56,7 +56,7 @@ intVal: Identifier|IntegerConstant;
 numVal: Identifier|numConstant;
 
 rangeType
-    : LS numVal (COMMA|DPERIOD) numVal RS
+    : LS numVal (COMMA|COLON) numVal RS
     ;
 
 castableType

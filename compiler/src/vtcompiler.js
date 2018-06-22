@@ -42,24 +42,30 @@ function parse(srcpath, input) {
     return tree;
 }
 
+function loadPipelineBlock(block, basepath){
+	for(var i=0;i<block.length;i++){
+		var entry = block[i];
+		if(entry.qname){
+			var name = entry.qname[0];
+			if(!ast.modules[name]) {
+				var filepath = basepath + "/" + name + ".vtl";
+				var src = fs.readFileSync(filepath, 'utf8');
+				var tree = parse(filepath, src);
+				ast.modules[name] = astBuilder.buildAst(tree);
+			}
+		}else{
+			loadPipelineBlock(entry, basepath);//this is a nested block
+		}
+	}
+}
+
 function loadPipeline(ast, basepath) {
 	var pipeline = ast.pipeline;
 	if(!pipeline) {
 		console.log("Pipeline definition not found.");
 		process.exit(1);
 	}
-
-	for(var i=0;i<pipeline.block.length;i++){
-		var entry = pipeline.block[i];
-		var name = entry.qname[0];
-		if(!ast.modules[name]) {
-			var filepath = basepath + "/" + name + ".vtl";
-			var src = fs.readFileSync(filepath, 'utf8');
-			var tree = parse(filepath, src);
-			ast.modules[name] = astBuilder.buildAst(tree);
-		}
-	}
-
+	loadPipelineBlock(ast.pipeline.block, basepath);
 }
 
 if(process.argv.length <= 2) {

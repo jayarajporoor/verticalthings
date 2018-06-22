@@ -149,7 +149,7 @@ function getFunctionCallAst(fcall){
 function astArrayExpr(expr){
 	var ast = {
 		id: getId(expr),
-		dim: getDimensionSpec(dimensionSpec)
+		dim: getDimensionSpec(expr.dimensionSpec())
 	};
 	return ast;
 }
@@ -298,7 +298,7 @@ function astNumVal(numVal){
 
 function astRangeType(rangeType){
 	var numVal = rangeType.numVal();
-	return {from: astNumVal(numVal[0]), to: astNumVal(numVal[1]), is_inclusive: rangeType.DPERIOD()? true : false};
+	return {from: astNumVal(numVal[0]), to: astNumVal(numVal[1]), is_inclusive: rangeType.COLON()? true : false};
 }
 
 function astPrimitiveType(ptype){
@@ -339,6 +339,7 @@ function astVarType(varType){
 function astArrayLiteral(alit){
     var entries = alit.literal();
     var ast = [];
+
     for(var i=0;i<entries.length;i++){
     	ast.push(astLiteral(entries[i]));
     }
@@ -347,7 +348,7 @@ function astArrayLiteral(alit){
 
 function astLiteral(literal){
 
-    var exprConstant = literal.exprConstant();
+    var exprConstant = literal.exprConstant ? literal.exprConstant() : null;//if astInitValue calls us we won't have exprConstant
     var stringLiteral = literal.StringLiteral();
     var arrayLiteral = literal.arrayLiteral();
 
@@ -355,7 +356,7 @@ function astLiteral(literal){
     if(exprConstant){
     	ast = getExprConstAst(exprConstant);
     }else
-    if(sringLiteral){
+    if(stringLiteral){
     	ast.sconst = getStringLiteral(stringLiteral);
     }else
     if(arrayLiteral){

@@ -12,11 +12,12 @@ init(int maxLabelIndexIP)
 	maxLabelIndex = maxLabelIndexIP;
 	front = -1;
 	back = -1;
-	for(int i =0; i< maxLabelIndex; i++)
+	for i in [0:maxLabelIndex]{
 		resultScores[i] = 0;
+	}
 }
 
-active flow vote(result: int) {
+default flow vote(int result) {
 	out = queue.push(result);
 	updateVote(result , out);
 
@@ -24,18 +25,19 @@ active flow vote(result: int) {
 }
 
 
-updateVote(in: int, out: int)
+updateVote(int inval, int outval)
 {
-	resultScores[in] = resultScores[in] + 1;
-	if(out!=0){
-		resultScores[out] = resultScores[out] - 1;	
+	resultScores[inval] = resultScores[inval] + 1;
+	if(outval!=0){
+		resultScores[outval] = resultScores[outval] - 1;	
 	}
 }
 
-computeResult() : int
+int computeResult()
 {
 	int maxCount = -1, maxIndex = 1;
-	for(int i=0; i<maxLabelIndex; i ++)
+
+	for i in [0:maxLabelIndex]
 	{
 		if(resultScores[i]>maxCount)
 		{

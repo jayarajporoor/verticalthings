@@ -2,9 +2,6 @@ module ble_send;
 
 use arduino;
 
-// Instantiate the extra Serial classes
-Uart Serial2(&sercom3, PIN_SERIAL2_RX, PIN_SERIAL2_TX, PAD_SERIAL2_RX, PAD_SERIAL2_TX);
-
 init() {
 	// Assign pins 0 & 1 SERCOM functionality
 	pinPeripheral(0, PIO_SERCOM);
@@ -13,7 +10,7 @@ init() {
   	Serial2.begin(9600) ;
   	//For HC-05 use 38000 baud.
  	
- 	panic("BLE set up failed") if bleSetup();
+ //	panic("BLE set up failed") if bleSetup();
 }
 
 default flow send(int result){
