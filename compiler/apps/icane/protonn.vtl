@@ -1,0 +1,51 @@
+module protonn;
+
+const float ldProjectionMatrix[M][N] ={{...},{}};
+prototypeMatrix: const float[. , .] ={{...}, {}};
+prototypeLabelMatrix: const float[. , .] ={{...}, {}};
+
+
+
+float gaussian(float x[n], float y[n], float gamma = 1.0){
+	sumSq =  reduce(map(x - y, _ ** 2), sum);
+	sumSq = -1*gamma*gamma*sumSq;
+	sumSq = exp(sumSq);
+	return sumSq;
+}
+
+float rho(labelScores : float[n]){
+	return reduce(labelScores, maxIndex); 
+}
+
+default flow predict(float x[N]){
+
+	float x_cap[N];
+	float y_cap[N];
+	float scores[N];
+
+	y_cap = 0;
+ 
+ 	x_cap = ldProjectionMatrix * x; //denseLDProjection(x, x_cap);
+ 
+	for i in 0..M { 
+		weight = gaussian(x_cap, prototypeMatrix[i]);
+		y_cap = y_cap + prototypeLabelMatrix[i] * weight;
+	}
+
+    scores = y_cap * 100000;
+
+	next(scores, rho(y_cap));
+}
+
+/*
+Smaller, more readable code.
+Type checking/type inference on vector/matrix dimensions.
+Standardized optimized implementations for platforms - programmer burden is lifted.
+layout optimizations for matrices, e.g. compile-time transposing.
+Simplifies running time/power analysis.
+Tradeoff between readability, modularity AND optimization. We eliminate this. 
+e.g., given lib functions matrix_mul, matrix_add:  matrix_mul(A, B, C); matrix_add(C, D) is modular and clear
+but not optimal - can be collapsed into a single loop. D = A * B + C; - will be transformed into an optimal loop.
+
+*/
+

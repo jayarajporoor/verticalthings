@@ -1,0 +1,49 @@
+module majority_vote;
+
+init(int maxLabelIndexIP)
+{
+	initStatus = 0;
+	if(maxLabelIndex > MAX_LABEL_INDEX)
+	{
+		initStatus = -1;
+		
+	}
+
+	maxLabelIndex = maxLabelIndexIP;
+	front = -1;
+	back = -1;
+	for(int i =0; i< maxLabelIndex; i++)
+		resultScores[i] = 0;
+}
+
+active flow vote(result: int) {
+	out = queue.push(result);
+	updateVote(result , out);
+
+	next(computeResult());
+}
+
+
+updateVote(in: int, out: int)
+{
+	resultScores[in] = resultScores[in] + 1;
+	if(out!=0){
+		resultScores[out] = resultScores[out] - 1;	
+	}
+}
+
+computeResult() : int
+{
+	int maxCount = -1, maxIndex = 1;
+	for(int i=0; i<maxLabelIndex; i ++)
+	{
+		if(resultScores[i]>maxCount)
+		{
+			maxCount = resultScores[i];
+			maxIndex = i;
+
+		}
+	}
+	return maxIndex;
+
+}

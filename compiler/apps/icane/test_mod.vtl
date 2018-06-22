@@ -1,0 +1,46 @@
+module mpu_acq;
+
+use arduino;
+
+const int N = 64;
+
+MPU6050 mpu1;
+int fifoBuffer[N];
+//0..N fifoPacketSize;
+
+void init(const boolean i2c_arduino) {
+	if(i2c_arduino) {
+	   Wire.begin();
+	   Wire.setClock(400000);
+	}else{
+	   FastWire::setup(400, true);
+	}
+
+	mpu1.init();
+
+	mpu1.dmpInitialize(); //assert == 0, panic != 0
+
+	mpu1.setDMPEnabled(true);
+
+	fifoPacketSize = mpu1.dmpGetFIFOPacketSize();//type error
+}
+
+default flow acq() {
+	mpuIntStatus = mpu1.getIntStatus();
+
+	if ((mpuIntStatus & 0x10) || fifoCount == 1024){
+		debug_print(millis());
+		debug_print(": FIFO Overflow!");
+		mpu1.resetFIFO();
+		samplesAfterReset = 0;
+		numNewReadings = 0;
+	} else if ((mpuIntStatus & 0x02)){
+		while(fifoCount < fifoPacketSize) {
+			 fifoCount = mpu1.getFIFOCount(); 
+		}
+		if(fifoCount >= fifoPacketSize) {
+			mpu1.getFIFOBytes(fifoBuffer, fifoPacketSize); //1ms
+			next(mpu1, fifoBuffer);
+		}
+	}
+}

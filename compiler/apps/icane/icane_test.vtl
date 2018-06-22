@@ -1,0 +1,22 @@
+module icane_test;
+
+pipeline icane_test {
+	generate_randomized,
+	normalize_mpu_ag,
+	if_gt_any(5, 5, 5, 5, 5, 5),	
+	tlc_featurizer,
+	int2float,
+	protonn,	
+	thresholding,
+	majority_vote(10),
+	if_changed,
+	{
+		replace_use(arduino, arduino_test),
+	    rate_limit(2000),	
+	    toggle_led.on,
+		ble_send @timeout ms,
+		on_panic(retry, 3, restart, 1),		
+		toggle_led.off,
+	},
+	on_panic(reboot)
+};
