@@ -15,8 +15,7 @@ function getCConst(node) {
 }
 
 function getBConst(node) {
-	var v = node.TRUE().getText();
-	return (v === 'true');
+	return (node.TRUE ? true : false);
 }
 
 function getNumConstAst(node){
@@ -463,6 +462,14 @@ function astIfStmt(stmt){
     return ast;
 }
 
+function astReturnStmt(stmt){
+	//returnStmt: RETURN expr;
+	return {
+		kind: 'return',
+		expr: getExprAst(stmt.expr())
+	};
+}
+
 function astStmt(stmt){
 	//stmtBlock | ifStmt | forStmt | whileStmt | assignStmt SEMI | functionCall SEMI
 	var stmtBlock = stmt.stmtBlock();
@@ -471,7 +478,11 @@ function astStmt(stmt){
 	var assignStmt = stmt.assignStmt();
 	var functionCall = stmt.functionCall();
 	var forStmt = stmt.forStmt();
+	var retStmt = stmt.returnStmt();
 
+	if(retStmt){
+		return astReturnStmt(retStmt);
+	}else
 	if(stmtBlock){
 		return astStmtBlock(stmtBlock);
 	}else

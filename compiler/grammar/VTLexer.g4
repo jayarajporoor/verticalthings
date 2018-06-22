@@ -81,11 +81,11 @@ EQ: '==';
 NEQ: '!=';
 ASSIGN: '=';
 
-PLUSASSIGN: "+=";
-MINUSASSIGN: "-=";
-MULASSIGN: "*=";
-INC: "++";
-DEC: "--";
+PLUSASSIGN: '+=';
+MINUSASSIGN: '-=';
+MULASSIGN: '*=';
+INC: '++';
+DEC: '--';
 
 LAND: '&&';
 LOR: '||';
@@ -101,6 +101,8 @@ BXOR: '^';
 INT: 'int';
 FLOAT: 'float';
 BOOLEAN: 'boolean';
+
+RETURN: 'return';
 
 Identifier
     :   IdentifierNondigit

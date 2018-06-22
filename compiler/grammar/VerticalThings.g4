@@ -112,8 +112,10 @@ assignStmt
     : qualIdentifier dimensionSpec? ASSIGN expr
     ;
 
+returnStmt: RETURN expr;
+
 stmt 
-    :   stmtBlock | ifStmt | forStmt | whileStmt | assignStmt SEMI | functionCall SEMI
+    :   stmtBlock | ifStmt | forStmt | whileStmt | assignStmt SEMI | functionCall SEMI | returnStmt SEMI
     ;    
     
 funcDef
