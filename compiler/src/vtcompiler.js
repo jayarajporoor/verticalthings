@@ -5,6 +5,7 @@ var antlr4 = require('antlr4/index');
 var VTLexer = require(__dirname + '/../grammar/out/parser/VTLexer');
 var VTParser = require(__dirname + '/../grammar/out/parser/VerticalThings');
 var astBuilder = require("./astbuilder.js");
+var SymbolTable = require("./symtbl.js");
 
 var parseErrorListener = {};
 var errors=0;
@@ -42,30 +43,31 @@ function parse(srcpath, input) {
     return tree;
 }
 
-function loadPipelineBlock(block, basepath){
+function loadPipelineBlock(block, basepath, symtbl){
 	for(var i=0;i<block.length;i++){
 		var entry = block[i];
 		if(entry.qname){
 			var name = entry.qname[0];
-			if(!ast.modules[name]) {
+			if(!ast.modules[name]) {				
 				var filepath = basepath + "/" + name + ".vtl";
 				var src = fs.readFileSync(filepath, 'utf8');
 				var tree = parse(filepath, src);
-				ast.modules[name] = astBuilder.buildAst(tree);
+				var scopetbl = symtbl.createScope(name);
+				ast.modules[name] = astBuilder.buildAst(tree, scopetbl);
 			}
 		}else{
-			loadPipelineBlock(entry, basepath);//this is a nested block
+			loadPipelineBlock(entry, basepath, symtbl);//this is a nested block
 		}
 	}
 }
 
-function loadPipeline(ast, basepath) {
+function loadPipeline(ast, basepath, symtbl) {
 	var pipeline = ast.pipeline;
 	if(!pipeline) {
 		console.log("Pipeline definition not found.");
 		process.exit(1);
 	}
-	loadPipelineBlock(ast.pipeline.block, basepath);
+	loadPipelineBlock(ast.pipeline.block, basepath, symtbl);
 }
 
 if(process.argv.length <= 2) {
@@ -76,24 +78,37 @@ if(process.argv.length <= 2) {
 var srcpath = process.argv[2];
 
 var printAst = false;
+var printSymtbl = false;
+var printColor = false;
 
 for(var i=3;i<process.argv.length;i++){
 	switch(process.argv[i]){
 		case "-ast" :
 			printAst = true;
 		break;
+		case "-symtbl":
+			printSymtbl = true;
+		break;
+		case "-color":
+			printColor = true;
+		break;
 	}
 }
 
 var input = fs.readFileSync(srcpath, 'utf8');
 var tree = parse(srcpath, input);
-var ast = astBuilder.buildAst(tree);
+var symtbl = new SymbolTable();
+var ast = astBuilder.buildAst(tree, symtbl);
 
 ast.modules = {};
 
-loadPipeline(ast, path.dirname(srcpath));
+loadPipeline(ast, path.dirname(srcpath), symtbl);
 
 if(printAst){
-	console.log(JSON.stringify(ast, null, 4));
+	console.log(util.inspect(ast, false, 500, printColor));
 }	
+
+if(printSymtbl){
+	console.log(util.inspect(symtbl, false, 500, printColor));
+}
 

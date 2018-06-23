@@ -1,3 +1,20 @@
+var SymbolTable = require("./symtbl.js");
+
+var ctx = {};
+
+function enterScope(scopename){
+	ctx.symtblPrev = ctx.symtbl;
+	ctx.symtbl = ctx.symtblPrev.createScope(scopename);
+}
+
+function exitScope(){
+	ctx.symtbl = ctx.symtblPrev;
+}
+
+function addSymbol(name, info){
+	ctx.symtbl.addSymbol(name, info);
+}
+
 function getId(node) {
 	return node.Identifier().getText();
 }
@@ -19,7 +36,7 @@ function getBConst(node) {
 }
 
 function getNumConstAst(node){
-	var ast = {};
+	var ast = {src: src_info(node)};
 	var iconst = node.IntegerConstant();
 	var fconst = node.FloatingConstant();
 	if(iconst)
@@ -36,16 +53,18 @@ function getExprConstAst(node) {
 	var num = node.numConstant();
 	var char = node.CharacterConstant();
 	var bconst = node.booleanLiteral();
+	var ast ={};
 	if(num){
-		return getNumConstAst(num);
+		ast = getNumConstAst(num);
 	}else
 	if(char){
-		return {cconst: getCharConst(char)};
+		ast = {cconst: getCharConst(char)};
 	}else
 	if(bconst){
-		return {bconst: getBConst(bconst)};
+		ast = {bconst: getBConst(bconst)};
 	}
-	return {};
+	ast.src = src_info(node);
+	return ast;
 }
 
 function getIdList(node) {
@@ -62,7 +81,7 @@ function astIntVal(val){
 	//Identifier|IntegerConstant;
 	var identifier = val.Identifier();
 	var iconst = val.IntegerConstant();
-	var ast = {};
+	var ast = {src: src_info(val)};
 	if(identifier){
 		ast.id = getId(val);
 	}else{
@@ -73,7 +92,7 @@ function astIntVal(val){
 
 function getDimExpr(dexpr){
 	//dimExpr : intVal op=(PLUS|MUL) intVal;
-	var ast = {};
+	var ast = {src: src_info(dexpr)};
 	ast.op = dexpr.op.text;
 	var intVal = dexpr.intVal();
 	ast.vals = [astIntVal(intVal[0]), astIntVal(intVal[1])];
@@ -143,25 +162,26 @@ function getFunctionCallAst(fcall){
 	}else{
 		ast.params = [];
 	}
-	return {fcall: ast};
+	return {fcall: ast, src: src_info(fcall)};
 }
 
 function astArrayExpr(expr){
 	var ast = {
 		id: getId(expr),
-		dim: getDimensionSpec(expr.dimensionSpec())
+		dim: getDimensionSpec(expr.dimensionSpec()),
+		src: src_info(expr)
 	};
 	return ast;
 }
 
 function getCastExprAst(expr){
 	//castExpr : castableType LP basicExpr RP;
-	return {op: 'cast', type: astPrimitiveType(expr.castableType()), expr: getBasicExprAst(expr.basicExpr())};
+	return {op: 'cast', type: astPrimitiveType(expr.castableType()), expr: getBasicExprAst(expr.basicExpr()), src: src_info(expr)};
 }
 
 
 function getBasicExprAst(expr){
-    var ast = {};
+    var ast = {src: src_info(expr)};
 	var qualIdentifier = expr.qualIdentifier();
 	var arrayExpr = expr.arrayExpr();
 	var functionCall = expr.functionCall();
@@ -213,14 +233,15 @@ function getRelExprAst(expr){
 		return {
 			op : expr.op.text,
 			lexpr: getBasicExprAst(basicExpr[0]),
-			rexpr: getBasicExprAst(basicExpr[1])
+			rexpr: getBasicExprAst(basicExpr[1]),
+			src: src_info(expr)
 		};
 	}
 }
 
 
 function getExprAst(expr){
-	var ast = {};
+	var ast = {src: src_info(expr)};
 	var basicExpr = expr.basicExpr();
 	var relExpr = expr.relExpr();
 	var subExpr = expr.expr();
@@ -266,9 +287,12 @@ function astPipelineBlock(pipelineBlock, ast){
 			astPipelineBlock(entryBlock, newBlock);
 		}
 	}
+
+	ast.src = src_info(pipelineBlock);
 }
 
 function astPipeline(pipelineDef, ast){
+	ast.src = src_info(pipelineDef);
 	ast.name = getId(pipelineDef);
 	ast.block = [];
 	astPipelineBlock(pipelineDef.pipelineBlock(), ast.block);
@@ -285,24 +309,25 @@ function astUseSpec(useSpec){
 function astNumVal(numVal){
 	var identifier = numVal.Identifier();
 	var numConstant = numVal.numConstant();
+	var ast ={};
 	if(identifier){
-		return {id: getId(numVal)};
+		ast = {id: getId(numVal)};
 	}else
 	if(numConstant){
-		return getNumConstAst(numConstant);
-	}else
-	{
-		return {};
+		ast = getNumConstAst(numConstant);
 	}
+	ast.src = src_info(numVal);
+	return ast;
 }
 
 function astRangeType(rangeType){
 	var numVal = rangeType.numVal();
-	return {from: astNumVal(numVal[0]), to: astNumVal(numVal[1]), is_inclusive: rangeType.COLON()? true : false};
+	return {from: astNumVal(numVal[0]), to: astNumVal(numVal[1]), is_inclusive: rangeType.COLON()? true : false, src: src_info(rangeType)};
 }
 
 function astPrimitiveType(ptype){
-	return {primitive: ptype.INT() ? 'int' : (ptype.FLOAT() ? 'float' : (ptype.BOOLEAN() ? 'boolean' : 'void'))};
+	return {primitive: ptype.INT() ? 'int' : (ptype.FLOAT() ? 'float' : (ptype.BOOLEAN() ? 'boolean' : 'void')), 
+          src: src_info(ptype)};
 }
 
 function astVarType(varType){
@@ -331,6 +356,8 @@ function astVarType(varType){
 	if(dimensionSpec){
 		ast.dim = getDimensionSpec(dimensionSpec);
 	}
+
+	ast.src = src_info(varType);
 
 	return ast;
 }
@@ -363,6 +390,8 @@ function astLiteral(literal){
     	ast.aconst  = astArrayLiteral(arrayLiteral);
     }
 
+    ast.src = src_info(literal);
+
     return ast;
 }
 
@@ -386,7 +415,8 @@ function astVarDef(def){
   var ast = {
   	type : astVarType(varType),
   	is_const: def.CONST() ? true : false,
-  	ids : []
+  	ids : [],
+	src: src_info(def)  	
   };
 
   for(var i=0;i<varId.length;i++){
@@ -395,6 +425,7 @@ function astVarDef(def){
 	  if(initValue){
 	  	astId.init = astInitValue(initValue);
 	  }
+	  addSymbol(astId.id, {type: ast.type, is_const: ast.is_const, src: ast.src} );
 	  ast.ids.push(astId);
   }
   return ast;
@@ -405,7 +436,8 @@ function astFormalParam(param){
 	return {
 		is_const: param.CONST() ? true : false,
 		type: astVarType(param.varType()),
-		id: getId(param)
+		id: getId(param),
+		src: src_info(param)		
 	};
 }
 
@@ -414,7 +446,8 @@ function astAssignStmt(stmt){
 	var ast = {
 		kind: 'assign',
 		qid : getIdList(stmt.qualIdentifier()),
-		expr: getExprAst(stmt.expr())
+		expr: getExprAst(stmt.expr()),
+		src: src_info(stmt)		
 	};
 	var dimSpec = stmt.dimensionSpec();
 	if(dimSpec){
@@ -429,7 +462,8 @@ function astForStmt(stmt){
     	kind: 'for',
     	ids: getIdList(stmt.identifierList()),
     	range: astRangeType(stmt.rangeType()),
-    	body: astStmtBlock(stmt.stmtBlock())
+    	body: astStmtBlock(stmt.stmtBlock()),
+		src: src_info(stmt)    	
     };
     return ast;
 }
@@ -439,7 +473,8 @@ function astWhileStmt(stmt){
 	var ast = {
 		kind: 'while',
 		expr: getExprAst(stmt.expr()),
-		body: astStmtBlock(stmt.stmtBlock())
+		body: astStmtBlock(stmt.stmtBlock()),
+		src: src_info(stmt)		
 	};
 	return ast;
 }
@@ -449,7 +484,8 @@ function astIfStmt(stmt){
     var ast = {
     	kind: 'if',
     	expr: getExprAst(stmt.expr()),
-    	if_body: astStmtBlock(stmt.stmtBlock())
+    	if_body: astStmtBlock(stmt.stmtBlock()),
+		src: src_info(stmt)    	
     };
     var elseStmt = stmt.elseStmt();
     if(elseStmt){
@@ -467,7 +503,8 @@ function astReturnStmt(stmt){
 	//returnStmt: RETURN expr;
 	return {
 		kind: 'return',
-		expr: getExprAst(stmt.expr())
+		expr: getExprAst(stmt.expr()),
+		src: src_info(stmt)
 	};
 }
 
@@ -510,14 +547,15 @@ function astStmtBlock(block){
 	for(var i=0;i<blockStmts.length;i++){
 		stmts.push(astStmt(blockStmts[i]));
 	}
-	return {stmts: stmts, kind: 'block'};
+	return {stmts: stmts, kind: 'block', src: src_info(block)};
 }
 
 function astFuncDef(fdef){
 	var ast = {};
-//(returnType | flowType)? Identifier LP paramList? RP         stmtBlock
+	ast.src = src_info(fdef);	
 	var varType = fdef.varType();
 	var flowType = fdef.flowType();
+
 	if(varType){
 		ast.type = astVarType(varType);
 	}
@@ -530,6 +568,11 @@ function astFuncDef(fdef){
 	}
 	ast.id = getId(fdef);
 	ast.params = [];
+
+	addSymbol(ast.id, {type:{ftype: ast.type, ptypes: ast.params}, src:  ast.src})
+
+	enterScope(ast.id);
+
 	var fparams = fdef.formalParams();
 	if(fparams){
 		fparams = fparams.formalParam();
@@ -545,11 +588,31 @@ function astFuncDef(fdef){
 		}
 	}
 	ast.body = astStmtBlock(fdef);
+
+	exitScope(ast.id);
+
 	return ast;
+}
+
+function get_token_info(tok){
+	return {
+		line: tok.line, 
+		col: tok.column
+	};
+}
+
+function src_info(node){
+	var src =
+	{
+		start: get_token_info(node.start),
+		end: get_token_info(node.stop)
+	};
+	return src;
 }
 
 function astModule(moduleDef, ast) {
 	ast.name = getId(moduleDef);
+	ast.src = src_info(moduleDef);
 	var useSpec = moduleDef.useSpec();
 	if(useSpec){
 		ast.uses = astUseSpec(useSpec);
@@ -578,11 +641,13 @@ function astModule(moduleDef, ast) {
 	return ast;
 }
 
-function buildAst(tree) {
+function buildAst(tree, symtbl) {
+	ctx.symtbl = symtbl;
 	var ast ={};
 	astModule(tree, ast);
 	return ast;
 }
+
 
 exports.buildAst = buildAst;
 
