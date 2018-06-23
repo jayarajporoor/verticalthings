@@ -1,0 +1,52 @@
+[
+    {
+      "label":"mpu_acq",
+      "acquires" : ["r1","r2","r3","r4"],
+      "duration" : "1000",
+      "power":[{
+                "resource":"r1",
+                "execpower":"110mah",
+                "exitpower":"50mah"
+              },
+              {
+                "resource":"r2",
+                "execpower":"40mah",
+                "exitpower":"10mah"
+              },
+              {
+                "resource":"r3",
+                "execpower":"10mah",
+                "exitpower":"5mah"
+              },
+              {
+                "resource":"r4",
+                "execpower":"70mah",
+                "exitpower":"40mah"
+              }
+              ]
+
+    },
+    {
+      "label":"normalize_mpu_ag",
+      "acquires":["r1","r2","r3"],
+      "duration": "2000",
+      "power":[{
+                "resource":"r1",
+                "execpower":"200mah",
+                "exitpower":"100mah"
+
+              },
+              {
+                "resource":"r2",
+                "execpower":"80mah",
+                "exitpower":"30mah"
+
+              },
+              {
+                "resource":"r1",
+                "execpower":"110mah",
+                "exitpower":"20mah"
+              }
+              ]
+    }
+  ]

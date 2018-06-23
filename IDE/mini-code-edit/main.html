@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+<title>Verteditior</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="zepto.min.js"></script>
+<script src="editor.js"></script>
+
+<script src="cm/lib/codemirror.js"></script>
+<script src="cm/mode/css/css.js"></script>
+<script src="cm/mode/vertical/vertical.js"></script>
+<script src="Sortable.min.js"></script>
+
+
+<!-- for search -->
+<script src="cm/lib/util/search.js"></script>
+<script src="cm/lib/util/searchcursor.js"></script>
+<script src="cm/lib/util/dialog.js"></script>
+<link src="cm/lib/util/dialog.css">
+
+<!-- for matchHighlighter -->
+<script src="cm/lib/util/match-highlighter.js"></script>
+<link rel="stylesheet" href="cm/doc/docs.css">
+<style type="text/css">
+	.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}
+	span.CodeMirror-matchhighlight { background-color: rgba(0, 255, 0, 0.3) }
+	.CodeMirror-focused span.CodeMirror-matchhighlight { background-color: rgba(0, 255, 0, 0.3) !important }
+</style>
+<!-- angular ,angular-ui-bootstrap
+<script src="node_modules/angular/angular.min.js"></script>
+<script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+<script src="Sortable.min.js"></script>
+
+-->
+<script src="node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="node_modules/jquery/dist/jquery.slim.min.js"></script>
+<script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+<link rel="stylesheet" href="node_modules/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+<!--for using bootstrap
+
+
+-->
+
+
+<!-- For autocomplete -->
+<script src="cm/lib/util/simple-hint.js"></script>
+<script src="cm/lib/util/javascript-hint.js"></script>
+<link rel="stylesheet" href="cm/lib/util/simple-hint.css">
+
+<!-- For indentation and brackets -->
+<script src="cm/lib/util/bracketcomplete.js"></script>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="cm/lib/codemirror.css">
+<link rel="stylesheet" href="cm/theme/lesser-dark.css">
+</head>
+<body>
+<!--
+<button id="new" class="btn btn-primary btn-md"> <img src="img/16x16/file_add.png"/>New  </button>
+<button id="open" class="btn btn-primary btn-md"><img src="img/16x16/file.png"/>    Open </button>
+<button id="save" class="btn btn-primary btn-md"><img src="img/16x16/diskette.png"/>Save </button>
+<button id="compile" class="btn btn-primary btn-md">Compile</button>
+<button id="btn-add-tab" type="button" class="btn btn-primary pull-right">Add Tab</button>
+-->
+<div id="c" class="container-fluid" >
+		<div class="row">
+		<div class="col-md-12">
+				<!-- Nav tabs -->
+				<ul id="tab-list" class="nav nav-tabs" role="tablist">
+						<li class="active">
+							<a href="#1" class="tab" data-toggle="tab">
+								<label></label>
+								<button class="close" type="button" title="Remove this page">×</button>
+							</a>
+						</li>
+
+				</ul>
+
+				<!-- Tab panes -->
+				<div id="tab-content" class="tab-content">
+						<div class="tab-pane editor fade in active show" id="1"></div>
+				</div>
+		</div>
+</div>
+</div>
+<div class="info" id ="info">
+  <label>Filename:</label><span id="title"></span>
+  <label>Mode: </label><span id="mode"></span>
+</div>
+<input style="display:none;" id="openFile" type="file" />
+<input style="display:none;" id="saveFile" type="file" nwsaveas />
+
+</body>
+
+
+<script type="text/javascript">
+$(document).ready(function () {
+		$('.nav-tabs').on('click', 'li', function() {
+		    $('.nav-tabs li.active').removeClass('active');
+		    $(this).addClass('active');
+		});
+		$('#tab-list').on('click','.close',function(){
+				var tabID = $(this).parents('a').attr('href');
+				$(this).parents('li').remove();
+        console.log(tabID);
+				$(tabID).remove();
+
+				//display first tab
+			  var tabFirst = $('#tab-list a:first');
+				tabFirst.tab('show');
+		});
+    $('#tab-list').on('click','.tab',function(){
+        resize();
+        console.log("hi");
+				var tabID = $(this).attr('href');
+				//$(this).parents('li').addClass('active');
+				tabID = tabID.split("#");
+				console.log(tabID[1]["fileName"]);
+        var name=tabTextarea[tabID[1]]["fileName"];
+        $(this).html(name+'<button class="close" type="button" title="Remove this page">×</button>');
+				document.getElementById("title").innerHTML = name;
+
+
+				$('#tab-list').removeClass("active");
+				$(this).parents('li').tab('show');
+
+		});
+
+
+var list = document.getElementById("tab-list");
+new Sortable(list);
+
+});
+</script>
+
+</html>
