@@ -16,8 +16,8 @@ class SymbolTable{
   			return info;
   		}
   		scope = scope.parent;
-  	}
-  	while(scope.parent !== scope);
+  	}while(scope.parent !== scope);
+  	
   	return null;
   }
 
