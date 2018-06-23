@@ -6,7 +6,21 @@ class SymbolTable{
   	this.scopes = {};
   	this.current_scope = this;
   }
-  // Method
+  
+
+  lookup(name){
+  	var scope = this.current_scope;
+  	do{
+  		var info = scope.symbols[name];
+  		if(info){
+  			return info;
+  		}
+  		scope = scope.parent;
+  	}
+  	while(scope.parent !== scope);
+  	return null;
+  }
+
   addSymbol(name, syminfo) {
   	var sym = {name: name, info: syminfo};
   	this.current_scope.symbols[name] = sym;
