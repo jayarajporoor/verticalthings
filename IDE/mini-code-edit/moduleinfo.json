@@ -1,0 +1,15 @@
+
+  [
+    {
+      "name":"mpu_acq",
+      "timeAnalysis" : "10 micro seconds",
+      "powerAnalysis" : "10mah",
+      "text" :"The scrollbars are always visible, even though the text does not overflow. I want to make the scrollbars only be visible when necessary - that is, only visible when there is enough text in the box that they are needed. Like a textarea does. How do I do this? Or is my only option to style a textarea so it looks like a div?"
+    },
+    {
+      "name": "normalize_mpu_ag",
+      "timeAnalysis" : "15 micro seconds",
+      "powerAnalysis" : "20 mah",
+      "text":" NULL"
+    }
+  ]
