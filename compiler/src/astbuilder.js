@@ -2,15 +2,6 @@ var SymbolTable = require("./symtbl.js");
 
 var ctx = {};
 
-function enterScope(scopename){
-	ctx.symtblPrev = ctx.symtbl;
-	ctx.symtbl = ctx.symtblPrev.createScope(scopename);
-}
-
-function exitScope(){
-	ctx.symtbl = ctx.symtblPrev;
-}
-
 function addSymbol(name, info){
 	ctx.symtbl.addSymbol(name, info);
 }
@@ -571,7 +562,7 @@ function astFuncDef(fdef){
 
 	addSymbol(ast.id, {type:{ftype: ast.type, ptypes: ast.params}, src:  ast.src})
 
-	enterScope(ast.id);
+	ctx.symtbl.createNestedScope(ast.id);
 
 	var fparams = fdef.formalParams();
 	if(fparams){
@@ -589,7 +580,7 @@ function astFuncDef(fdef){
 	}
 	ast.body = astStmtBlock(fdef);
 
-	exitScope(ast.id);
+	ctx.symtbl.exitNestedScope();
 
 	return ast;
 }

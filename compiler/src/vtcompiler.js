@@ -52,8 +52,9 @@ function loadPipelineBlock(block, basepath, symtbl){
 				var filepath = basepath + "/" + name + ".vtl";
 				var src = fs.readFileSync(filepath, 'utf8');
 				var tree = parse(filepath, src);
-				var scopetbl = symtbl.createScope(name);
-				ast.modules[name] = astBuilder.buildAst(tree, scopetbl);
+				symtbl.createNestedScope(name);
+				ast.modules[name] = astBuilder.buildAst(tree, symtbl);
+				symtbl.exitNestedScope();
 			}
 		}else{
 			loadPipelineBlock(entry, basepath, symtbl);//this is a nested block
@@ -97,7 +98,7 @@ for(var i=3;i<process.argv.length;i++){
 
 var input = fs.readFileSync(srcpath, 'utf8');
 var tree = parse(srcpath, input);
-var symtbl = new SymbolTable();
+var symtbl = new SymbolTable(null, "<root>");
 var ast = astBuilder.buildAst(tree, symtbl);
 
 ast.modules = {};
