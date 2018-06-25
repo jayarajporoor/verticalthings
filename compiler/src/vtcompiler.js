@@ -112,7 +112,7 @@ for(var i=3;i<process.argv.length;i++){
 
 var input = fs.readFileSync(srcpath, 'utf8');
 var tree = parse(srcpath, input);
-var symtbl = new SymbolTable(null, "<root>");
+var symtbl = new SymbolTable("<root>");
 var ast = astBuilder.buildAst(tree, symtbl);
 
 ast.modules = {};

@@ -1,5 +1,7 @@
 'use strict';
 
+var AliasTable = require("./aliastbl.js");
+
 function array_push(target, obj){
 	for(var i=0;i<obj.length;i++){
 		target.push(obj[i]);
@@ -15,29 +17,73 @@ class DUSeq{
   	this.seq = [];
   }
 
-  vardef(var, syms){
-  	if(!var.type.dim){//if not array type, ignore.
+  vardef(vr, init_syms, noinit_syms){
+  	if(!vr.type.dim){//if not array type, ignore.
   		return;
   	}
-  	for(var i=0;i<var.ids;i++){
-  		var sym = this.symtbl.lookup(var.ids[i]);
+  	for(var i=0;i<vr.defs;i++){
+  		var sym = this.symtbl.lookup(vr.defs[i].id);
   		if(sym){
-  			syms.push(sym);
+  			if(sym.has_init)
+  				init_syms.push(sym);
+  			else
+  				noinit_syms.push(sym);
   		}
   	}
   }
 
   vardefs(vardefs, is_mod){  	
-  	var syms = [];
+  	var init_syms = []. noinit_syms=[];
   	for(var i=0;i < vardefs.length;i++){
-  		vardef(vardefs[i], syms);
+  		vardef(vardefs[i], init_syms, noinit_syms);
   	}
-  	var entry = is_mod ? {def: syms, kind: 'mem'} : {def: syms, kind: 'init'};
-  	this.seq.push(entry);
+
+  	var entry=null;
+  	if(is_mod){
+  		var syms = init_syms.concat(noinit_syms);
+  		if(syms.length > 0){
+  			entry = {mem: syms};
+  		}
+  	}else{
+  		if(init_syms.length > 0){
+  			entry = {def: syms, kind: 'init'};
+  		}
+  		if(noinit_syms.length > 0){
+  			if(!entry) entry = {};
+  			entry.undef = syms;
+  		}
+  	}
+  	if(entry){
+  		this.seq.push(entry);
+  	}
   }
 
-  expr(ast){
+  expr(ast, syms){
+  	var id = ast.qid ? ast.qid[0] : null;
 
+  	if(id){
+  		var sym = this.symtbl.lookup(id);
+  		if(sym.type.dim){
+  			syms.push(sym);
+  		}
+  	}else{
+  		if(ast.expr){
+  			expr(ast.expr, syms);
+  		}
+  		if(ast.lexpr){
+  			expr(ast.lexpr, syms);
+  		}
+  		if(ast.rexpr){
+  			expr(ast.rexpr, syms);
+  		}
+
+  		if(ast.fcall){
+  			var fname = ast.fcall.qname[0];
+  			this.aliastbl.enterFunctionCall(fname, ast.fcall.params);
+  			//process function call.
+  			this.aliastbl.exitFunctionCall();
+  		}
+  	}
   }
 
   stmt(ast){
@@ -59,7 +105,9 @@ class DUSeq{
 			}			
 		break;
 		case 'assign':
-			aggr_seq  = [{def: ast.id, use: this.expr(ast.expr) }];
+			var syms = [];
+			this.expr(ast.expr, syms);
+			aggr_seq  = [{def: ast.id, use: syms }];
 		break;
 	}
 	return aggr_seq;
@@ -125,6 +173,7 @@ class DUSeq{
   	this.root_ast = ast;
   	symtbl.setRootScope();
   	this.symtbl = symtbl;
+  	this.aliastbl = new AliasTable(symtbl);
   	if(ast.pipeline){
   		this.pipeline_block(ast.pipeline.block);
   	}else{
