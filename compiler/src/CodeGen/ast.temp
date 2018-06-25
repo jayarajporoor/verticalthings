@@ -1,8 +1,28 @@
 {
     "name": "test_pipeline",
+    "src": {
+        "start": {
+            "line": 1,
+            "col": 0
+        },
+        "end": {
+            "line": 6,
+            "col": 1
+        }
+    },
     "uses": [],
     "vars": [],
     "pipeline": {
+        "src": {
+            "start": {
+                "line": 3,
+                "col": 0
+            },
+            "end": {
+                "line": 6,
+                "col": 1
+            }
+        },
         "name": "nandu",
         "block": [
             {
@@ -12,7 +32,17 @@
                 "params": [
                     {
                         "expr": {
-                            "bconst": true
+                            "bconst": true,
+                            "src": {
+                                "start": {
+                                    "line": 4,
+                                    "col": 4
+                                },
+                                "end": {
+                                    "line": 4,
+                                    "col": 4
+                                }
+                            }
                         }
                     }
                 ]
@@ -28,27 +58,77 @@
     "modules": {
         "m1": {
             "name": "m1",
+            "src": {
+                "start": {
+                    "line": 1,
+                    "col": 0
+                },
+                "end": {
+                    "line": 13,
+                    "col": 0
+                }
+            },
             "uses": [],
             "vars": [],
             "fdefs": [
                 {
+                    "src": {
+                        "start": {
+                            "line": 3,
+                            "col": 0
+                        },
+                        "end": {
+                            "line": 7,
+                            "col": 0
+                        }
+                    },
                     "flow": "default",
                     "id": "lol",
                     "params": [],
                     "vars": [
                         {
                             "type": {
-                                "primitive": "int"
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 4,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 4,
+                                        "col": 1
+                                    }
+                                }
                             },
                             "is_const": false,
                             "ids": [
                                 {
                                     "id": "a",
                                     "init": {
+                                        "src": {
+                                            "start": {
+                                                "line": 4,
+                                                "col": 7
+                                            },
+                                            "end": {
+                                                "line": 4,
+                                                "col": 7
+                                            }
+                                        },
                                         "iconst": 0
                                     }
                                 }
-                            ]
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 4,
+                                    "col": 1
+                                },
+                                "end": {
+                                    "line": 4,
+                                    "col": 8
+                                }
+                            }
                         }
                     ],
                     "body": {
@@ -59,6 +139,16 @@
                                     "a"
                                 ],
                                 "expr": {
+                                    "src": {
+                                        "start": {
+                                            "line": 5,
+                                            "col": 3
+                                        },
+                                        "end": {
+                                            "line": 5,
+                                            "col": 5
+                                        }
+                                    },
                                     "op": "+",
                                     "lexpr": {
                                         "qid": [
@@ -66,7 +156,27 @@
                                         ]
                                     },
                                     "rexpr": {
+                                        "src": {
+                                            "start": {
+                                                "line": 5,
+                                                "col": 5
+                                            },
+                                            "end": {
+                                                "line": 5,
+                                                "col": 5
+                                            }
+                                        },
                                         "iconst": 1
+                                    }
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 5,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 5,
+                                        "col": 5
                                     }
                                 }
                             },
@@ -76,32 +186,102 @@
                                         "next"
                                     ],
                                     "params": []
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 6,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 6,
+                                        "col": 6
+                                    }
                                 }
                             }
                         ],
-                        "kind": "block"
+                        "kind": "block",
+                        "src": {
+                            "start": {
+                                "line": 3,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 7,
+                                "col": 0
+                            }
+                        }
                     }
                 },
                 {
+                    "src": {
+                        "start": {
+                            "line": 9,
+                            "col": 0
+                        },
+                        "end": {
+                            "line": 13,
+                            "col": 0
+                        }
+                    },
                     "type": {
-                        "primitive": "int"
+                        "primitive": "int",
+                        "src": {
+                            "start": {
+                                "line": 9,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 9,
+                                "col": 0
+                            }
+                        }
                     },
                     "id": "main",
                     "params": [],
                     "vars": [
                         {
                             "type": {
-                                "primitive": "int"
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 10,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 10,
+                                        "col": 1
+                                    }
+                                }
                             },
                             "is_const": false,
                             "ids": [
                                 {
                                     "id": "c",
                                     "init": {
+                                        "src": {
+                                            "start": {
+                                                "line": 10,
+                                                "col": 7
+                                            },
+                                            "end": {
+                                                "line": 10,
+                                                "col": 7
+                                            }
+                                        },
                                         "iconst": 0
                                     }
                                 }
-                            ]
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 10,
+                                    "col": 1
+                                },
+                                "end": {
+                                    "line": 10,
+                                    "col": 8
+                                }
+                            }
                         }
                     ],
                     "body": {
@@ -112,6 +292,16 @@
                                     "c"
                                 ],
                                 "expr": {
+                                    "src": {
+                                        "start": {
+                                            "line": 11,
+                                            "col": 3
+                                        },
+                                        "end": {
+                                            "line": 11,
+                                            "col": 5
+                                        }
+                                    },
                                     "op": "+",
                                     "lexpr": {
                                         "qid": [
@@ -119,7 +309,27 @@
                                         ]
                                     },
                                     "rexpr": {
+                                        "src": {
+                                            "start": {
+                                                "line": 11,
+                                                "col": 5
+                                            },
+                                            "end": {
+                                                "line": 11,
+                                                "col": 5
+                                            }
+                                        },
                                         "iconst": 1
+                                    }
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 11,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 11,
+                                        "col": 5
                                     }
                                 }
                             },
@@ -129,39 +339,107 @@
                                         "next"
                                     ],
                                     "params": []
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 12,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 12,
+                                        "col": 6
+                                    }
                                 }
                             }
                         ],
-                        "kind": "block"
+                        "kind": "block",
+                        "src": {
+                            "start": {
+                                "line": 9,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 13,
+                                "col": 0
+                            }
+                        }
                     }
                 }
             ]
         },
         "m2": {
             "name": "m2",
+            "src": {
+                "start": {
+                    "line": 1,
+                    "col": 0
+                },
+                "end": {
+                    "line": 6,
+                    "col": 0
+                }
+            },
             "uses": [],
             "vars": [],
             "fdefs": [
                 {
-                    "type": {
-                        "primitive": "int"
+                    "src": {
+                        "start": {
+                            "line": 3,
+                            "col": 0
+                        },
+                        "end": {
+                            "line": 6,
+                            "col": 0
+                        }
                     },
+                    "flow": "default",
                     "id": "hol",
                     "params": [],
                     "vars": [
                         {
                             "type": {
-                                "primitive": "int"
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 4,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 4,
+                                        "col": 1
+                                    }
+                                }
                             },
                             "is_const": false,
                             "ids": [
                                 {
                                     "id": "b",
                                     "init": {
+                                        "src": {
+                                            "start": {
+                                                "line": 4,
+                                                "col": 7
+                                            },
+                                            "end": {
+                                                "line": 4,
+                                                "col": 7
+                                            }
+                                        },
                                         "iconst": 0
                                     }
                                 }
-                            ]
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 4,
+                                    "col": 1
+                                },
+                                "end": {
+                                    "line": 4,
+                                    "col": 8
+                                }
+                            }
                         }
                     ],
                     "body": {
@@ -172,6 +450,16 @@
                                     "b"
                                 ],
                                 "expr": {
+                                    "src": {
+                                        "start": {
+                                            "line": 5,
+                                            "col": 3
+                                        },
+                                        "end": {
+                                            "line": 5,
+                                            "col": 5
+                                        }
+                                    },
                                     "op": "+",
                                     "lexpr": {
                                         "qid": [
@@ -179,12 +467,42 @@
                                         ]
                                     },
                                     "rexpr": {
+                                        "src": {
+                                            "start": {
+                                                "line": 5,
+                                                "col": 5
+                                            },
+                                            "end": {
+                                                "line": 5,
+                                                "col": 5
+                                            }
+                                        },
                                         "iconst": 1
+                                    }
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 5,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 5,
+                                        "col": 5
                                     }
                                 }
                             }
                         ],
-                        "kind": "block"
+                        "kind": "block",
+                        "src": {
+                            "start": {
+                                "line": 3,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 6,
+                                "col": 0
+                            }
+                        }
                     }
                 }
             ]
