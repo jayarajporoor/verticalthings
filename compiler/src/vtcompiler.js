@@ -81,6 +81,7 @@ var srcpath = process.argv[2];
 var printAst = false;
 var printSymtbl = false;
 var printColor = false;
+var printJson = false;
 
 for(var i=3;i<process.argv.length;i++){
 	switch(process.argv[i]){
@@ -92,6 +93,9 @@ for(var i=3;i<process.argv.length;i++){
 		break;
 		case "-color":
 			printColor = true;
+		break;
+		case "-json":
+			printJson = true;
 		break;
 	}
 }
@@ -106,7 +110,12 @@ ast.modules = {};
 loadPipeline(ast, path.dirname(srcpath), symtbl);
 
 if(printAst){
-	console.log(util.inspect(ast, false, 500, printColor));
+	if(printJson){
+		console.log(JSON.stringify(ast, null, 4));
+	}
+	else{
+		console.log(util.inspect(ast, false, 500, printColor));
+	}
 }	
 
 if(printSymtbl){
