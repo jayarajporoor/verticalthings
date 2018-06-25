@@ -1,3 +1,5 @@
+'use strict';
+
 class SymbolTable{
   constructor(parent, name) {
   	this.name = name;
