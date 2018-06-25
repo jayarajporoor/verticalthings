@@ -686,10 +686,7 @@ function getDefaultFlow(obj){
 
 
 var code=[];
-// code.push("enum " + obj.pipeline.name+"{");
 var states=[];
-// var ind=0;
-// var cur_state;
 for(var i in obj.pipeline.block){
 	states.push(obj.pipeline.block[i].qname.join('_'));
 }
@@ -721,5 +718,15 @@ code.push("__state = __" + states[0] + ";");
 code.push("}");
 code.push("}");
 
+code.push("void setup()");
+code.push("{");
+// Calling all inits
+for(var i in states){
+	console.log(obj.modules[states[i]].fdefs.indexOf("init"));
+	for(var j in obj.modules[states[i]].fdefs){
+		if(obj.modules[states[i]].fdefs[j].id === "init")
+			code.push("__"+states[i]+"init();");
+	}
+}
+code.push("}");
 console.log(code.join('\n'));
-// console.log(expr(str));
