@@ -347,7 +347,7 @@ var symbolicNames = [ null, "MODULE", "PIPELINE", "FLOW", "USE", "CONFIG",
 
 var ruleNames =  [ "module", "pipelineDef", "pipelineBlock", "pipelineEntry", 
                    "pipelineList", "useSpec", "booleanLiteral", "arrayLiteral", 
-                   "initValue", "varId", "varDef", "dimExpr", "dimValue", 
+                   "initValue", "varIdDef", "varDef", "dimExpr", "dimValue", 
                    "dimensionSpec", "intVal", "numVal", "rangeType", "castableType", 
                    "primitiveType", "varType", "flowType", "formalParam", 
                    "formalParams", "stmtBlock", "elseStmt", "ifStmt", "identifierList", 
@@ -451,7 +451,7 @@ VerticalThings.RULE_useSpec = 5;
 VerticalThings.RULE_booleanLiteral = 6;
 VerticalThings.RULE_arrayLiteral = 7;
 VerticalThings.RULE_initValue = 8;
-VerticalThings.RULE_varId = 9;
+VerticalThings.RULE_varIdDef = 9;
 VerticalThings.RULE_varDef = 10;
 VerticalThings.RULE_dimExpr = 11;
 VerticalThings.RULE_dimValue = 12;
@@ -1407,7 +1407,7 @@ VerticalThings.prototype.initValue = function() {
     return localctx;
 };
 
-function VarIdContext(parser, parent, invokingState) {
+function VarIdDefContext(parser, parent, invokingState) {
 	if(parent===undefined) {
 	    parent = null;
 	}
@@ -1416,40 +1416,40 @@ function VarIdContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = VerticalThings.RULE_varId;
+    this.ruleIndex = VerticalThings.RULE_varIdDef;
     return this;
 }
 
-VarIdContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
-VarIdContext.prototype.constructor = VarIdContext;
+VarIdDefContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
+VarIdDefContext.prototype.constructor = VarIdDefContext;
 
-VarIdContext.prototype.Identifier = function() {
+VarIdDefContext.prototype.Identifier = function() {
     return this.getToken(VerticalThings.Identifier, 0);
 };
 
-VarIdContext.prototype.ASSIGN = function() {
+VarIdDefContext.prototype.ASSIGN = function() {
     return this.getToken(VerticalThings.ASSIGN, 0);
 };
 
-VarIdContext.prototype.initValue = function() {
+VarIdDefContext.prototype.initValue = function() {
     return this.getTypedRuleContext(InitValueContext,0);
 };
 
-VarIdContext.prototype.enterRule = function(listener) {
+VarIdDefContext.prototype.enterRule = function(listener) {
     if(listener instanceof VerticalThingsListener ) {
-        listener.enterVarId(this);
+        listener.enterVarIdDef(this);
 	}
 };
 
-VarIdContext.prototype.exitRule = function(listener) {
+VarIdDefContext.prototype.exitRule = function(listener) {
     if(listener instanceof VerticalThingsListener ) {
-        listener.exitVarId(this);
+        listener.exitVarIdDef(this);
 	}
 };
 
-VarIdContext.prototype.accept = function(visitor) {
+VarIdDefContext.prototype.accept = function(visitor) {
     if ( visitor instanceof VerticalThingsVisitor ) {
-        return visitor.visitVarId(this);
+        return visitor.visitVarIdDef(this);
     } else {
         return visitor.visitChildren(this);
     }
@@ -1458,12 +1458,12 @@ VarIdContext.prototype.accept = function(visitor) {
 
 
 
-VerticalThings.VarIdContext = VarIdContext;
+VerticalThings.VarIdDefContext = VarIdDefContext;
 
-VerticalThings.prototype.varId = function() {
+VerticalThings.prototype.varIdDef = function() {
 
-    var localctx = new VarIdContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 18, VerticalThings.RULE_varId);
+    var localctx = new VarIdDefContext(this, this._ctx, this.state);
+    this.enterRule(localctx, 18, VerticalThings.RULE_varIdDef);
     var _la = 0; // Token type
     try {
         this.enterOuterAlt(localctx, 1);
@@ -1512,14 +1512,14 @@ VarDefContext.prototype.varType = function() {
     return this.getTypedRuleContext(VarTypeContext,0);
 };
 
-VarDefContext.prototype.varId = function(i) {
+VarDefContext.prototype.varIdDef = function(i) {
     if(i===undefined) {
         i = null;
     }
     if(i===null) {
-        return this.getTypedRuleContexts(VarIdContext);
+        return this.getTypedRuleContexts(VarIdDefContext);
     } else {
-        return this.getTypedRuleContext(VarIdContext,i);
+        return this.getTypedRuleContext(VarIdDefContext,i);
     }
 };
 
@@ -1585,7 +1585,7 @@ VerticalThings.prototype.varDef = function() {
         this.state = 174;
         this.varType();
         this.state = 175;
-        this.varId();
+        this.varIdDef();
         this.state = 180;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
@@ -1593,7 +1593,7 @@ VerticalThings.prototype.varDef = function() {
             this.state = 176;
             this.match(VerticalThings.COMMA);
             this.state = 177;
-            this.varId();
+            this.varIdDef();
             this.state = 182;
             this._errHandler.sync(this);
             _la = this._input.LA(1);

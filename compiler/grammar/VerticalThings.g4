@@ -37,10 +37,10 @@ arrayLiteral
 
 initValue: expr | StringLiteral | arrayLiteral;
 
-varId: Identifier (ASSIGN initValue)?;
+varIdDef: Identifier (ASSIGN initValue)?;
 
 varDef
-    :  CONST? varType varId (COMMA varId)* SEMI
+    :  CONST? varType varIdDef (COMMA varIdDef)* SEMI
     ;
 
 dimExpr : intVal op=(PLUS|MUL) intVal;

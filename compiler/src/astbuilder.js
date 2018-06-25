@@ -400,24 +400,24 @@ function astInitValue(initValue){
 }
 
 function astVarDef(def){
-  //varId: Identifier (ASSIGN initValue)?;
+  //varIdDef: Identifier (ASSIGN initValue)?;
   var varType = def.varType();
-  var varId  = def.varId();
+  var varIdDef  = def.varIdDef();
   var ast = {
   	type : astVarType(varType),
   	is_const: def.CONST() ? true : false,
-  	ids : [],
+  	defs : [],
 	src: src_info(def)  	
   };
 
-  for(var i=0;i<varId.length;i++){
-  	  var astId = {id: getId(varId[i])};
-  	  var initValue = varId[i].initValue();
+  for(var i=0;i<varIdDef.length;i++){
+  	  var def = {id: getId(varIdDef[i])};
+  	  var initValue = varIdDef[i].initValue();
 	  if(initValue){
-	  	astId.init = astInitValue(initValue);
+	  	def.init = astInitValue(initValue);
 	  }
-	  addSymbol(astId.id, {type: ast.type, is_const: ast.is_const, src: ast.src} );
-	  ast.ids.push(astId);
+	  addSymbol(def.id, {type: ast.type, is_const: ast.is_const, src: ast.src, has_init: def.init ? true : false} );
+	  ast.defs.push(def);
   }
   return ast;
 }
