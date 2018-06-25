@@ -1,8 +1,28 @@
 var obj = {
     "name": "test_pipeline",
+    "src": {
+        "start": {
+            "line": 1,
+            "col": 0
+        },
+        "end": {
+            "line": 6,
+            "col": 1
+        }
+    },
     "uses": [],
     "vars": [],
     "pipeline": {
+        "src": {
+            "start": {
+                "line": 3,
+                "col": 0
+            },
+            "end": {
+                "line": 6,
+                "col": 1
+            }
+        },
         "name": "nandu",
         "block": [
             {
@@ -12,7 +32,17 @@ var obj = {
                 "params": [
                     {
                         "expr": {
-                            "bconst": true
+                            "bconst": true,
+                            "src": {
+                                "start": {
+                                    "line": 4,
+                                    "col": 4
+                                },
+                                "end": {
+                                    "line": 4,
+                                    "col": 4
+                                }
+                            }
                         }
                     }
                 ]
@@ -28,27 +58,77 @@ var obj = {
     "modules": {
         "m1": {
             "name": "m1",
+            "src": {
+                "start": {
+                    "line": 1,
+                    "col": 0
+                },
+                "end": {
+                    "line": 13,
+                    "col": 0
+                }
+            },
             "uses": [],
             "vars": [],
             "fdefs": [
                 {
+                    "src": {
+                        "start": {
+                            "line": 3,
+                            "col": 0
+                        },
+                        "end": {
+                            "line": 7,
+                            "col": 0
+                        }
+                    },
                     "flow": "default",
                     "id": "lol",
                     "params": [],
                     "vars": [
                         {
                             "type": {
-                                "primitive": "int"
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 4,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 4,
+                                        "col": 1
+                                    }
+                                }
                             },
                             "is_const": false,
                             "ids": [
                                 {
                                     "id": "a",
                                     "init": {
+                                        "src": {
+                                            "start": {
+                                                "line": 4,
+                                                "col": 7
+                                            },
+                                            "end": {
+                                                "line": 4,
+                                                "col": 7
+                                            }
+                                        },
                                         "iconst": 0
                                     }
                                 }
-                            ]
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 4,
+                                    "col": 1
+                                },
+                                "end": {
+                                    "line": 4,
+                                    "col": 8
+                                }
+                            }
                         }
                     ],
                     "body": {
@@ -59,6 +139,16 @@ var obj = {
                                     "a"
                                 ],
                                 "expr": {
+                                    "src": {
+                                        "start": {
+                                            "line": 5,
+                                            "col": 3
+                                        },
+                                        "end": {
+                                            "line": 5,
+                                            "col": 5
+                                        }
+                                    },
                                     "op": "+",
                                     "lexpr": {
                                         "qid": [
@@ -66,7 +156,27 @@ var obj = {
                                         ]
                                     },
                                     "rexpr": {
+                                        "src": {
+                                            "start": {
+                                                "line": 5,
+                                                "col": 5
+                                            },
+                                            "end": {
+                                                "line": 5,
+                                                "col": 5
+                                            }
+                                        },
                                         "iconst": 1
+                                    }
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 5,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 5,
+                                        "col": 5
                                     }
                                 }
                             },
@@ -76,32 +186,102 @@ var obj = {
                                         "next"
                                     ],
                                     "params": []
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 6,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 6,
+                                        "col": 6
+                                    }
                                 }
                             }
                         ],
-                        "kind": "block"
+                        "kind": "block",
+                        "src": {
+                            "start": {
+                                "line": 3,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 7,
+                                "col": 0
+                            }
+                        }
                     }
                 },
                 {
+                    "src": {
+                        "start": {
+                            "line": 9,
+                            "col": 0
+                        },
+                        "end": {
+                            "line": 13,
+                            "col": 0
+                        }
+                    },
                     "type": {
-                        "primitive": "int"
+                        "primitive": "int",
+                        "src": {
+                            "start": {
+                                "line": 9,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 9,
+                                "col": 0
+                            }
+                        }
                     },
                     "id": "main",
                     "params": [],
                     "vars": [
                         {
                             "type": {
-                                "primitive": "int"
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 10,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 10,
+                                        "col": 1
+                                    }
+                                }
                             },
                             "is_const": false,
                             "ids": [
                                 {
                                     "id": "c",
                                     "init": {
+                                        "src": {
+                                            "start": {
+                                                "line": 10,
+                                                "col": 7
+                                            },
+                                            "end": {
+                                                "line": 10,
+                                                "col": 7
+                                            }
+                                        },
                                         "iconst": 0
                                     }
                                 }
-                            ]
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 10,
+                                    "col": 1
+                                },
+                                "end": {
+                                    "line": 10,
+                                    "col": 8
+                                }
+                            }
                         }
                     ],
                     "body": {
@@ -112,6 +292,16 @@ var obj = {
                                     "c"
                                 ],
                                 "expr": {
+                                    "src": {
+                                        "start": {
+                                            "line": 11,
+                                            "col": 3
+                                        },
+                                        "end": {
+                                            "line": 11,
+                                            "col": 5
+                                        }
+                                    },
                                     "op": "+",
                                     "lexpr": {
                                         "qid": [
@@ -119,7 +309,27 @@ var obj = {
                                         ]
                                     },
                                     "rexpr": {
+                                        "src": {
+                                            "start": {
+                                                "line": 11,
+                                                "col": 5
+                                            },
+                                            "end": {
+                                                "line": 11,
+                                                "col": 5
+                                            }
+                                        },
                                         "iconst": 1
+                                    }
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 11,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 11,
+                                        "col": 5
                                     }
                                 }
                             },
@@ -129,39 +339,107 @@ var obj = {
                                         "next"
                                     ],
                                     "params": []
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 12,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 12,
+                                        "col": 6
+                                    }
                                 }
                             }
                         ],
-                        "kind": "block"
+                        "kind": "block",
+                        "src": {
+                            "start": {
+                                "line": 9,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 13,
+                                "col": 0
+                            }
+                        }
                     }
                 }
             ]
         },
         "m2": {
             "name": "m2",
+            "src": {
+                "start": {
+                    "line": 1,
+                    "col": 0
+                },
+                "end": {
+                    "line": 6,
+                    "col": 0
+                }
+            },
             "uses": [],
             "vars": [],
             "fdefs": [
                 {
-                    "type": {
-                        "primitive": "int"
+                    "src": {
+                        "start": {
+                            "line": 3,
+                            "col": 0
+                        },
+                        "end": {
+                            "line": 6,
+                            "col": 0
+                        }
                     },
+                    "flow": "default",
                     "id": "hol",
                     "params": [],
                     "vars": [
                         {
                             "type": {
-                                "primitive": "int"
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 4,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 4,
+                                        "col": 1
+                                    }
+                                }
                             },
                             "is_const": false,
                             "ids": [
                                 {
                                     "id": "b",
                                     "init": {
+                                        "src": {
+                                            "start": {
+                                                "line": 4,
+                                                "col": 7
+                                            },
+                                            "end": {
+                                                "line": 4,
+                                                "col": 7
+                                            }
+                                        },
                                         "iconst": 0
                                     }
                                 }
-                            ]
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 4,
+                                    "col": 1
+                                },
+                                "end": {
+                                    "line": 4,
+                                    "col": 8
+                                }
+                            }
                         }
                     ],
                     "body": {
@@ -172,6 +450,16 @@ var obj = {
                                     "b"
                                 ],
                                 "expr": {
+                                    "src": {
+                                        "start": {
+                                            "line": 5,
+                                            "col": 3
+                                        },
+                                        "end": {
+                                            "line": 5,
+                                            "col": 5
+                                        }
+                                    },
                                     "op": "+",
                                     "lexpr": {
                                         "qid": [
@@ -179,26 +467,72 @@ var obj = {
                                         ]
                                     },
                                     "rexpr": {
+                                        "src": {
+                                            "start": {
+                                                "line": 5,
+                                                "col": 5
+                                            },
+                                            "end": {
+                                                "line": 5,
+                                                "col": 5
+                                            }
+                                        },
                                         "iconst": 1
+                                    }
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 5,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 5,
+                                        "col": 5
                                     }
                                 }
                             }
                         ],
-                        "kind": "block"
+                        "kind": "block",
+                        "src": {
+                            "start": {
+                                "line": 3,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 6,
+                                "col": 0
+                            }
+                        }
                     }
                 }
             ]
         }
     }
 };
+
 function fcall(obj){
 	var s="";
-	s=s+obj.qid.join(".")+"(";
-	for(var i in obj.params)
-		s=s+expr(obj.params[i].expr)+", ";
-	if(obj.params.length>0)
-		return (s.substring(0,s.length-2)+")");
-	else return s+")";
+	if(obj.qid.join("_") != "next"){
+		s=s+obj.qid.join("_")+"(";
+		for(var i in obj.params)
+			s=s+expr(obj.params[i].expr)+", ";
+		if(obj.params.length>0)
+			return (s.substring(0,s.length-2)+")");
+		else return s+")";
+	}
+	else
+	{
+		var ind=states.indexOf(cur_mod);
+		ind++;
+		if(ind<states.length){
+			// cur_state=states[ind];
+			return "__state = __"+states[ind];
+		}
+		else{
+			// cur_state=states[0];
+			return "__state = __"+states[0];
+		}
+	}
 }
 
 function expr(obj){
@@ -316,8 +650,6 @@ function params(obj){
 function fdefs(obj,str){
 	// console.log(code);
 	var s="";
-		if(cur_mod=="m2__")
-			console.log(obj.type+" lololololoollolo");
 	if(typeof obj.type != 'undefined'){
 		s=s+obj.type.primitive+" ";
 	}
@@ -333,6 +665,8 @@ function fdefs(obj,str){
 	str.push(s);
 
 	str.push("{");
+	// str.push("__state = __" + states[0] + ";");
+	// cur_ind=0;
 
 	for(var i in obj.vars){
 		str.push(vars(obj.vars[i])+";");
@@ -340,14 +674,23 @@ function fdefs(obj,str){
 	stmts(obj.body,str);
     str.push("}");
 }
+
+function getDefaultFlow(obj){
+	var s="";
+	for(var i in obj){
+		if(obj[i].flow === "default"){
+			return obj[i].id;
+		}
+	}
+}
+
+
 var code=[];
-// code.push("enum " + obj.pipeline.name+"{");
 var states=[];
 for(var i in obj.pipeline.block){
-	states.push(obj.pipeline.block[i].qname.join('.'));
+	states.push(obj.pipeline.block[i].qname.join('_'));
 }
-code.push("enum " + obj.pipeline.name + "{__" + states.join(", __") + "};");
-
+code.push("enum __" + obj.pipeline.name + "{__" + states.join(", __") + "} __state = __" + states[0] + ";");
 var cur_mod="";
 for(var j in states){
 	cur_mod=states[j];
@@ -355,5 +698,35 @@ for(var j in states){
 	    fdefs(obj.modules[cur_mod].fdefs[i],code);
 	}
 }
+cur_state=states[0];
+code.push("void loop()");
+code.push("{");
+code.push("switch(__state)");
+code.push("{");
+for(var i in states){
+	code.push("case __" + states[i] + ":");
+	code.push("__state = __"+states[0]+";");
+	if(obj.pipeline.block[i].qname.length > 1)
+		code.push("__" + states[i] + "();");
+	else{
+		code.push("__" + states[i] + getDefaultFlow(obj.modules[states[i]].fdefs) + "();");
+	}
+	code.push("break;");
+}
+code.push("default :");
+code.push("__state = __" + states[0] + ";");
+code.push("}");
+code.push("}");
+
+code.push("void setup()");
+code.push("{");
+// Calling all inits
+for(var i in states){
+	console.log(obj.modules[states[i]].fdefs.indexOf("init"));
+	for(var j in obj.modules[states[i]].fdefs){
+		if(obj.modules[states[i]].fdefs[j].id === "init")
+			code.push("__"+states[i]+"init();");
+	}
+}
+code.push("}");
 console.log(code.join('\n'));
-// console.log(expr(str));
