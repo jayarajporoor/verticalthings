@@ -64,7 +64,7 @@ var obj = {
                     "col": 0
                 },
                 "end": {
-                    "line": 13,
+                    "line": 18,
                     "col": 0
                 }
             },
@@ -78,7 +78,7 @@ var obj = {
                             "col": 0
                         },
                         "end": {
-                            "line": 7,
+                            "line": 12,
                             "col": 0
                         }
                     },
@@ -96,23 +96,34 @@ var obj = {
                                     },
                                     "end": {
                                         "line": 4,
-                                        "col": 1
+                                        "col": 9
                                     }
+                                },
+                                "dim": {
+                                    "dim": [
+                                        {
+                                            "iconst": 2
+                                        },
+                                        {
+                                            "iconst": 2
+                                        }
+                                    ],
+                                    "is_ring": false
                                 }
                             },
                             "is_const": false,
-                            "ids": [
+                            "defs": [
                                 {
                                     "id": "a",
                                     "init": {
                                         "src": {
                                             "start": {
                                                 "line": 4,
-                                                "col": 7
+                                                "col": 13
                                             },
                                             "end": {
                                                 "line": 4,
-                                                "col": 7
+                                                "col": 13
                                             }
                                         },
                                         "iconst": 0
@@ -126,7 +137,7 @@ var obj = {
                                 },
                                 "end": {
                                     "line": 4,
-                                    "col": 8
+                                    "col": 14
                                 }
                             }
                         }
@@ -134,39 +145,220 @@ var obj = {
                     "body": {
                         "stmts": [
                             {
-                                "kind": "assign",
-                                "qid": [
-                                    "a"
+                                "kind": "for",
+                                "ids": [
+                                    "i"
                                 ],
-                                "expr": {
-                                    "src": {
-                                        "start": {
-                                            "line": 5,
-                                            "col": 3
-                                        },
-                                        "end": {
-                                            "line": 5,
-                                            "col": 5
-                                        }
-                                    },
-                                    "op": "+",
-                                    "lexpr": {
-                                        "qid": [
-                                            "a"
-                                        ]
-                                    },
-                                    "rexpr": {
+                                "range": {
+                                    "from": {
                                         "src": {
                                             "start": {
                                                 "line": 5,
-                                                "col": 5
+                                                "col": 11
                                             },
                                             "end": {
                                                 "line": 5,
-                                                "col": 5
+                                                "col": 11
                                             }
                                         },
-                                        "iconst": 1
+                                        "iconst": 0
+                                    },
+                                    "to": {
+                                        "src": {
+                                            "start": {
+                                                "line": 5,
+                                                "col": 13
+                                            },
+                                            "end": {
+                                                "line": 5,
+                                                "col": 13
+                                            }
+                                        },
+                                        "iconst": 2
+                                    },
+                                    "is_inclusive": false,
+                                    "src": {
+                                        "start": {
+                                            "line": 5,
+                                            "col": 10
+                                        },
+                                        "end": {
+                                            "line": 5,
+                                            "col": 14
+                                        }
+                                    }
+                                },
+                                "body": {
+                                    "stmts": [
+                                        {
+                                            "kind": "for",
+                                            "ids": [
+                                                "j"
+                                            ],
+                                            "range": {
+                                                "from": {
+                                                    "src": {
+                                                        "start": {
+                                                            "line": 6,
+                                                            "col": 12
+                                                        },
+                                                        "end": {
+                                                            "line": 6,
+                                                            "col": 12
+                                                        }
+                                                    },
+                                                    "iconst": 0
+                                                },
+                                                "to": {
+                                                    "src": {
+                                                        "start": {
+                                                            "line": 6,
+                                                            "col": 14
+                                                        },
+                                                        "end": {
+                                                            "line": 6,
+                                                            "col": 14
+                                                        }
+                                                    },
+                                                    "iconst": 2
+                                                },
+                                                "is_inclusive": false,
+                                                "src": {
+                                                    "start": {
+                                                        "line": 6,
+                                                        "col": 11
+                                                    },
+                                                    "end": {
+                                                        "line": 6,
+                                                        "col": 15
+                                                    }
+                                                }
+                                            },
+                                            "body": {
+                                                "stmts": [
+                                                    {
+                                                        "kind": "assign",
+                                                        "qid": [
+                                                            "a"
+                                                        ],
+                                                        "expr": {
+                                                            "src": {
+                                                                "start": {
+                                                                    "line": 7,
+                                                                    "col": 11
+                                                                },
+                                                                "end": {
+                                                                    "line": 7,
+                                                                    "col": 25
+                                                                }
+                                                            },
+                                                            "op": "+",
+                                                            "lexpr": {
+                                                                "id": "a",
+                                                                "dim": {
+                                                                    "dim": [
+                                                                        {
+                                                                            "id": "i"
+                                                                        },
+                                                                        {
+                                                                            "id": "j"
+                                                                        }
+                                                                    ],
+                                                                    "is_ring": false
+                                                                },
+                                                                "src": {
+                                                                    "start": {
+                                                                        "line": 7,
+                                                                        "col": 11
+                                                                    },
+                                                                    "end": {
+                                                                        "line": 7,
+                                                                        "col": 17
+                                                                    }
+                                                                }
+                                                            },
+                                                            "rexpr": {
+                                                                "id": "a",
+                                                                "dim": {
+                                                                    "dim": [
+                                                                        {
+                                                                            "id": "i"
+                                                                        },
+                                                                        {
+                                                                            "id": "j"
+                                                                        }
+                                                                    ],
+                                                                    "is_ring": false
+                                                                },
+                                                                "src": {
+                                                                    "start": {
+                                                                        "line": 7,
+                                                                        "col": 19
+                                                                    },
+                                                                    "end": {
+                                                                        "line": 7,
+                                                                        "col": 25
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+                                                        "src": {
+                                                            "start": {
+                                                                "line": 7,
+                                                                "col": 3
+                                                            },
+                                                            "end": {
+                                                                "line": 7,
+                                                                "col": 25
+                                                            }
+                                                        },
+                                                        "dim": {
+                                                            "dim": [
+                                                                {
+                                                                    "id": "i"
+                                                                },
+                                                                {
+                                                                    "id": "j"
+                                                                }
+                                                            ],
+                                                            "is_ring": false
+                                                        }
+                                                    }
+                                                ],
+                                                "kind": "block",
+                                                "src": {
+                                                    "start": {
+                                                        "line": 6,
+                                                        "col": 16
+                                                    },
+                                                    "end": {
+                                                        "line": 8,
+                                                        "col": 2
+                                                    }
+                                                }
+                                            },
+                                            "src": {
+                                                "start": {
+                                                    "line": 6,
+                                                    "col": 2
+                                                },
+                                                "end": {
+                                                    "line": 8,
+                                                    "col": 2
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "kind": "block",
+                                    "src": {
+                                        "start": {
+                                            "line": 5,
+                                            "col": 15
+                                        },
+                                        "end": {
+                                            "line": 9,
+                                            "col": 1
+                                        }
                                     }
                                 },
                                 "src": {
@@ -175,8 +367,8 @@ var obj = {
                                         "col": 1
                                     },
                                     "end": {
-                                        "line": 5,
-                                        "col": 5
+                                        "line": 9,
+                                        "col": 1
                                     }
                                 }
                             },
@@ -189,11 +381,11 @@ var obj = {
                                 },
                                 "src": {
                                     "start": {
-                                        "line": 6,
+                                        "line": 11,
                                         "col": 1
                                     },
                                     "end": {
-                                        "line": 6,
+                                        "line": 11,
                                         "col": 6
                                     }
                                 }
@@ -206,7 +398,7 @@ var obj = {
                                 "col": 0
                             },
                             "end": {
-                                "line": 7,
+                                "line": 12,
                                 "col": 0
                             }
                         }
@@ -215,11 +407,11 @@ var obj = {
                 {
                     "src": {
                         "start": {
-                            "line": 9,
+                            "line": 14,
                             "col": 0
                         },
                         "end": {
-                            "line": 13,
+                            "line": 18,
                             "col": 0
                         }
                     },
@@ -227,11 +419,11 @@ var obj = {
                         "primitive": "int",
                         "src": {
                             "start": {
-                                "line": 9,
+                                "line": 14,
                                 "col": 0
                             },
                             "end": {
-                                "line": 9,
+                                "line": 14,
                                 "col": 0
                             }
                         }
@@ -244,27 +436,27 @@ var obj = {
                                 "primitive": "int",
                                 "src": {
                                     "start": {
-                                        "line": 10,
+                                        "line": 15,
                                         "col": 1
                                     },
                                     "end": {
-                                        "line": 10,
+                                        "line": 15,
                                         "col": 1
                                     }
                                 }
                             },
                             "is_const": false,
-                            "ids": [
+                            "defs": [
                                 {
                                     "id": "c",
                                     "init": {
                                         "src": {
                                             "start": {
-                                                "line": 10,
+                                                "line": 15,
                                                 "col": 7
                                             },
                                             "end": {
-                                                "line": 10,
+                                                "line": 15,
                                                 "col": 7
                                             }
                                         },
@@ -274,11 +466,11 @@ var obj = {
                             ],
                             "src": {
                                 "start": {
-                                    "line": 10,
+                                    "line": 15,
                                     "col": 1
                                 },
                                 "end": {
-                                    "line": 10,
+                                    "line": 15,
                                     "col": 8
                                 }
                             }
@@ -294,11 +486,11 @@ var obj = {
                                 "expr": {
                                     "src": {
                                         "start": {
-                                            "line": 11,
+                                            "line": 16,
                                             "col": 3
                                         },
                                         "end": {
-                                            "line": 11,
+                                            "line": 16,
                                             "col": 5
                                         }
                                     },
@@ -311,11 +503,11 @@ var obj = {
                                     "rexpr": {
                                         "src": {
                                             "start": {
-                                                "line": 11,
+                                                "line": 16,
                                                 "col": 5
                                             },
                                             "end": {
-                                                "line": 11,
+                                                "line": 16,
                                                 "col": 5
                                             }
                                         },
@@ -324,11 +516,11 @@ var obj = {
                                 },
                                 "src": {
                                     "start": {
-                                        "line": 11,
+                                        "line": 16,
                                         "col": 1
                                     },
                                     "end": {
-                                        "line": 11,
+                                        "line": 16,
                                         "col": 5
                                     }
                                 }
@@ -342,11 +534,11 @@ var obj = {
                                 },
                                 "src": {
                                     "start": {
-                                        "line": 12,
+                                        "line": 17,
                                         "col": 1
                                     },
                                     "end": {
-                                        "line": 12,
+                                        "line": 17,
                                         "col": 6
                                     }
                                 }
@@ -355,11 +547,11 @@ var obj = {
                         "kind": "block",
                         "src": {
                             "start": {
-                                "line": 9,
+                                "line": 14,
                                 "col": 0
                             },
                             "end": {
-                                "line": 13,
+                                "line": 18,
                                 "col": 0
                             }
                         }
@@ -412,7 +604,7 @@ var obj = {
                                 }
                             },
                             "is_const": false,
-                            "ids": [
+                            "defs": [
                                 {
                                     "id": "b",
                                     "init": {
@@ -544,12 +736,22 @@ function expr(obj){
 	}
 	else if(typeof obj.qid != 'undefined'){
 		str = str + obj.qid.join(".");
+        if(typeof obj.dim != 'undefined'){
+            for(var i in obj.dim.dim){
+                str=str + "[" + expr(obj.dim.dim[i]) + "]";
+            }
+        }
 	}
 	else if(typeof obj.iconst != 'undefined'){
 		str = obj.iconst;
 	}
 	else if(typeof obj.id != 'undefined'){
 		str = obj.id;
+        if(typeof obj.dim != 'undefined'){
+            for(var i in obj.dim.dim){
+                str=str + "[" + expr(obj.dim.dim[i]) + "]";
+            }
+        }
 	}
 	else if(typeof obj.fcall != 'undefined'){
 		str = fcall(obj.fcall);
@@ -571,7 +773,7 @@ function stmts(obj,str){
 	if(typeof obj.kind != 'undefined'){
 		switch(obj.kind){
 			case "assign":
-				str.push(obj.qid.join(".") + "=" + expr(obj.expr) + ";");
+				str.push(expr(obj) + "=" + expr(obj.expr) + ";");
 				break;
 			case "if":
 				// console.log(obj);
@@ -583,7 +785,7 @@ function stmts(obj,str){
 				}
 				break;
 			case "for":
-				str.push("for(" + obj.ids[0] + "=" + expr(obj.range.from) + "; " + obj.ids[0] + "<" + expr(obj.range.to) + "; " + obj.ids[0] + "++)");
+				str.push("for(int " + obj.ids[0] + "=" + expr(obj.range.from) + "; " + obj.ids[0] + "<" + expr(obj.range.to) + "; " + obj.ids[0] + "++)");
 				stmts(obj.body,str);
 				break;
 			case "while":
@@ -623,11 +825,11 @@ function vars(obj){
 	s=s+type.primitive+" ";
 	// console.log(s);
 	var temp=[];
-	for(var i in obj.ids){
-		if(typeof obj.ids[i].init != 'undefined')
-			temp.push(obj.ids[i].id+type.dim+"="+expr(obj.ids[i].init));
+	for(var i in obj.defs){
+		if(typeof obj.defs[i].init != 'undefined')
+			temp.push(obj.defs[i].id+type.dim+"="+expr(obj.defs[i].init));
 		else
-			temp.push(obj.ids[i].id+type.dim);
+			temp.push(obj.defs[i].id+type.dim);
 	}
 	s=s+temp.join(", ");
 	return s;
@@ -722,7 +924,7 @@ code.push("void setup()");
 code.push("{");
 // Calling all inits
 for(var i in states){
-	console.log(obj.modules[states[i]].fdefs.indexOf("init"));
+	// console.log(obj.modules[states[i]].fdefs.indexOf("init"));
 	for(var j in obj.modules[states[i]].fdefs){
 		if(obj.modules[states[i]].fdefs[j].id === "init")
 			code.push("__"+states[i]+"init();");
