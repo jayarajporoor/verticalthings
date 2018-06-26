@@ -22,15 +22,23 @@ class SymbolTable{
         }
   		}
   		scope = scope.parent;
-  	}while(scope.parent !== scope);
+  	}while(scope.parent);
   	
   	return null;
   }
 
-  addSymbol(name, syminfo) {
+  addSymbolToCurrentScope(name, syminfo) {
   	var sym = {name: name, info: syminfo};
   	this.current_scope.symbols[name] = sym;
   	return sym;
+  }
+
+  removeSymbolFromCurrentScope(name){
+    if(this.current_scope.symbols[name]){
+      delete this.current_scope.symbols[name];
+      return true;
+    }
+    return false;
   }
 
   createNestedScope(scopename){

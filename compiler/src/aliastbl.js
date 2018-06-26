@@ -29,13 +29,21 @@ class AliasTable{
 
   lookup_sym(name){
   	var curr_scope = this.current_scope;
+  	var alias=null;
+  	var alias_scope = curr_scope;
   	while(curr_scope.parent){
-  		if(curr_scope.aliases[name]){
-  			var alias =  curr_scope.aliases[name];
-  			return curr_scope.symtbl.lookup(name);
+  		var alias = curr_scope.aliases[name];
+  		if(alias){
+  			if(alias.id){
+  				name = alias.id;
+  				alias_scope = curr_scope;
+  			}
   		}
+		curr_scope = curr_scope.parent;
   	}
-  	return null;
+  	return alias_scope.symtbl.lookup(name);
   }
 
 }
+
+module.exports = AliasTable;

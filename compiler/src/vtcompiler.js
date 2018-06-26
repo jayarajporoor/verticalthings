@@ -85,6 +85,9 @@ var printJson = false;
 
 var ast_transforms = [];
 var code_path = null;
+var ctx_attr = null;
+
+var mod_params = [];
 
 for(var i=3;i<process.argv.length;i++){
 	switch(process.argv[i]){
@@ -116,6 +119,17 @@ for(var i=3;i<process.argv.length;i++){
 				code_path = "";
 			}
 		break;
+		case "-ctx":
+			if(process.argv[i+1]){
+				ctx_attr = process.argv[i+1];
+				i++;
+			}else{
+				ctx_attr = "";
+			}			
+		break;
+		default:
+			mod_params.push(process.argv[i]);
+		break;
 	}
 }
 
@@ -128,7 +142,7 @@ ast.modules = {};
 
 loadPipeline(ast, path.dirname(srcpath), symtbl);
 
-var transform_ctx = {symtbl: symtbl};
+var transform_ctx = {symtbl: symtbl, params: mod_params};
 
 for(var i=0;i<ast_transforms.length;i++){
 	var xmod = require(ast_transforms[i]);
@@ -139,13 +153,17 @@ for(var i=0;i<ast_transforms.length;i++){
 	}
 }
 
-if(printAst){
+function print_object(obj){
 	if(printJson){
-		console.log(JSON.stringify(ast, null, 4));
+		console.log(JSON.stringify(obj, null, 4));
 	}
 	else{
-		console.log(util.inspect(ast, false, 500, printColor));
-	}
+		console.log(util.inspect(obj, false, 500, printColor));
+	}	
+}
+
+if(printAst){
+	print_object(ast);
 }	
 
 if(printSymtbl){
@@ -162,5 +180,13 @@ if(code_path !== null){
 		}else{
 			fs.writeFileSync(code_path, code_str);
 		}
+	}
+}
+
+if(ctx_attr !== null){
+	if(ctx_attr === ""){
+		print_object(transform_ctx);
+	}else{
+		print_object(transform_ctx[ctx_attr]);
 	}
 }

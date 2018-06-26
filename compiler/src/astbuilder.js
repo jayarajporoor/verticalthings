@@ -3,7 +3,7 @@ var SymbolTable = require("./symtbl.js");
 var ctx = {};
 
 function addSymbol(name, info){
-	ctx.symtbl.addSymbol(name, info);
+	ctx.symtbl.addSymbolToCurrentScope(name, info);
 }
 
 function getId(node) {
@@ -527,7 +527,9 @@ function astStmt(stmt){
 		return astAssignStmt(assignStmt);
 	}else
 	if(functionCall){
-		return getFunctionCallAst(functionCall);
+		var ast = getFunctionCallAst(functionCall);
+		ast.kind = 'fcall';
+		return ast;
 	}else
 	if(forStmt){
 		return astForStmt(forStmt);
