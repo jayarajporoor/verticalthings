@@ -238,3 +238,4 @@ var states=[];
 // codeGen(obj,code);
 exports.stmt=stmts;
 exports.fdef=fdefs;
+exports.fparam=params;
