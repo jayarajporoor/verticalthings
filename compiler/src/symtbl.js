@@ -36,7 +36,7 @@ class SymbolTable{
   createNestedScope(scopename){
   	//console.log("Create scope ", scopename, " under ", this.current_scope.name);
   	var stbl = new SymbolTable(scopename, this.current_scope);
-  	this.scopes[scopename] = stbl;
+  	this.current_scope.scopes[scopename] = stbl;
   	this.current_scope = stbl;
   	return stbl;
   }
