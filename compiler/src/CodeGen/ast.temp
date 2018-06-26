@@ -1,25 +1,35 @@
+Parsing ./CodeGen/work/test_pipeline.vtl
+Parsing ./CodeGen/work/m1.vtl
 {
     "name": "test_pipeline",
+    "src": {
+        "start": {
+            "line": 1,
+            "col": 0
+        },
+        "end": {
+            "line": 5,
+            "col": 1
+        }
+    },
     "uses": [],
     "vars": [],
     "pipeline": {
+        "src": {
+            "start": {
+                "line": 3,
+                "col": 0
+            },
+            "end": {
+                "line": 5,
+                "col": 1
+            }
+        },
         "name": "nandu",
         "block": [
             {
                 "qname": [
                     "m1"
-                ],
-                "params": [
-                    {
-                        "expr": {
-                            "bconst": true
-                        }
-                    }
-                ]
-            },
-            {
-                "qname": [
-                    "m2"
                 ]
             }
         ]
@@ -28,27 +38,88 @@
     "modules": {
         "m1": {
             "name": "m1",
+            "src": {
+                "start": {
+                    "line": 1,
+                    "col": 0
+                },
+                "end": {
+                    "line": 7,
+                    "col": 0
+                }
+            },
             "uses": [],
             "vars": [],
             "fdefs": [
                 {
+                    "src": {
+                        "start": {
+                            "line": 3,
+                            "col": 0
+                        },
+                        "end": {
+                            "line": 7,
+                            "col": 0
+                        }
+                    },
                     "flow": "default",
                     "id": "lol",
                     "params": [],
                     "vars": [
                         {
                             "type": {
-                                "primitive": "int"
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 4,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 4,
+                                        "col": 9
+                                    }
+                                },
+                                "dim": {
+                                    "dim": [
+                                        {
+                                            "iconst": 2
+                                        },
+                                        {
+                                            "iconst": 2
+                                        }
+                                    ],
+                                    "is_ring": false
+                                }
                             },
                             "is_const": false,
-                            "ids": [
+                            "defs": [
                                 {
                                     "id": "a",
                                     "init": {
+                                        "src": {
+                                            "start": {
+                                                "line": 4,
+                                                "col": 13
+                                            },
+                                            "end": {
+                                                "line": 4,
+                                                "col": 13
+                                            }
+                                        },
                                         "iconst": 0
                                     }
                                 }
-                            ]
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 4,
+                                    "col": 1
+                                },
+                                "end": {
+                                    "line": 4,
+                                    "col": 14
+                                }
+                            }
                         }
                     ],
                     "body": {
@@ -59,6 +130,16 @@
                                     "a"
                                 ],
                                 "expr": {
+                                    "src": {
+                                        "start": {
+                                            "line": 5,
+                                            "col": 3
+                                        },
+                                        "end": {
+                                            "line": 5,
+                                            "col": 5
+                                        }
+                                    },
                                     "op": "+",
                                     "lexpr": {
                                         "qid": [
@@ -66,7 +147,19 @@
                                         ]
                                     },
                                     "rexpr": {
-                                        "iconst": 1
+                                        "qid": [
+                                            "a"
+                                        ]
+                                    }
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 5,
+                                        "col": 1
+                                    },
+                                    "end": {
+                                        "line": 5,
+                                        "col": 5
                                     }
                                 }
                             },
@@ -76,115 +169,30 @@
                                         "next"
                                     ],
                                     "params": []
-                                }
-                            }
-                        ],
-                        "kind": "block"
-                    }
-                },
-                {
-                    "type": {
-                        "primitive": "int"
-                    },
-                    "id": "main",
-                    "params": [],
-                    "vars": [
-                        {
-                            "type": {
-                                "primitive": "int"
-                            },
-                            "is_const": false,
-                            "ids": [
-                                {
-                                    "id": "c",
-                                    "init": {
-                                        "iconst": 0
-                                    }
-                                }
-                            ]
-                        }
-                    ],
-                    "body": {
-                        "stmts": [
-                            {
-                                "kind": "assign",
-                                "qid": [
-                                    "c"
-                                ],
-                                "expr": {
-                                    "op": "+",
-                                    "lexpr": {
-                                        "qid": [
-                                            "c"
-                                        ]
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 6,
+                                        "col": 1
                                     },
-                                    "rexpr": {
-                                        "iconst": 1
+                                    "end": {
+                                        "line": 6,
+                                        "col": 6
                                     }
-                                }
-                            },
-                            {
-                                "fcall": {
-                                    "qid": [
-                                        "next"
-                                    ],
-                                    "params": []
                                 }
                             }
                         ],
-                        "kind": "block"
-                    }
-                }
-            ]
-        },
-        "m2": {
-            "name": "m2",
-            "uses": [],
-            "vars": [],
-            "fdefs": [
-                {
-                    "type": {
-                        "primitive": "int"
-                    },
-                    "id": "hol",
-                    "params": [],
-                    "vars": [
-                        {
-                            "type": {
-                                "primitive": "int"
+                        "kind": "block",
+                        "src": {
+                            "start": {
+                                "line": 3,
+                                "col": 0
                             },
-                            "is_const": false,
-                            "ids": [
-                                {
-                                    "id": "b",
-                                    "init": {
-                                        "iconst": 0
-                                    }
-                                }
-                            ]
+                            "end": {
+                                "line": 7,
+                                "col": 0
+                            }
                         }
-                    ],
-                    "body": {
-                        "stmts": [
-                            {
-                                "kind": "assign",
-                                "qid": [
-                                    "b"
-                                ],
-                                "expr": {
-                                    "op": "+",
-                                    "lexpr": {
-                                        "qid": [
-                                            "b"
-                                        ]
-                                    },
-                                    "rexpr": {
-                                        "iconst": 1
-                                    }
-                                }
-                            }
-                        ],
-                        "kind": "block"
                     }
                 }
             ]

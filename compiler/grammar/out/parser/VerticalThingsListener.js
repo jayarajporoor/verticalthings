@@ -92,12 +92,12 @@ VerticalThingsListener.prototype.exitInitValue = function(ctx) {
 };
 
 
-// Enter a parse tree produced by VerticalThings#varId.
-VerticalThingsListener.prototype.enterVarId = function(ctx) {
+// Enter a parse tree produced by VerticalThings#varIdDef.
+VerticalThingsListener.prototype.enterVarIdDef = function(ctx) {
 };
 
-// Exit a parse tree produced by VerticalThings#varId.
-VerticalThingsListener.prototype.exitVarId = function(ctx) {
+// Exit a parse tree produced by VerticalThings#varIdDef.
+VerticalThingsListener.prototype.exitVarIdDef = function(ctx) {
 };
 
 

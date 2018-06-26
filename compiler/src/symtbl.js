@@ -1,5 +1,7 @@
+'use strict';
+
 class SymbolTable{
-  constructor(parent, name) {
+  constructor(name, parent) {
   	this.name = name;
   	this.parent = parent;
   	this.symbols = {};
@@ -8,29 +10,41 @@ class SymbolTable{
   }
   
 
-  lookup(name){
+  lookup(name, kind){//kind = 'vardef', 'fdef'
   	var scope = this.current_scope;
   	do{
-  		var info = scope.symbols[name];
-  		if(info){
-  			return info;
+  		var sym = scope.symbols[name];
+  		if(sym){
+        switch(kind){
+          case 'vardef': if(!sym.info.is_formal_param && !sym.info.type.is_func) return sym; break;
+          case 'fdef' : if(sym.info.type.is_func) return sym; break;
+          default: return sym; 
+        }
   		}
   		scope = scope.parent;
-  	}
-  	while(scope.parent !== scope);
+  	}while(scope.parent);
+  	
   	return null;
   }
 
-  addSymbol(name, syminfo) {
+  addSymbolToCurrentScope(name, syminfo) {
   	var sym = {name: name, info: syminfo};
   	this.current_scope.symbols[name] = sym;
   	return sym;
   }
 
+  removeSymbolFromCurrentScope(name){
+    if(this.current_scope.symbols[name]){
+      delete this.current_scope.symbols[name];
+      return true;
+    }
+    return false;
+  }
+
   createNestedScope(scopename){
   	//console.log("Create scope ", scopename, " under ", this.current_scope.name);
-  	var stbl = new SymbolTable(this.current_scope, scopename);
-  	this.scopes[scopename] = stbl;
+  	var stbl = new SymbolTable(scopename, this.current_scope);
+  	this.current_scope.scopes[scopename] = stbl;
   	this.current_scope = stbl;
   	return stbl;
   }
@@ -53,7 +67,11 @@ class SymbolTable{
   }
 
   setRootScope(){
-  	while(this.current_scope !== this) this.current_scope = this.current_scope.parent;
+  	while(this.current_scope.parent) this.current_scope = this.current_scope.parent;
+  }
+
+  getCurrentScope(){
+    return this.current_scope;
   }
 }
 

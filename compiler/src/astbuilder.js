@@ -3,7 +3,7 @@ var SymbolTable = require("./symtbl.js");
 var ctx = {};
 
 function addSymbol(name, info){
-	ctx.symtbl.addSymbol(name, info);
+	ctx.symtbl.addSymbolToCurrentScope(name, info);
 }
 
 function getId(node) {
@@ -400,36 +400,38 @@ function astInitValue(initValue){
 }
 
 function astVarDef(def){
-  //varId: Identifier (ASSIGN initValue)?;
+  //varIdDef: Identifier (ASSIGN initValue)?;
   var varType = def.varType();
-  var varId  = def.varId();
+  var varIdDef  = def.varIdDef();
   var ast = {
   	type : astVarType(varType),
   	is_const: def.CONST() ? true : false,
-  	ids : [],
+  	defs : [],
 	src: src_info(def)  	
   };
 
-  for(var i=0;i<varId.length;i++){
-  	  var astId = {id: getId(varId[i])};
-  	  var initValue = varId[i].initValue();
+  for(var i=0;i<varIdDef.length;i++){
+  	  var def = {id: getId(varIdDef[i])};
+  	  var initValue = varIdDef[i].initValue();
 	  if(initValue){
-	  	astId.init = astInitValue(initValue);
+	  	def.init = astInitValue(initValue);
 	  }
-	  addSymbol(astId.id, {type: ast.type, is_const: ast.is_const, src: ast.src} );
-	  ast.ids.push(astId);
+	  addSymbol(def.id, {type: ast.type, is_const: ast.is_const, src: ast.src, has_init: def.init ? true : false} );
+	  ast.defs.push(def);
   }
   return ast;
 }
 
 function astFormalParam(param){
 	//varType Identifier
-	return {
+	var ast= {
 		is_const: param.CONST() ? true : false,
 		type: astVarType(param.varType()),
 		id: getId(param),
 		src: src_info(param)		
 	};
+	addSymbol(ast.id, {type: ast.type, is_const: ast.is_const, src: ast.src, is_formal_param: true} );	
+	return ast;
 }
 
 function astAssignStmt(stmt){
@@ -525,7 +527,9 @@ function astStmt(stmt){
 		return astAssignStmt(assignStmt);
 	}else
 	if(functionCall){
-		return getFunctionCallAst(functionCall);
+		var ast = getFunctionCallAst(functionCall);
+		ast.kind = 'fcall';
+		return ast;
 	}else
 	if(forStmt){
 		return astForStmt(forStmt);
@@ -560,7 +564,7 @@ function astFuncDef(fdef){
 	ast.id = getId(fdef);
 	ast.params = [];
 
-	addSymbol(ast.id, {type:{ftype: ast.type, ptypes: ast.params}, src:  ast.src})
+	addSymbol(ast.id, {type:{is_func: true, ftype: ast.type, formal_params: ast.params}, src:  ast.src})
 
 	ctx.symtbl.createNestedScope(ast.id);
 

@@ -1,0 +1,30 @@
+18
+19
+36
+38 
+37 
+42
+32
+45
+[]
+makeblocks done
+Basic Blocks are 
+-------------------
+152
+[ , [ 2 ], [ 3 ], [ 4 ], [ 3, 5 ], [ 6 ], [ 2, 7 ], [],  ]
+power is 60 type is undefined
+10
+number
+power is 60 type is undefined
+7
+number
+600
+number
+120
+number
+6
+number
+Basic Blocks are 
+-------------------
+47765
+[ , [ 2 ], [ 3 ], [ 4 ], [ 3, 5 ], [ 6 ], [ 2, 7 ], [],  ]
