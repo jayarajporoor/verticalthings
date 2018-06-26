@@ -239,3 +239,4 @@ var states=[];
 exports.stmt=stmts;
 exports.fdef=fdefs;
 exports.fparam=params;
+exports.var=vars;
