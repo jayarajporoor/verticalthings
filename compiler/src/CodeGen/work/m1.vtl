@@ -1,8 +1,13 @@
 module m1;
 
 default flow lol(){
-	int a=0;
-	a=a+1;
+	int[2][2]	a=0;
+	for i in [0,2]{
+		for j in [0,2]{
+			a[i][j]=a[i][j]+a[i][j];
+		}
+	}
+	//a=a+1;
 	next();
 }
 

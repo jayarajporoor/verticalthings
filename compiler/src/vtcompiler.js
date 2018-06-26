@@ -81,6 +81,9 @@ var srcpath = process.argv[2];
 var printAst = false;
 var printSymtbl = false;
 var printColor = false;
+var printJson = false;
+
+var ast_transforms = [];
 
 for(var i=3;i<process.argv.length;i++){
 	switch(process.argv[i]){
@@ -93,20 +96,43 @@ for(var i=3;i<process.argv.length;i++){
 		case "-color":
 			printColor = true;
 		break;
+		case "-json":
+			printJson = true;
+		break;
+		case "-xast":
+			if(process.argv[i+1]){
+				ast_transforms.push(process.argv[i+1]);
+				i++;
+			}else{
+				console.log("Please provide the AST transform module file path.");
+			}
+		break;
 	}
 }
 
 var input = fs.readFileSync(srcpath, 'utf8');
 var tree = parse(srcpath, input);
-var symtbl = new SymbolTable(null, "<root>");
+var symtbl = new SymbolTable("<root>");
 var ast = astBuilder.buildAst(tree, symtbl);
 
 ast.modules = {};
 
 loadPipeline(ast, path.dirname(srcpath), symtbl);
 
+var transform_ctx = {symtbl: symtbl};
+
+for(var i=0;i<ast_transforms.length;i++){
+	var xfn = require(ast_transforms[i]);
+	xfn(ast, transform_ctx);
+}
+
 if(printAst){
-	console.log(util.inspect(ast, false, 500, printColor));
+	if(printJson){
+		console.log(JSON.stringify(ast, null, 4));
+	}
+	else{
+		console.log(util.inspect(ast, false, 500, printColor));
+	}
 }	
 
 if(printSymtbl){
