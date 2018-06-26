@@ -1,0 +1,24 @@
+enum __nandu{__m1} __state = __m1;
+void __m1lol()
+{
+int a[2][2]=0;
+{
+a=(a+a);
+__state = __m1;
+}
+}
+void loop()
+{
+switch(__state)
+{
+case __m1:
+__state = __m1;
+__m1lol();
+break;
+default :
+__state = __m1;
+}
+}
+void setup()
+{
+}

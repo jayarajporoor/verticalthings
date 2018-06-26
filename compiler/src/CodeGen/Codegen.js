@@ -183,13 +183,14 @@ function getDefaultFlow(obj){
 }
 
 
-module.exports = function codeGen(obj,ctx){
+exports.transform = function codeGen(obj,ctx){
 	if(!ctx.code){
 		ctx.code = [];
 	}
 	var code = ctx.code;
    
-    for(var i in obj.pipeline.block){
+    for(var i=0; i<obj.pipeline.block.length;i++){
+        // console.log(i,obj.pipeline.block[i]);
         states.push(obj.pipeline.block[i].qname.join('_'));
     }
     code.push("enum __" + obj.pipeline.name + "{__" + states.join(", __") + "} __state = __" + states[0] + ";");
@@ -235,3 +236,5 @@ module.exports = function codeGen(obj,ctx){
 var cur_mod="";
 var states=[];
 // codeGen(obj,code);
+exports.stmt=stmts;
+exports.fdef=fdefs;
