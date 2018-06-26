@@ -184,7 +184,11 @@ function getDefaultFlow(obj){
 
 
 module.exports = function codeGen(obj,ctx){
-    var code=[];
+	if(!ctx.code){
+		ctx.code = [];
+	}
+	var code = ctx.code;
+   
     for(var i in obj.pipeline.block){
         states.push(obj.pipeline.block[i].qname.join('_'));
     }
@@ -224,13 +228,10 @@ module.exports = function codeGen(obj,ctx){
             if(obj.modules[states[i]].fdefs[j].id === "init")
                 code.push("__"+states[i]+"init();");
         }
-    }
-    ctx.code=code;
+    }    
     code.push("}");
-    console.log(ctx.code.join('\n'));
 };
 
 var cur_mod="";
 var states=[];
-var code=[];
 // codeGen(obj,code);

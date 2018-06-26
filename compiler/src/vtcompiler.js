@@ -84,6 +84,7 @@ var printColor = false;
 var printJson = false;
 
 var ast_transforms = [];
+var code_path;
 
 for(var i=3;i<process.argv.length;i++){
 	switch(process.argv[i]){
@@ -105,6 +106,13 @@ for(var i=3;i<process.argv.length;i++){
 				i++;
 			}else{
 				console.log("Please provide the AST transform module file path.");
+			}
+		case "-code":
+			if(process.argv[i+1]){
+				code_path = process.argv[i+1];
+				i++;
+			}else{
+				code_path = "";
 			}
 		break;
 	}
@@ -139,3 +147,15 @@ if(printSymtbl){
 	console.log(util.inspect(symtbl, false, 500, printColor));
 }
 
+if(code_path){
+	if(!transform_ctx.code || transform_ctx.code.length === 0){
+		console.log("Code not generated!");
+	}else{
+		var code_str = transform_ctx.code.join("\n");
+		if(code_path === ""){
+			console.log(code_str);
+		}else{
+			fs.writeFileSync(code_path, code_str);
+		}
+	}
+}
