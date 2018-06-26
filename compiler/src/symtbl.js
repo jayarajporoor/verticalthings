@@ -1,7 +1,7 @@
 'use strict';
 
 class SymbolTable{
-  constructor(parent, name) {
+  constructor(name, parent) {
   	this.name = name;
   	this.parent = parent;
   	this.symbols = {};
@@ -10,12 +10,16 @@ class SymbolTable{
   }
   
 
-  lookup(name){
+  lookup(name, kind){//kind = 'vardef', 'fdef'
   	var scope = this.current_scope;
   	do{
   		var info = scope.symbols[name];
   		if(info){
-  			return info;
+        switch(kind){
+          case 'vardef': if(!info.is_formal_param && !info.ftype) return info; break;
+          case 'fdef' : if(info.ftype) return info; break;
+          default: return info; 
+        }
   		}
   		scope = scope.parent;
   	}while(scope.parent !== scope);
@@ -31,7 +35,7 @@ class SymbolTable{
 
   createNestedScope(scopename){
   	//console.log("Create scope ", scopename, " under ", this.current_scope.name);
-  	var stbl = new SymbolTable(this.current_scope, scopename);
+  	var stbl = new SymbolTable(scopename, this.current_scope);
   	this.scopes[scopename] = stbl;
   	this.current_scope = stbl;
   	return stbl;
@@ -55,7 +59,11 @@ class SymbolTable{
   }
 
   setRootScope(){
-  	while(this.current_scope !== this) this.current_scope = this.current_scope.parent;
+  	while(this.current_scope.parent) this.current_scope = this.current_scope.parent;
+  }
+
+  getCurrentScope(){
+    return this.current_scope;
   }
 }
 

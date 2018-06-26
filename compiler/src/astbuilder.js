@@ -424,12 +424,14 @@ function astVarDef(def){
 
 function astFormalParam(param){
 	//varType Identifier
-	return {
+	var ast= {
 		is_const: param.CONST() ? true : false,
 		type: astVarType(param.varType()),
 		id: getId(param),
 		src: src_info(param)		
 	};
+	addSymbol(ast.id, {type: ast.type, is_const: ast.is_const, src: ast.src, is_formal_param: true} );	
+	return ast;
 }
 
 function astAssignStmt(stmt){
@@ -560,7 +562,7 @@ function astFuncDef(fdef){
 	ast.id = getId(fdef);
 	ast.params = [];
 
-	addSymbol(ast.id, {type:{ftype: ast.type, ptypes: ast.params}, src:  ast.src})
+	addSymbol(ast.id, {type:{ftype: ast.type, formal_params: ast.params}, src:  ast.src})
 
 	ctx.symtbl.createNestedScope(ast.id);
 
