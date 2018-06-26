@@ -1,3 +1,3 @@
-module.exports = function(ast, ctx){
+export.transform = function(ast, ctx){
     console.log("Transform called!");
 };

@@ -130,8 +130,12 @@ loadPipeline(ast, path.dirname(srcpath), symtbl);
 var transform_ctx = {symtbl: symtbl};
 
 for(var i=0;i<ast_transforms.length;i++){
-	var xfn = require(ast_transforms[i]);
-	xfn(ast, transform_ctx);
+	var xmod = require(ast_transforms[i]);
+	if(!xmod.transform){
+		console.log("The transform module ", ast_transforms[i], " do not have transform(ast, ctx) function defined.");
+	}else{
+		xmod.transform(ast, transform_ctx);
+	}
 }
 
 if(printAst){
