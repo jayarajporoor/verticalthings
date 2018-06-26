@@ -86,6 +86,7 @@ var printJson = false;
 var ast_transforms = [];
 var code_path = null;
 var ctx_attr = null;
+var config_path;
 
 var mod_params = [];
 
@@ -127,6 +128,14 @@ for(var i=3;i<process.argv.length;i++){
 				ctx_attr = "";
 			}			
 		break;
+		case "-config":
+			if(process.argv[i+1]){
+				config_path = process.argv[i+1];
+				i++;
+			}else{
+				console.log("Please specify the configuration file after the -config parameter.");
+			}					
+		break;
 		default:
 			mod_params.push(process.argv[i]);
 		break;
@@ -143,6 +152,10 @@ ast.modules = {};
 loadPipeline(ast, path.dirname(srcpath), symtbl);
 
 var transform_ctx = {symtbl: symtbl, params: mod_params};
+
+if(config_path){
+	transform_ctx.config = JSON.parse(fs.readFileSync(config_path));
+}
 
 for(var i=0;i<ast_transforms.length;i++){
 	var xmod = require(ast_transforms[i]);

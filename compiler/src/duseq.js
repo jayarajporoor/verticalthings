@@ -19,16 +19,19 @@ class DUSeq{
   }
 
   vardef(vr, init_syms, noinit_syms){
+
     if(!vr.type.dim){//if not array type, ignore.
       return;
     }
-    for(var i=0;i<vr.defs;i++){
+    for(var i=0;i<vr.defs.length;i++){
       var sym = this.symtbl.lookup(vr.defs[i].id);
       if(sym){
         if(sym.has_init)
           init_syms.push(sym);
         else
           noinit_syms.push(sym);
+      }else{
+        console.log("Symbol not found for vardef ", vr.defs[i].id);
       }
     }
   }
@@ -51,7 +54,7 @@ class DUSeq{
       }
       if(noinit_syms.length > 0){
         if(!entry) entry = {};
-        entry.undef = syms;
+        entry.undef = noinit_syms;
       }
     }
     if(entry){
@@ -118,10 +121,14 @@ class DUSeq{
           }
         }
         if(fdef_ast){
+          var saved_scope_name = this.symtbl.getCurrentScope().name;
+          this.symtbl.exitNestedScope();//of the caller          
           this.aliastbl.enterFunctionCall(fname, ast.params);
-          this.symtbl.enterNestedScope(fname);
-          fdef(fdef_ast);
-          this.symtbl.exitNestedScope();
+                    
+          this.symtbl.enterNestedScope(fname);//of the calleee
+          this.fdef(fdef_ast);
+          this.symtbl.exitNestedScope();//of the callee
+          this.symtbl.enterNestedScope(saved_scope_name);//of the caller
           this.aliastbl.exitFunctionCall();          
         }else{
           console.log("DUSeq: Fdef ast not found for: ", fname, "in module ", mod_name);
@@ -177,30 +184,17 @@ class DUSeq{
   }
 
   flow(mod, flow_name){
-    if(!mod.fdefs) return;
+    var mod_name = flow_name[0];
 
-    var fname = flow_name.length == 1? null : flow_name[1];
-    var named_fdef = null;
-
-    for(var i=0;i<mod.fdefs.length;i++){
-      var fdef = mod.fdefs[i];
-      if(fname){
-        if(fdef.id === fname && fdef.flow){
-          named_fdef = mod.fdefs[i];
-        }
-      }else{
-        if(fdef.flow === 'default'){
-          named_fdef = mod.fdefs[i];
-        }
-      }
+    if(!this.mods_visited[mod_name]){
+      this.vardefs(mod.vars, true);
+      this.mods_visited[mod_name]  = true;
     }
+    var fdef = ast_util.find_flow(mod, flow_name[1]);
 
-    if(named_fdef){
-      this.symtbl.enterNestedScope(named_fdef.id);
-      if(mod.vars){
-        this.vardefs(mod.vars, true);
-      }     
-      this.fdef(named_fdef);
+    if(fdef){
+      this.symtbl.enterNestedScope(fdef.id);
+      this.fdef(fdef);
       this.symtbl.exitNestedScope();
     }else{
       console.log("DUSeq: Flow name", flow_name, "not found");
@@ -214,14 +208,14 @@ class DUSeq{
     this.current_module = name;
     if(mod) {
       this.symtbl.enterNestedScope(name);
-      this.fdef(mod, entry.qname);
+      this.flow(mod, entry.qname);
       this.symtbl.exitNestedScope();
     }
   }
 
   pipeline(entry){
     while(entry){
-      pipeline_entry(entry);
+      this.pipeline_entry(entry);
       entry = entry.next;
     }
   }

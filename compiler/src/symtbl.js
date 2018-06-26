@@ -13,12 +13,12 @@ class SymbolTable{
   lookup(name, kind){//kind = 'vardef', 'fdef'
   	var scope = this.current_scope;
   	do{
-  		var info = scope.symbols[name];
-  		if(info){
+  		var sym = scope.symbols[name];
+  		if(sym){
         switch(kind){
-          case 'vardef': if(!info.is_formal_param && !info.ftype) return info; break;
-          case 'fdef' : if(info.ftype) return info; break;
-          default: return info; 
+          case 'vardef': if(!sym.info.is_formal_param && !sym.info.type.is_func) return sym; break;
+          case 'fdef' : if(sym.info.type.is_func) return sym; break;
+          default: return sym; 
         }
   		}
   		scope = scope.parent;

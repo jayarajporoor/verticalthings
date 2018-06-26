@@ -564,7 +564,7 @@ function astFuncDef(fdef){
 	ast.id = getId(fdef);
 	ast.params = [];
 
-	addSymbol(ast.id, {type:{ftype: ast.type, formal_params: ast.params}, src:  ast.src})
+	addSymbol(ast.id, {type:{is_func: true, ftype: ast.type, formal_params: ast.params}, src:  ast.src})
 
 	ctx.symtbl.createNestedScope(ast.id);
 
