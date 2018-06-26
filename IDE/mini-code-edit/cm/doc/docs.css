@@ -1,7 +1,7 @@
 body {
   font-family: Droid Sans, Arial, sans-serif;
   line-height: 1.5;
-  max-width: 64.3em;
+  max-width: 100%;
   margin: 3em auto;
   padding: 0 1em;
 }
@@ -53,7 +53,7 @@ img.logo {
 }
 
 a:link, a:visited, .quasilink {
-  color: #df0019;
+  color: #000000;
   cursor: pointer;
   text-decoration: none;
 }
