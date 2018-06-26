@@ -207,22 +207,22 @@ class DUSeq{
     }
   }
 
-  pipeline_block(block){    
-    for(var i=0;i<block.length;i++){
-      var entry = block[i];
-      if(entry.qname){
-        this.current_pipeline_entry = entry;
-        var name = entry.qname[0];
-        var mod = this.root_ast.modules[name];
-        this.current_module = name;
-        if(mod) {
-          this.symtbl.enterNestedScope(name);
-          this.flow(mod, entry.qname);
-          this.symtbl.exitNestedScope();
-        }
-      }else{
-        this.pipeline_block(entry);//this is a nested block
-      }
+  pipeline_entry(entry){    
+    this.current_pipeline_entry = entry;
+    var name = entry.qname[0];
+    var mod = this.root_ast.modules[name];
+    this.current_module = name;
+    if(mod) {
+      this.symtbl.enterNestedScope(name);
+      this.fdef(mod, entry.qname);
+      this.symtbl.exitNestedScope();
+    }
+  }
+
+  pipeline(entry){
+    while(entry){
+      pipeline_entry(entry);
+      entry = entry.next;
     }
   }
 
@@ -230,11 +230,12 @@ class DUSeq{
     this.root_ast = ast;
     symtbl.setRootScope();
     this.symtbl = symtbl;
+    this.mods_visited = {};
     this.aliastbl = new AliasTable(symtbl);
-    if(ast.pipeline){
-      this.pipeline_block(ast.pipeline.block);
+    if(ast.pipeline && ast.pipeline.block.length > 0){
+      this.pipeline(ast.pipeline.block[0]);
     }else{
-      console.log("DUSeq.build: No pipeline found");
+      console.log("DUSeq.build: No/empty pipeline found");
     }
     return this.seq;
   }

@@ -40,3 +40,6 @@ exports.find_default_flow = find_default_flow;
 exports.find_fdef = find_fdef;
 exports.find_flow = find_flow;
 exports.vector_ops = ['push'];
+exports.deep_copy = function(obj){
+	return JSON.parse(JSON.stringify(obj));
+}
