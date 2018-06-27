@@ -65,11 +65,6 @@ class DUSeq{
   expr(ast, use_syms, def_syms, seq){    
     var id = ast.qid ? ast.qid[0] : ast.id;
 
-    if(ast.id || ast.qid){
-      var resolv = ast_util.resolve_matrix_expr(ast, this.symtbl);
-      console.log(resolv);
-    }
-
     if(id){
       var sym = this.dynscope.lookup_sym(id);
       if(sym){
@@ -133,6 +128,7 @@ class DUSeq{
             saved_mod_scope_name = this.symtbl.getCurrentScope().name;
             this.symtbl.exitNestedScope();//of the caller module
             this.symtbl.enterNestedScope(mod_name); 
+            this.vardefs(mod_ast.vars, seq, true);
             //console.log("Save and exit scope ", saved_mod_scope_name, " and enter ", mod_name);
           }          
           this.dynscope.enterFunctionCall(fdef_ast.id, ast.params);
@@ -206,10 +202,8 @@ class DUSeq{
   flow(mod, flow_name){
     var mod_name = flow_name[0];
 
-    if(!this.mods_visited[mod_name]){
-      this.vardefs(mod.vars, this.seq, true);
-      this.mods_visited[mod_name]  = true;
-    }
+    this.vardefs(mod.vars, this.seq, true);
+
     var fdef = ast_util.find_flow(mod, flow_name[1]);
 
     if(fdef){
@@ -236,10 +230,7 @@ class DUSeq{
   }
 
   pipeline(entry){
-    while(entry){
-      this.pipeline_entry(entry);
-      entry = entry.next;
-    }
+    this.pipeline_entry(entry);
   }
 
   build(ast, symtbl){
