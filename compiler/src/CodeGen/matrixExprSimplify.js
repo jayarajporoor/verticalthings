@@ -106,7 +106,7 @@ function get_dim(ast,ctx){
 function transform_expr(ast, ctx){
 	var details = get_dim(ast, ctx);
 	// console.log(details);
-	details.info.type.dim.dim = details.dim;
+	details.info.type.dim.dim = JSON.parse(JSON.stringify(details.dim.dim));
 	// console.log(JSON.stringify(ast));
 	block_stmts.push({kind: "assign",id : "$t"+temp_ind,expr: JSON.parse(JSON.stringify(ast))});
 	ctx.symtbl.addSymbolToCurrentScope("$t"+temp_ind , details.info);

@@ -102,6 +102,7 @@ function stmts(obj,str){
 }
 
 function type_resolve(obj){
+	// console.log(obj);
 	var primitive=obj.primitive;
 	var dim="";
 	if(typeof obj.dim != 'undefined')
