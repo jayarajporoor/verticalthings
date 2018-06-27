@@ -70,5 +70,5 @@ exports.find_default_flow = find_default_flow;
 exports.find_fdef = find_fdef;
 exports.find_flow = find_flow;
 exports.vector_ops = ['push'];
-exports.unresolved_dim = unresolved_dim;
+exports.resolve_matrix_expr = resolve_matrix_expr;
 exports.deep_copy = deep_copy;
