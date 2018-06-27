@@ -50,13 +50,13 @@ class SymbolTable{
   }
 
   exitNestedScope(){
-  	console.log("Exit scope ", this.current_scope.name, " to ", this.current_scope.parent.name);
+  	//console.log("Exit scope ", this.current_scope.name, " to ", this.current_scope.parent.name);
   	this.current_scope = this.current_scope.parent;
   	return this.current_scope;
   }
 
   enterNestedScope(scopename){
-  	console.log("Enter scope ", scopename, " from ", this.current_scope.name);
+  	//console.log("Enter scope ", scopename, " from ", this.current_scope.name);
   	var scope = this.getNestedScope(scopename);
   	this.current_scope = scope;
   	return scope;
