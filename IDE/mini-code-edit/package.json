@@ -6,9 +6,7 @@
   "scripts": {
     "start": "nw"
   },
-  "devDependencies": {
-    "nw": "^0.12.0"
-  },
+  "devDependencies": {},
   "window": {
     "width": 400,
     "height": 520,
@@ -23,6 +21,7 @@
     "chart.js": "^2.7.2",
     "jquery": "^3.3.1",
     "moment": "^2.22.2",
+    "nw": "^0.30.2",
     "popper": "^1.0.1",
     "popper.js": "^1.14.3"
   }

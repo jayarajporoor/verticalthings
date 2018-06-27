@@ -16,7 +16,6 @@ var xmlhttp = new XMLHttpRequest();
 xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         modules   = JSON.parse(this.responseText);
-
     }
 };
 xmlhttp.open("GET", "moduleinfo.json", true);
@@ -137,6 +136,7 @@ function handleNewTab()
 
   console.log("hello");
   var id=tabID;
+  console.log(id);
   tabTextarea[tabID] = CodeMirror(
     document.getElementById(id),
     {
@@ -266,7 +266,6 @@ function initContextMenu() {
 
     }
   }));
-
   window.addEventListener('contextmenu',
                                   function(ev) {
     ev.preventDefault();
@@ -363,7 +362,8 @@ function resize()
   var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
   var containerWidth = window.innerWidth-30;
   var containerHeight = window.innerHeight-document.getElementById("analysis").offsetHeight-20;
-
+  console.log("resized");
+  console.log(id);
   var scrollerElement = tabTextarea[id] .getScrollerElement();
   scrollerElement.style.width = containerWidth + 'px';
   scrollerElement.style.height = containerHeight + 'px';

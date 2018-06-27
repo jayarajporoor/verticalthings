@@ -5,23 +5,23 @@
       "duration" : "1000",
       "power":[{
                 "resource":"r1",
-                "execpower":"110mah",
-                "exitpower":"50mah"
+                "execpower":"110",
+                "exitpower":"50"
               },
               {
                 "resource":"r2",
-                "execpower":"40mah",
-                "exitpower":"10mah"
+                "execpower":"40",
+                "exitpower":"10"
               },
               {
                 "resource":"r3",
-                "execpower":"10mah",
-                "exitpower":"5mah"
+                "execpower":"10",
+                "exitpower":"5"
               },
               {
                 "resource":"r4",
-                "execpower":"70mah",
-                "exitpower":"40mah"
+                "execpower":"70",
+                "exitpower":"40"
               }
               ]
 
@@ -32,20 +32,43 @@
       "duration": "2000",
       "power":[{
                 "resource":"r1",
-                "execpower":"200mah",
-                "exitpower":"100mah"
+                "execpower":"200",
+                "exitpower":"100"
 
               },
               {
                 "resource":"r2",
-                "execpower":"80mah",
-                "exitpower":"30mah"
+                "execpower":"80",
+                "exitpower":"30"
 
               },
               {
+                "resource":"r3",
+                "execpower":"4  0",
+                "exitpower":"20"
+              }
+              ]
+    },
+    {
+      "label":"thresholding",
+      "acquires":["r1","r2","r3"],
+      "duration": "2000",
+      "power":[{
                 "resource":"r1",
-                "execpower":"110mah",
-                "exitpower":"20mah"
+                "execpower":"200",
+                "exitpower":"100"
+
+              },
+              {
+                "resource":"r2",
+                "execpower":"80",
+                "exitpower":"30"
+
+              },
+              {
+                "resource":"r3",
+                "execpower":"110",
+                "exitpower":"20"
               }
               ]
     }

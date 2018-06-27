@@ -180,7 +180,7 @@ CodeMirror.defineMode("vertical", function(conf, parserConf) {
         startState: function(basecolumn) {
             return {
               tokenize: tokenBase,
-              scopes: [{offset:basecolumn || 0, type:'v'}],
+              scopes: [{offset:basecolumn || 0, type:'vtl'}],
               lastToken: null,
               lambda: false,
               dedent: 0
