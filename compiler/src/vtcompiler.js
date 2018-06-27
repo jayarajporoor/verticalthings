@@ -49,7 +49,7 @@ function loadPipelineBlock(block, basepath, symtbl){
 		if(entry.qname){
 			var name = entry.qname[0];
 			if(!ast.modules[name]) {				
-				var filepath = basepath + "/" + name + ".vtl";
+				var filepath = basepath + "/" + name + ".vt";
 				var src = fs.readFileSync(filepath, 'utf8');
 				var tree = parse(filepath, src);
 				symtbl.createNestedScope(name);
