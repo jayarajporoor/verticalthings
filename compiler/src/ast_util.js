@@ -40,17 +40,30 @@ function deep_copy(obj){
 	return JSON.parse(JSON.stringify(obj));
 }
 
-function unresolved_dim(ast, symtbl){
-	var sym_dim = symtbl.lookup(ast.id).info.type.dim;
+function resolve_matrix_expr(ast, symtbl){
+	var resolv = {};
+	var id = ast.id;
+	if(ast.qid){
+		id = ast.qid[0];
+	}
+	var sym = symtbl.lookup(id);
+	var sym_dim = sym.info.type.dim;
+	if(!sym_dim){
+		return null;
+	}
+
 	if(ast.dim){
 		var udim = [];
 		for(var i=ast.dim.length;i<sym_dim.length;i++){
 			udim.push(deep_copy(sym_dim[i]));
 		}
-		return udim;
+		resolv.dim = udim;
 	}else{
-		return deep_copy(sym_dim);
+		resolv.dim = deep_copy(sym_dim);
 	}
+	resolv.id = id;	
+	resolv.sym = sym;
+	return resolv;
 }
 
 exports.find_default_flow = find_default_flow;
