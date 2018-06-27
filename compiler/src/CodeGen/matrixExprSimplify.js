@@ -140,9 +140,9 @@ function expr(ast, ctx, isRoot){
 		}
 	}
 	return ast;
-	console.log("----------------------------------");
-	block_stmts.push({kind : "assign", id : " ", expr : ast});
-	console.log(JSON.stringify(block_stmts[1]));
+	// console.log("----------------------------------");
+	// block_stmts.push({kind : "assign", id : " ", expr : ast});
+	// console.log(JSON.stringify(block_stmts[1]));
 
 }
 
