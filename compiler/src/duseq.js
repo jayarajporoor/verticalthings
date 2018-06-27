@@ -128,14 +128,18 @@ class DUSeq{
             saved_mod_scope_name = this.symtbl.getCurrentScope().name;
             this.symtbl.exitNestedScope();//of the caller module
             this.symtbl.enterNestedScope(mod_name); 
+            //console.log("Save and exit scope ", saved_mod_scope_name, " and enter ", mod_name);
           }          
           this.dynscope.enterFunctionCall(fdef_ast.id, ast.params);
 
           this.symtbl.enterNestedScope(fdef_ast.id);//of the calleee
           this.fdef(fdef_ast, seq);
-          this.symtbl.exitNestedScope();//of the callee
+          this.symtbl.exitNestedScope();//of the callee          
+
           if(saved_mod_scope_name){
+            this.symtbl.exitNestedScope();
             this.symtbl.enterNestedScope(saved_mod_scope_name); 
+            //console.log("Exit and re-enter ", saved_mod_scope_name, " ", this.symtbl.getCurrentScope().name);
           }
           this.symtbl.enterNestedScope(saved_scope_name);//of the caller
           this.dynscope.exitFunctionCall();          
