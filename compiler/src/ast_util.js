@@ -51,11 +51,12 @@ function resolve_matrix_expr(ast, symtbl){
 	if(!sym_dim){
 		return null;
 	}
-
+	sym_dim = sym_dim.dim;
 	if(ast.dim){
+		var ast_dim = ast.dim.dim;		
 		var udim = [];
-		for(var i=ast.dim.length;i<sym_dim.length;i++){
-			udim.push(deep_copy(sym_dim[i]));
+		for(var i=ast_dim.length;i<sym_dim.length;i++){
+			udim.push(sym_dim[i]);
 		}
 		resolv.dim = udim;
 	}else{

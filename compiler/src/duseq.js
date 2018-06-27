@@ -62,8 +62,13 @@ class DUSeq{
     }
   }
 
-  expr(ast, use_syms, def_syms, seq){
-    var id = ast.qid ? ast.qid[0] : null;
+  expr(ast, use_syms, def_syms, seq){    
+    var id = ast.qid ? ast.qid[0] : ast.id;
+
+    if(ast.id || ast.qid){
+      var resolv = ast_util.resolve_matrix_expr(ast, this.symtbl);
+      console.log(resolv);
+    }
 
     if(id){
       var sym = this.dynscope.lookup_sym(id);
