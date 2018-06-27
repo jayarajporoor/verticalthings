@@ -42,10 +42,12 @@ function assign(ast, ctx){
 
 function checkIfLoopNeeded(ast,ctx){
 	// console.log(ast);
-	console.log(ctx.symtbl.lookup(ast.id));
+	console.log(ctx.symtbl.lookup(ast.id).dim);
 }
 
 function addLoop(ast,ctx){
 	checkIfLoopNeeded(ast,ctx);
 }
+
+var astlib=require("./../ast_util.js");
 exports.transform = loopGen;
