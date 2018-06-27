@@ -102,6 +102,7 @@ function stmts(obj,str){
 }
 
 function type_resolve(obj){
+	// console.log(obj);
 	var primitive=obj.primitive;
 	var dim="";
 	if(typeof obj.dim != 'undefined')
@@ -113,8 +114,9 @@ function type_resolve(obj){
 
 function vars(obj){
 	var s="";
-	if(typeof obj.is_const != 'undefined'){
-		if(obj.is_const === "true")
+	// console.log(obj.type.is_const);
+	if(typeof obj.type.is_const != 'undefined'){
+		if(obj.type.is_const === true)
 			s=s+"const ";
 	}
 	var type = type_resolve(obj.type);
@@ -133,8 +135,8 @@ function vars(obj){
 
 function params(obj){
 	var s="";
-	if(typeof obj.is_const != 'undefined'){
-		if(obj.is_const=="true")
+	if(typeof obj.type.is_const != 'undefined'){
+		if(obj.type.is_const === true)
 			s=s+"const ";
 	}
 	var type=type_resolve(obj.type);
@@ -183,7 +185,8 @@ function getDefaultFlow(obj){
 }
 
 
-exports.transform = function codeGen(obj,ctx){
+function codeGen(obj,ctx){
+	// console.log("asdasd");
 	if(!ctx.code){
 		ctx.code = [];
 	}
@@ -231,11 +234,15 @@ exports.transform = function codeGen(obj,ctx){
         }
     }    
     code.push("}");
+    // console.log("CODE :");
+    // console.log(code);
+    // return code;
 };
 
 var cur_mod="";
 var states=[];
 // codeGen(obj,code);
+exports.transform=codeGen;
 exports.stmt=stmts;
 exports.fdef=fdefs;
 exports.fparam=params;

@@ -4,7 +4,7 @@ function transform(ast,ctx){
 		fdefs(ast.modules[i].fdefs,ctx);
 		ctx.symtbl.exitNestedScope();
 	}
-};
+}
 
 function fdefs(ast,ctx){
 	for(var i = 0; i < ast.length ; i++){
@@ -86,27 +86,44 @@ function is_dim_resolved(ast,ctx){
 }
 
 function get_dim(ast,ctx){
-	// console.log(ast);
-	if(ast.op == "+"){
+	var Left;
+	var Right;
+	if(ast.op == "+" || ast.op == "-"){
 		if(typeof ast.lexpr.id != 'undefined'){
-				return {dim : ctx.symtbl.lookup(ast.lexpr.id).info.type.dim, info:ctx.symtbl.lookup(ast.lexpr.id).info};
+			Left = ctx.symtbl.lookup(ast.lexpr.id);
+			return {dim : Left.info.type.dim, info:Left.info};
 		}
-		else
-			return {dim:ctx.symtbl.lookup(ast.lexpr.qid[0]).info.type.dim , info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
+		else{
+			Left = ctx.symtbl.lookup(ast.lexpr.qid[0]);
+			return {dim: Left.info.type.dim , info: Left.info};
+		}
 	}
 	else if(ast.op == "*"){
-		if(typeof ast.lexpr.id != 'undefined'){
-				return { dim : [ctx.symtbl.lookup(ast.lexpr.id).info.type.dim.dim[0],ctx.symtbl.lookup(ast.rexpr.id).info.type.dim.dim[1]], info : ctx.symtbl.lookup(ast.lexpr.id).info};
-		}
-		else
-			return {dim : [ctx.symtbl.lookup(ast.lexpr.qid[0]).info.type.dim[0],ctx.symtbl.lookup(ast.rexpr.qid[0]).info.type.dim[1]], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};	
+			if(typeof ast.lexpr.id != 'undefined' && typeof ast.rexpr.id != 'undefined'){
+				Left = ctx.symtbl.lookup(ast.lexpr.id);
+				Right = ctx.symtbl.lookup(ast.rexpr.id);
+			}
+			else if(typeof ast.lexpr.id != 'undefined' && typeof ast.rexpr.qid != 'undefined'){
+				Left = ctx.symtbl.lookup(ast.lexpr.id);
+				Right = ctx.symtbl.lookup(ast.rexpr.qid[0]);
+			}
+			else if(typeof ast.lexpr.qid != 'undefined' && typeof ast.rexp.id != 'undefined'){
+				Left = ctx.symtbl.lookup(ast.lexpr.qid[0]);
+				Right = ctx.symtbl.lookup(ast.rexpr.id);
+			}
+			else if(typeof ast.lexpr.qid != 'undefined' && typeof ast.rexpr.qid != 'undefined'){
+				Left = ctx.symtbl.lookup(ast.lexpr.qid[0]);
+				Right = ctx.symtbl.lookup(ast.rexpr.qid[0]);
+			}
+			if(Left.info.type.dim.dim.length === 2 && Right.info.type.dim.dim.length === 2)
+			return { dim : [Left.info.type.dim.dim[0],Right.info.type.dim.dim[1]], info : Left.info};
 	}
 }
 
 function transform_expr(ast, ctx){
 	var details = get_dim(ast, ctx);
 	// console.log(details);
-	details.info.type.dim.dim = details.dim;
+	details.info.type.dim.dim = JSON.parse(JSON.stringify(details.dim.dim));
 	// console.log(JSON.stringify(ast));
 	block_stmts.push({kind: "assign",id : "$t"+temp_ind,expr: JSON.parse(JSON.stringify(ast))});
 	ctx.symtbl.addSymbolToCurrentScope("$t"+temp_ind , details.info);
@@ -140,9 +157,9 @@ function expr(ast, ctx, isRoot){
 		}
 	}
 	return ast;
-	console.log("----------------------------------");
-	block_stmts.push({kind : "assign", id : " ", expr : ast});
-	console.log(JSON.stringify(block_stmts[1]));
+	// console.log("----------------------------------");
+	// block_stmts.push({kind : "assign", id : " ", expr : ast});
+	// console.log(JSON.stringify(block_stmts[1]));
 
 }
 
