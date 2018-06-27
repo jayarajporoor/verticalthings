@@ -1,0 +1,6 @@
+module test_mod2;
+
+int x;
+default flow process(int[3] val){
+	x = val * 3;
+}

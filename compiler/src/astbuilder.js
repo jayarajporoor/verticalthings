@@ -411,10 +411,10 @@ function primitive_size(t){
 
 function computeDimensions(ast, val){
 	var dim = ast.type.dim.dim;
-	var nested_val = val.aconst;
+	var nested_val = val && val.aconst;
 	var i;
 	var size = 1;
-	for(i=0;(i<dim.length) && (nested_val);i++){
+	for(i=0;i<dim.length;i++){
 		var dimval = dim[i];
 		var dimsize = 0;
 		if(dimval.id){
@@ -427,12 +427,11 @@ function computeDimensions(ast, val){
 	  		delete dimval.id;
 	  		dimval.iconst = nested_val.length;
 		}
-
 		if(dimval.iconst){
 			dimsize = dimval.iconst;
 		}
 		size *= dimsize;
-		nested_val = nested_val[0].aconst;
+		nested_val = nested_val && nested_val[0].aconst;
 	}
 	size *= primitive_size(ast.type.primitive);
 	return size;
@@ -457,7 +456,7 @@ function astVarDef(def){
 	  	def.init = astInitValue(initValue);
 	  }
 	  var syminfo = {type: ast.type, is_const: ast.is_const, src: ast.src, value: def.init};
-	  if(ast.type.dim && def.init){
+	  if(ast.type.dim){
 	  	var size = computeDimensions(ast, def.init);
 	  	if(size){
 	  		syminfo.size = size;

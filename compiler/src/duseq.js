@@ -1,6 +1,6 @@
 'use strict';
 
-var AliasTable = require("./aliastbl.js");
+var DynScope = require("./dynscope.js");
 var ast_util = require("./ast_util.js");
 
 function array_push(target, obj){
@@ -36,7 +36,7 @@ class DUSeq{
     }
   }
 
-  vardefs(vardefs, is_mod){   
+  vardefs(vardefs, seq, is_mod){   
     var init_syms = [], noinit_syms=[];
     for(var i=0;i < vardefs.length;i++){
       this.vardef(vardefs[i], init_syms, noinit_syms);
@@ -58,15 +58,15 @@ class DUSeq{
       }
     }
     if(entry){
-      this.seq.push(entry);
+      seq.push(entry);
     }
   }
 
-  expr(ast, use_syms, def_syms){
+  expr(ast, use_syms, def_syms, seq){
     var id = ast.qid ? ast.qid[0] : null;
 
     if(id){
-      var sym = this.aliastbl.lookup_sym(id);
+      var sym = this.dynscope.lookup_sym(id);
       if(sym){
         if(sym.info.type.dim){
           use_syms.push(sym);
@@ -74,27 +74,27 @@ class DUSeq{
       }
     }else{
       if(ast.expr){
-        this.expr(ast.expr, use_syms, def_syms);
+        this.expr(ast.expr, use_syms, def_syms, seq);
       }
       if(ast.lexpr){
-        this.expr(ast.lexpr, use_syms, def_syms);
+        this.expr(ast.lexpr, use_syms, def_syms, seq);
       }
       if(ast.rexpr){
-        this.expr(ast.rexpr, use_syms, def_syms);
+        this.expr(ast.rexpr, use_syms, def_syms, seq);
       }
 
       if(ast.fcall){
-        this.fcall(ast.fcall, use_syms, def_syms);
+        this.fcall(ast.fcall, use_syms, def_syms, seq);
       }
     }
   }
 
-  fcall(ast, use_syms, def_syms){
+  fcall(ast, use_syms, def_syms, seq){
       var fname = ast.qid[0];
       var qname= ast.qid[1];
       if(qname){
         if(ast_util.vector_ops.indexOf(qname) >= 0){
-          var sym = this.aliastbl.lookup_sym(fname);
+          var sym = this.dynscope.lookup_sym(fname);
           use_syms.push(sym);
           def_syms.push(sym);
         }
@@ -102,7 +102,7 @@ class DUSeq{
         var mod_ast;
         if(fname === 'next'){
           if(this.current_pipeline_entry.next){
-            mod_ast = this.root_ast.modules[this.current_pipeline_entry.next.name];
+            mod_ast = this.root_ast.modules[this.current_pipeline_entry.next.qname[0]];
           }else{
             console.log("Next flow module not found for ", this.current_pipeline_entry.qname);
             return;
@@ -111,25 +111,34 @@ class DUSeq{
           mod_ast = this.root_ast.modules[this.current_module];
         }
         var fdef_ast=null;
-        var mod_name = "<unknown>";
+        var mod_name = null;
         if(mod_ast){
           mod_name = mod_ast.name;
           if(fname === 'next'){
-            fdef_ast = ast_util.find_flow(mod_ast, this.next_qname[1]);
+            fdef_ast = ast_util.find_flow(mod_ast, this.current_pipeline_entry.qname[1]);
           }else{
             fdef_ast = ast_util.find_fdef(mod_ast, fname);
           }
         }
         if(fdef_ast){
           var saved_scope_name = this.symtbl.getCurrentScope().name;
+          var saved_mod_scope_name;
           this.symtbl.exitNestedScope();//of the caller          
-          this.aliastbl.enterFunctionCall(fname, ast.params);
-                    
-          this.symtbl.enterNestedScope(fname);//of the calleee
-          this.fdef(fdef_ast);
+          if(mod_name){
+            saved_mod_scope_name = this.symtbl.getCurrentScope().name;
+            this.symtbl.exitNestedScope();//of the caller module
+            this.symtbl.enterNestedScope(mod_name); 
+          }          
+          this.dynscope.enterFunctionCall(fdef_ast.id, ast.params);
+
+          this.symtbl.enterNestedScope(fdef_ast.id);//of the calleee
+          this.fdef(fdef_ast, seq);
           this.symtbl.exitNestedScope();//of the callee
+          if(saved_mod_scope_name){
+            this.symtbl.enterNestedScope(saved_mod_scope_name); 
+          }
           this.symtbl.enterNestedScope(saved_scope_name);//of the caller
-          this.aliastbl.exitFunctionCall();          
+          this.dynscope.exitFunctionCall();          
         }else{
           console.log("DUSeq: Fdef ast not found for: ", fname, "in module ", mod_name);
         }
@@ -156,46 +165,50 @@ class DUSeq{
       break;
       case 'fcall':
         var use_syms =[], def_syms = [];
-        this.fcall(ast.fcall, use_syms, def_syms);
+        this.fcall(ast.fcall, use_syms, def_syms, aggr_seq);
+        aggr_seq.unshift({use: use_syms, def: def_syms});//add to beginning.        
       break;
       case 'assign':
         var use_syms = [], def_syms=[];
-        this.expr(ast.expr, use_syms, def_syms);
-        var sym = this.aliastbl.lookup_sym(ast.qid[0]);
+        this.expr(ast.expr, use_syms, def_syms, aggr_seq);
+        var id = ast.qid[0] || ast.id;
+        var sym = this.dynscope.lookup_sym(id);
         if(sym){
           if(sym.info.type.dim){
             def_syms.push(sym);
           }
         }else{
-          console.log("Symbol", ast.qid[0], "cannot be looked up");
+          console.log("Symbol", id, "cannot be looked up");
         }
-        aggr_seq  = [{use: use_syms, def: def_syms}];        
+        aggr_seq.unshift({use: use_syms, def: def_syms});//add to beginning.
       break;
     }
     return aggr_seq;
   }
 
-  fdef(ast){
+  fdef(ast, seq){
     if(ast.vars){
-      this.vardefs(ast.vars);
+      this.vardefs(ast.vars, seq);
     }
-    var seq = this.stmt(ast.body);
-    array_push(this.seq, seq);
+    var stmt_seq = this.stmt(ast.body);
+    array_push(seq, stmt_seq);
   }
 
   flow(mod, flow_name){
     var mod_name = flow_name[0];
 
     if(!this.mods_visited[mod_name]){
-      this.vardefs(mod.vars, true);
+      this.vardefs(mod.vars, this.seq, true);
       this.mods_visited[mod_name]  = true;
     }
     var fdef = ast_util.find_flow(mod, flow_name[1]);
 
     if(fdef){
+      this.dynscope.enterFlow(fdef.id);
       this.symtbl.enterNestedScope(fdef.id);
-      this.fdef(fdef);
+      this.fdef(fdef, this.seq);
       this.symtbl.exitNestedScope();
+      this.dynscope.exitFunctionCall();
     }else{
       console.log("DUSeq: Flow name", flow_name, "not found");
     }
@@ -225,7 +238,7 @@ class DUSeq{
     symtbl.setRootScope();
     this.symtbl = symtbl;
     this.mods_visited = {};
-    this.aliastbl = new AliasTable(symtbl);
+    this.dynscope = new DynScope(symtbl);
     if(ast.pipeline && ast.pipeline.block.length > 0){
       this.pipeline(ast.pipeline.block[0]);
     }else{

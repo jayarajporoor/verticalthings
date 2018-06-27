@@ -1,20 +1,27 @@
 'use strict';
 
-class AliasTable{
-  constructor(symtbl, parent) {
-  	this.symtbl = symtbl.getCurrentScope();
+class DynScope{
+  constructor(symtbl, parent, desc) {
+    desc = desc || "<root>";
+  	this.symtbl = symtbl;
   	this.parent = parent;
   	this.aliases = {};
+    this.desc = desc;
   	this.current_scope = this;
+  }
+
+  enterFlow(name){
+    var child = new DynScope(this.symtbl.getNestedScope(name), this, "Flow " + name);
+    this.current_scope = child;
   }
   
   enterFunctionCall(name, actualParams){
   	var fsym = this.symtbl.lookup(name, 'fdef');
   	if(!fsym){
-  		console.log("AliasTable: Cannot find function symbol ", name, " in symtbl scope ", this.symtbl.current_scope.name);
+  		console.log("DynScope: Cannot find function symbol ", name, " in symtbl scope ", this.symtbl.current_scope.name);
   		return;
   	}
-  	var child = new AliasTable(this.symtbl, this);
+  	var child = new DynScope(this.symtbl.getNestedScope(name), this.current_scope, "Function call " + name);
   	var formal_params = fsym.info.type.formal_params;
   	for(var i=0;i<actualParams.length && i < formal_params.length;i++){
   		var formal_param = formal_params[i];
@@ -28,7 +35,6 @@ class AliasTable{
   		}
   		child.aliases[formal_param.id] = {id: aliased_id};
   	}
-  	child.symtbl = this.symtbl.getNestedScope(name);
   	this.current_scope = child;
   }
 
@@ -39,24 +45,24 @@ class AliasTable{
   lookup_sym(name){  	
   	var curr_scope = this.current_scope;
   	var alias=null;
-  	var alias_scope = curr_scope;
-  	while(curr_scope.parent){
+  	var dyn_scope = curr_scope;
+  	while(curr_scope){
   		var alias = curr_scope.aliases[name];
   		if(alias){
   			if(alias.id){
   				name = alias.id;
-  				alias_scope = curr_scope;
+  				dyn_scope = curr_scope.parent;
   			}else{
   				break;
   			}
   		}else{
   			break;
   		}
-		curr_scope = curr_scope.parent;
+		  curr_scope = curr_scope.parent;
   	}
-  	return alias_scope.symtbl.lookup(name);
+  	return dyn_scope.symtbl.lookup(name,null,true);
   }
 
 }
 
-module.exports = AliasTable;
+module.exports = DynScope;

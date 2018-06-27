@@ -10,8 +10,8 @@ class SymbolTable{
   }
   
 
-  lookup(name, kind){//kind = 'vardef', 'fdef'
-  	var scope = this.current_scope;
+  lookup(name, kind, non_scoped){//kind = 'vardef', 'fdef'
+  	var scope = non_scoped ? this : this.current_scope;
   	do{
   		var sym = scope.symbols[name];
   		if(sym){
@@ -22,7 +22,7 @@ class SymbolTable{
         }
   		}
   		scope = scope.parent;
-  	}while(scope.parent);
+  	}while(scope);
   	
   	return null;
   }
@@ -50,13 +50,13 @@ class SymbolTable{
   }
 
   exitNestedScope(){
-  	//console.log("Exit scope ", this.current_scope.name, " to ", this.current_scope.parent.name);
+  	console.log("Exit scope ", this.current_scope.name, " to ", this.current_scope.parent.name);
   	this.current_scope = this.current_scope.parent;
   	return this.current_scope;
   }
 
   enterNestedScope(scopename){
-  	//console.log("Enter scope ", scopename, " from ", this.current_scope.name);
+  	console.log("Enter scope ", scopename, " from ", this.current_scope.name);
   	var scope = this.getNestedScope(scopename);
   	this.current_scope = scope;
   	return scope;
