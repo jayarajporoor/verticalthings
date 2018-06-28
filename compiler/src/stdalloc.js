@@ -2,10 +2,10 @@ const assert = require('assert');
 const ast_util = require("./ast_util.js");
 
 var ltmap ={};
-var full_lt = [];
+var full_ltmap = {};
 var regions = [];
 
-function compute_lt(duseq){
+function compute_ltmap(duseq){
 	var idx = 0;
 	var idx_used;
 
@@ -36,7 +36,7 @@ function compute_lt(duseq){
 				var lt = ltmap[scoped_name];
 				if(lt){
 					if(lt.mem){
-						full_lt.push(lt.sym);
+						full_ltmap[scoped_name] = lt.sym;
 						delete ltmap[scoped_name];
 					}else{
 						lt.end = idx;
@@ -208,20 +208,53 @@ function optimize_regions(max_lifetime, merge_policy){
 	}while(changed);
 }
 
+function allocate_addresses(){
+	var next_loc = 0;
+	var address_assigned = {};
+	var address_alloc = [];	
+
+	for(var k in full_ltmap){
+		var sym = full_ltmap[k];
+		var addr = {sym: sym, loc: next_loc};
+		address_alloc.push(addr);
+		next_loc += sym.info.size;
+	}
+
+	for(var i=0;i<regions.length;i++){
+		var blocks = regions[i].blocks;
+		for(var j=0;j<blocks.length;j++){
+			var block = blocks[j];
+			var owners = block.owners;
+			for(var k=0;k<owners.length;k++){
+				var sym = owners[k].sym;
+				var scoped_name = ast_util.get_scoped_name(sym);
+				if(!address_assigned[scoped_name]){
+					address_assigned[scoped_name] = true;
+					var addr = {sym: sym, loc: next_loc};
+					address_alloc.push(addr);
+				}
+			}
+			next_loc += block.size;
+		}
+	}
+	return address_alloc;
+}
+
 exports.transform = function(ast, ctx){
 	if(!ctx.duseq){
 		console.log("DUseq must be created prior to calling stdalloc.");
 		return;
 	}
 
-	compute_lt(ctx.duseq);
+	compute_ltmap(ctx.duseq);
 	
-//	console.log(full_lt);
+//	console.log(full_ltmap);
 //	console.log(ltmap);
 	
 	var max_lifetime = init_regions();
 
 	optimize_regions(max_lifetime, default_merge_policy);
+	var address_alloc = allocate_addresses();
 //	console.log(regions);
-	ctx.regions = regions;
+	ctx.address_alloc = address_alloc;
 };
