@@ -6,6 +6,10 @@ function addSymbol(name, info){
 	ctx.symtbl.addSymbolToCurrentScope(name, info);
 }
 
+function getSymbol(name){
+	return ctx.symtbl.lookup(name);
+}
+
 function getId(node) {
 	return node.Identifier().getText();
 }
@@ -418,14 +422,21 @@ function computeDimensions(ast, val){
 		var dimval = dim[i];
 		var dimsize = 0;
 		if(dimval.id){
+			var dimlen = nested_val && nested_val.length;
+			if(!dimlen){
+				var sym = getSymbol(dimval.id);
+				if(sym && sym.info.value && sym.info.value.iconst){
+					dimlen = sym.info.value.iconst;
+				}
+			}
 			//console.log(dimval.id, nested_val.length);
 	  		addSymbol(dimval.id, { type: {primitive: 'int', is_const: true}
 	  			                 , src: ast.src
-	  			                 , value: {iconst: nested_val.length}
+	  			                 , value: {iconst: dimlen}
 	  			                 , is_dim: true
 	  			                 } );
 	  		delete dimval.id;
-	  		dimval.iconst = nested_val.length;
+	  		dimval.iconst = dimlen;
 		}
 		if(dimval.iconst){
 			dimsize = dimval.iconst;

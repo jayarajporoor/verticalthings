@@ -163,12 +163,15 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 			c = 0;
 			tblock = cblock = null;
 		}
-		assert(!tblock && !cblock);//nothing pending.
+		assert(!(tblock && cblock));//both not pending together.
 		if(merged_blocks){
-			while(cidx < candidate.length){
-				merged_blocks.push(candidate[cidx]);
-				target_region.size += candidate[cidx].size;
-				cidx++;				
+			if(!cblock){
+				cblock = candidate[cidx++];
+			}
+			while(cblock){
+				merged_blocks.push(cblock);
+				target_region.size += cblock.size;
+				cblock = candidate[cidx++];				
 			}
 			target_region.blocks = merged_blocks;
 		}		
@@ -215,8 +218,8 @@ function allocate_addresses(){
 
 	for(var k in full_ltmap){
 		var sym = full_ltmap[k];
-		var addr = {sym: sym, loc: next_loc};
-		address_alloc.push(addr);
+		var alloc = {sym: sym, loc: next_loc, size: sym.info.size};
+		address_alloc.push(alloc);
 		next_loc += sym.info.size;
 	}
 
@@ -230,8 +233,8 @@ function allocate_addresses(){
 				var scoped_name = ast_util.get_scoped_name(sym);
 				if(!address_assigned[scoped_name]){
 					address_assigned[scoped_name] = true;
-					var addr = {sym: sym, loc: next_loc};
-					address_alloc.push(addr);
+					var alloc = {sym: sym, loc: next_loc, size: sym.info.size};
+					address_alloc.push(alloc);
 				}
 			}
 			next_loc += block.size;
@@ -260,7 +263,7 @@ exports.transform = function(ast, ctx){
 	if(ctx.params['-printalloc']){
 		for(var i=0;i<address_alloc.length;i++){
 			var alloc = address_alloc[i];
-			console.log(ast_util.get_scoped_name(alloc.sym, "'s "), " at ", alloc.loc);
+			console.log(ast_util.get_scoped_name(alloc.sym, "'s "), " at ", alloc.loc, " size ", alloc.size);
 		}
 	}
 };
