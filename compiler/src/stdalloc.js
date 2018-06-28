@@ -214,13 +214,16 @@ function optimize_regions(max_lifetime, merge_policy){
 function allocate_addresses(){
 	var next_loc = 0;
 	var address_assigned = {};
-	var address_alloc = [];	
+	var alloc = [];	
+	var total_alloc_size = 0, total_obj_size = 0;
 
 	for(var k in full_ltmap){
 		var sym = full_ltmap[k];
-		var alloc = {sym: sym, loc: next_loc, size: sym.info.size};
-		address_alloc.push(alloc);
+		var sym_alloc = {sym: sym, loc: next_loc};
+		alloc.push(sym_alloc);
 		next_loc += sym.info.size;
+		total_alloc_size += sym_alloc.sym.info.size;
+		total_obj_size += sym_alloc.sym.info.size;
 	}
 
 	for(var i=0;i<regions.length;i++){
@@ -233,14 +236,16 @@ function allocate_addresses(){
 				var scoped_name = ast_util.get_scoped_name(sym);
 				if(!address_assigned[scoped_name]){
 					address_assigned[scoped_name] = true;
-					var alloc = {sym: sym, loc: next_loc, size: sym.info.size};
-					address_alloc.push(alloc);
+					var sym_alloc = {sym: sym, loc: next_loc};
+					alloc.push(sym_alloc);
+					total_obj_size += sym_alloc.sym.info.size;
 				}
 			}
+			total_alloc_size += block.size;			
 			next_loc += block.size;
 		}
 	}
-	return address_alloc;
+	return {alloc: alloc, total_alloc_size: total_alloc_size, total_obj_size: total_obj_size};
 }
 
 exports.transform = function(ast, ctx){
@@ -257,13 +262,14 @@ exports.transform = function(ast, ctx){
 	var max_lifetime = init_regions();
 
 	optimize_regions(max_lifetime, default_merge_policy);
-	var address_alloc = allocate_addresses();
+	var mem = allocate_addresses();
 //	console.log(regions);
-	ctx.address_alloc = address_alloc;
+	ctx.mem = mem;
 	if(ctx.params['-printalloc']){
-		for(var i=0;i<address_alloc.length;i++){
-			var alloc = address_alloc[i];
-			console.log(ast_util.get_scoped_name(alloc.sym, "'s "), " at ", alloc.loc, " size ", alloc.size);
+		console.log("Total alloc size ", mem.total_alloc_size, ", total size of objects ", mem.total_obj_size);
+		for(var i=0;i<mem.alloc.length;i++){
+			var alloc = mem.alloc[i];
+			console.log(ast_util.get_scoped_name(alloc.sym, "'s "), " at ", alloc.loc, ", object size ", alloc.sym.info.size);
 		}
 	}
 };
