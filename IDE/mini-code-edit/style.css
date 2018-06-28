@@ -39,6 +39,7 @@ button {
   display: none;
 }
 #main{
+  position: fixed;
   margin-left: 135px;
   width:100%;
 }

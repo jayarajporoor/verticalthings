@@ -13,7 +13,7 @@ CodeMirror.defineMode("vertical", function(conf, parserConf) {
     var identifiers = new RegExp("^[_A-Za-z][_A-Za-z0-9]*");
 
     var wordOperators = wordRegexp(['and', 'or', 'not', 'is', 'in']);
-    var commonkeywords = ['bind', 'acquire', 'yield','mpu_acq','normalize_mpu_ag','if_gt_any','tlc_featurizer','int2float','protonn','thresholding',
+    var commonkeywords = ['bind', 'acquire', 'yield','mpu_acq','normalize_mpu_ag','if_gt_any','tlcfeaturizer','int2float','protonn','thresholding',
                           'majority_vote','if_changed','rate_limit','ble_send','on_panic','toggle_led','icane'];
     var commonBuiltins = ['int','long long','float','char','double','pipeline','module'];
 
@@ -27,6 +27,18 @@ CodeMirror.defineMode("vertical", function(conf, parserConf) {
 
     var indentInfo = null;
 
+    function tokenComment(stream, state) {
+      console.log("hi");
+      var maybeEnd = false, ch;
+      while (ch = stream.next()) {
+        if (ch == "/" && maybeEnd) {
+          state.tokenize = tokenBase;
+          break;
+        }
+        maybeEnd = (ch == "*");
+      }
+      return "comment";
+    }
     // tokenizers
     function tokenBase(stream, state) {
         // Handle scope changes
@@ -36,13 +48,20 @@ CodeMirror.defineMode("vertical", function(conf, parserConf) {
         }
 
         var ch = stream.peek();
-
         // Handle Comments
-        if (ch === '#') {
-            stream.skipToEnd();
-            return 'comment';
-        }
 
+        if (ch == "/") {
+          stream.next();
+          if (stream.eat("*")) {
+            state.tokenize = tokenComment;
+            return tokenComment(stream, state);
+          }
+          if (stream.eat("/")) {
+            console.log("singleLine");
+            stream.skipToEnd();
+            return "comment";
+          }
+        }
         // Handle Number Literals
         if (stream.match(/^[0-9\.]/, false)) {
             var floatLiteral = false;
