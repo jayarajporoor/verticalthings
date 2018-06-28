@@ -1,0 +1,7 @@
+June 27
+--------
+#2 symbol table:
+sym.info.has_init removed, sym.info.value added. this will contain the intialized value if present.
+
+#1 ast/symbol table:
+moved is_const field from ast to ast.type - so this is also available in symbol table.

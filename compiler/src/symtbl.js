@@ -10,8 +10,8 @@ class SymbolTable{
   }
   
 
-  lookup(name, kind){//kind = 'vardef', 'fdef'
-  	var scope = this.current_scope;
+  lookup(name, kind, non_scoped){//kind = 'vardef', 'fdef'
+  	var scope = non_scoped ? this : this.current_scope;
   	do{
   		var sym = scope.symbols[name];
   		if(sym){
@@ -22,7 +22,7 @@ class SymbolTable{
         }
   		}
   		scope = scope.parent;
-  	}while(scope.parent);
+  	}while(scope);
   	
   	return null;
   }

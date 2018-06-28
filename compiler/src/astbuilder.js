@@ -399,16 +399,55 @@ function astInitValue(initValue){
 	}
 }
 
+const primitive_sizes = {
+	'int': 4,
+	'float': 4,
+	'char' : 1
+};
+
+function primitive_size(t){
+	return primitive_sizes[t];
+}
+
+function computeDimensions(ast, val){
+	var dim = ast.type.dim.dim;
+	var nested_val = val && val.aconst;
+	var i;
+	var size = 1;
+	for(i=0;i<dim.length;i++){
+		var dimval = dim[i];
+		var dimsize = 0;
+		if(dimval.id){
+			//console.log(dimval.id, nested_val.length);
+	  		addSymbol(dimval.id, { type: {primitive: 'int', is_const: true}
+	  			                 , src: ast.src
+	  			                 , value: {iconst: nested_val.length}
+	  			                 , is_dim: true
+	  			                 } );
+	  		delete dimval.id;
+	  		dimval.iconst = nested_val.length;
+		}
+		if(dimval.iconst){
+			dimsize = dimval.iconst;
+		}
+		size *= dimsize;
+		nested_val = nested_val && nested_val[0].aconst;
+	}
+	size *= primitive_size(ast.type.primitive);
+	return size;
+}
+
 function astVarDef(def){
   //varIdDef: Identifier (ASSIGN initValue)?;
   var varType = def.varType();
   var varIdDef  = def.varIdDef();
   var ast = {
   	type : astVarType(varType),
-  	is_const: def.CONST() ? true : false,
   	defs : [],
 	src: src_info(def)  	
   };
+
+  ast.type.is_const = def.CONST() ? true : false;
 
   for(var i=0;i<varIdDef.length;i++){
   	  var def = {id: getId(varIdDef[i])};
@@ -416,7 +455,14 @@ function astVarDef(def){
 	  if(initValue){
 	  	def.init = astInitValue(initValue);
 	  }
-	  addSymbol(def.id, {type: ast.type, is_const: ast.is_const, src: ast.src, has_init: def.init ? true : false} );
+	  var syminfo = {type: ast.type, is_const: ast.is_const, src: ast.src, value: def.init};
+	  if(ast.type.dim){
+	  	var size = computeDimensions(ast, def.init);
+	  	if(size){
+	  		syminfo.size = size;
+	  	}
+	  }
+	  addSymbol(def.id, syminfo);
 	  ast.defs.push(def);
   }
   return ast;
