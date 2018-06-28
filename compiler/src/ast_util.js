@@ -67,8 +67,9 @@ function resolve_matrix_expr(ast, symtbl){
 	return resolv;
 }
 
-function get_scoped_name(sym){
-	return sym.scope_names.join("_") + "_" + sym.name;
+function get_scoped_name(sym, sep){
+	sep = !sep ? "_" : sep;
+	return sym.scope_names.join(sep) + sep + sym.name;
 }
 
 exports.find_default_flow = find_default_flow;

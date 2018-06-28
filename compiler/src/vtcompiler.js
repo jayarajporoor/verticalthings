@@ -88,7 +88,7 @@ var code_path = null;
 var ctx_attr = null;
 var config_path;
 
-var mod_params = [];
+var mod_params = {};
 
 for(var i=3;i<process.argv.length;i++){
 	switch(process.argv[i]){
@@ -137,7 +137,14 @@ for(var i=3;i<process.argv.length;i++){
 			}					
 		break;
 		default:
-			mod_params.push(process.argv[i]);
+			var arg = process.argv[i];
+			var argval = true;
+			var next_arg = process.argv[i+1];
+			if(next_arg && next_arg[0] !== '-'){
+				argval = next_arg;
+				i++;
+			}
+			mod_params[arg] = argval;
 		break;
 	}
 }

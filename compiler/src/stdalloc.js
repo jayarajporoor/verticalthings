@@ -257,4 +257,10 @@ exports.transform = function(ast, ctx){
 	var address_alloc = allocate_addresses();
 //	console.log(regions);
 	ctx.address_alloc = address_alloc;
+	if(ctx.params['-printalloc']){
+		for(var i=0;i<address_alloc.length;i++){
+			var alloc = address_alloc[i];
+			console.log(ast_util.get_scoped_name(alloc.sym, "'s "), " at ", alloc.loc);
+		}
+	}
 };
