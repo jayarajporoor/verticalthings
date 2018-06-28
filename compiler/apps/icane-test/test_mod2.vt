@@ -1,7 +1,8 @@
 module test_mod2;
 
 int x;
-int[3] fff;
-default flow process(int[3] val){
-	fff = val * x + fff;
+int[10] fff;
+default flow process(int[10] val){
+	fff = 5;
+	x = val * fff;
 }

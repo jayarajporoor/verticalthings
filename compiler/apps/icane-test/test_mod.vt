@@ -1,19 +1,13 @@
 module test_mod;
 
-int[M][N] xxx ={{1,2,3}, {3,4,5}};
-
-void abc(int[n] aaa, int[n] bbb){
-	aaa = 3;
-	bbb = aaa;
-}
+int[10] xxx;
 
 default flow acquire(){
-	int[3] yyy;
-	int[3] zzz;
-	yyy = 3;
-	xxx = yyy * 5;
-	zzz = 6;
-	abc(xxx, zzz);
+	int[10] yyy;
+	int[10] zzz;
+	xxx = 4;
+	yyy = xxx * 3;
+	zzz = yyy * 4;
 	next(zzz);
 }
 
