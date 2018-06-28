@@ -101,10 +101,10 @@ class DUSeq{
       }else{
         var mod_ast;
         if(fname === 'next'){
-          if(this.current_pipeline_entry.next){
-            mod_ast = this.root_ast.modules[this.current_pipeline_entry.next.qname[0]];
+          if(this.pipeline_stack[0].next){//index 0 is top of the stack.
+            mod_ast = this.root_ast.modules[this.pipeline_stack[0].next.qname[0]];
           }else{
-            console.log("Next flow module not found for ", this.current_pipeline_entry.qname);
+            console.log("Next flow module not found for ", this.pipeline_stack[0].qname);
             return;
           }
         }else{
@@ -115,7 +115,7 @@ class DUSeq{
         if(mod_ast){
           mod_name = mod_ast.name;
           if(fname === 'next'){
-            fdef_ast = ast_util.find_flow(mod_ast, this.current_pipeline_entry.qname[1]);
+            fdef_ast = ast_util.find_flow(mod_ast, this.pipeline_stack[0].qname[1]);
           }else{
             fdef_ast = ast_util.find_fdef(mod_ast, fname);
           }
@@ -129,6 +129,7 @@ class DUSeq{
             this.symtbl.exitNestedScope();//of the caller module
             this.symtbl.enterNestedScope(mod_name); 
             this.vardefs(mod_ast.vars, seq, true);
+            this.pipeline_stack.unshift(this.pipeline_stack[0].next);
             //console.log("Save and exit scope ", saved_mod_scope_name, " and enter ", mod_name);
           }          
           this.dynscope.enterFunctionCall(fdef_ast.id, ast.params);
@@ -138,12 +139,13 @@ class DUSeq{
           this.symtbl.exitNestedScope();//of the callee          
 
           if(saved_mod_scope_name){
+            this.pipeline_stack.shift();//remove top of the stack.
             this.symtbl.exitNestedScope();
             this.symtbl.enterNestedScope(saved_mod_scope_name); 
             //console.log("Exit and re-enter ", saved_mod_scope_name, " ", this.symtbl.getCurrentScope().name);
           }
           this.symtbl.enterNestedScope(saved_scope_name);//of the caller
-          this.dynscope.exitFunctionCall();          
+          this.dynscope.exitFunctionCall();                    
         }else{
           console.log("DUSeq: Fdef ast not found for: ", fname, "in module ", mod_name);
         }
@@ -217,8 +219,8 @@ class DUSeq{
     }
   }
 
-  pipeline_entry(entry){    
-    this.current_pipeline_entry = entry;
+  enter_pipeline(entry){    
+    this.pipeline_stack = [entry];
     var name = entry.qname[0];
     var mod = this.root_ast.modules[name];
     this.current_module = name;
@@ -229,10 +231,6 @@ class DUSeq{
     }
   }
 
-  pipeline(entry){
-    this.pipeline_entry(entry);
-  }
-
   build(ast, symtbl){
     this.root_ast = ast;
     symtbl.setRootScope();
@@ -240,7 +238,7 @@ class DUSeq{
     this.mods_visited = {};
     this.dynscope = new DynScope(symtbl);
     if(ast.pipeline && ast.pipeline.block.length > 0){
-      this.pipeline(ast.pipeline.block[0]);
+      this.enter_pipeline(ast.pipeline.block[0]);
     }else{
       console.log("DUSeq.build: No/empty pipeline found");
     }

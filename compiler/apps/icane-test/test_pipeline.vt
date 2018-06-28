@@ -2,5 +2,6 @@ module test_pipeline;
 
 pipeline icane_test {
 	test_mod(true),
-	test_mod2
+	test_mod2,
+	test_mod3
 };
