@@ -67,9 +67,14 @@ function resolve_matrix_expr(ast, symtbl){
 	return resolv;
 }
 
+function get_scoped_name(sym){
+	return sym.scope_names.join("_") + "_" + sym.name;
+}
+
 exports.find_default_flow = find_default_flow;
 exports.find_fdef = find_fdef;
 exports.find_flow = find_flow;
 exports.vector_ops = ['push'];
 exports.resolve_matrix_expr = resolve_matrix_expr;
 exports.deep_copy = deep_copy;
+exports.get_scoped_name = get_scoped_name;

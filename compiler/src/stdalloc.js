@@ -1,4 +1,5 @@
 const assert = require('assert');
+const ast_util = require("./ast_util.js");
 
 var ltmap ={};
 var full_lt = [];
@@ -14,13 +15,15 @@ function compute_lt(duseq){
 		if(du.mem){
 			for(var j=0;j < du.mem.length;j++){
 				var m = du.mem[j];
-				ltmap[m.name] = {mem: true, sym: m};
+				var scoped_name = ast_util.get_scoped_name(m);
+				ltmap[scoped_name] = {mem: true, sym: m};
 			}
 		}
 		if(du.undef){
 			for(var j=0;j< du.undef.length;j++){
 				var m = du.undef[j];
-				ltmap[m.name] = {undef: true, sym: m};
+				var scoped_name = ast_util.get_scoped_name(m);				
+				ltmap[scoped_name] = {undef: true, sym: m};
 			}
 		}
 
@@ -29,11 +32,12 @@ function compute_lt(duseq){
 		if(du.use){
 			for(var j=0;j < du.use.length;j++){
 				var m = du.use[j];
-				var lt = ltmap[m.name];
+				var scoped_name = ast_util.get_scoped_name(m);				
+				var lt = ltmap[scoped_name];
 				if(lt){
 					if(lt.mem){
 						full_lt.push(lt.sym);
-						delete ltmap[m.name];
+						delete ltmap[scoped_name];
 					}else{
 						lt.end = idx;
 						idx_used = true;
@@ -45,7 +49,8 @@ function compute_lt(duseq){
 		if(du.def){
 			for(var j=0;j < du.def.length;j++){
 				var m = du.def[j];
-				var lt = ltmap[m.name];
+				var scoped_name = ast_util.get_scoped_name(m);				
+				var lt = ltmap[scoped_name];
 				if(lt){
 					lt.mem = false;
 					lt.undef = false;
@@ -211,12 +216,12 @@ exports.transform = function(ast, ctx){
 
 	compute_lt(ctx.duseq);
 	
-	console.log(full_lt);
-	console.log(ltmap);
+//	console.log(full_lt);
+//	console.log(ltmap);
 	
 	var max_lifetime = init_regions();
 
 	optimize_regions(max_lifetime, default_merge_policy);
-	console.log(regions);
+//	console.log(regions);
 	ctx.regions = regions;
 };

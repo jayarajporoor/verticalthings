@@ -14,8 +14,10 @@ class SymbolTable{
   	var scope = non_scoped ? this : this.current_scope;
   	do{
   		var sym = scope.symbols[name];
-  		if(sym){
-        switch(kind){
+  		if(sym)
+      {
+        switch(kind)
+        {
           case 'vardef': if(!sym.info.is_formal_param && !sym.info.type.is_func) return sym; break;
           case 'fdef' : if(sym.info.type.is_func) return sym; break;
           default: return sym; 
@@ -28,7 +30,14 @@ class SymbolTable{
   }
 
   addSymbolToCurrentScope(name, syminfo) {
-  	var sym = {name: name, info: syminfo};
+    var scope_names = [];
+    var scope = this.current_scope;
+    do{
+      scope_names.unshift(scope.name);//add to beginning of the array.
+      scope = scope.parent;
+    }while(scope && scope.parent);
+  
+  	var sym = {name: name, info: syminfo, scope_names: scope_names};
   	this.current_scope.symbols[name] = sym;
   	return sym;
   }
