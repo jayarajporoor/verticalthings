@@ -1,7 +1,8 @@
 module m1;
 
 default flow lol(){
-	const int[2][2]	a=0;
-	a=a+a+a;
+	int[2][2]	a=0;
+	int[2][2] b,c,d,e;
+	a=b+c+d+e+f;
 	next();
 }
