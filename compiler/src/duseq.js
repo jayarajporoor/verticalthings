@@ -13,6 +13,37 @@ function branch_merge(seq1, seq2){
   return seq1.concat(seq2);
 }
 
+function seq_merge(seq_entry, use_syms, def_syms, use_found, def_found){
+  for(var i=0;i<seq_entry.use.length;i++){
+      var m = seq_entry.use[i];
+      var scoped_name = ast_util.get_scoped_name(m);
+      if(!use_found[scoped_name]){
+        use_found[scoped_name] = true;
+        use_syms.push(m);
+      }
+  }
+  for(var i=0;i<seq_entry.def.length;i++){
+      var m = seq_entry.def[i];
+      var scoped_name = ast_util.get_scoped_name(m);
+      if(!def_found[scoped_name]){
+        def_found[scoped_name] = true;
+        def_syms.push(m);
+      }
+  }
+}
+
+function loop_merge(expr_seq, stmt_seq){
+  var use_syms = [], def_syms = [];
+  var use_found ={}, def_found = {};
+  for(var i=0;i<expr_seq.length;i++){
+    seq_merge(expr_seq[i], use_syms, def_syms, use_found, def_found);
+  }
+  for(var i=0;i<stmt_seq.length;i++){
+    seq_merge(stmt_seq[i], use_syms, def_syms, use_found, def_found);
+  }
+  return [{use_syms: use_syms, def_syms: def_syms}];
+}
+
 class DUSeq{
   constructor() {
     this.seq = [];
@@ -92,6 +123,8 @@ class DUSeq{
   fcall(ast, use_syms, def_syms, seq){
       var fname = ast.qid[0];
       var qname= ast.qid[1];
+      var is_flow = false;
+
       if(qname){
         if(ast_util.vector_ops.indexOf(qname) >= 0){
           var sym = this.dynscope.lookup_sym(fname);
@@ -103,6 +136,7 @@ class DUSeq{
         if(fname === 'next'){
           if(this.pipeline_stack[0].next){//index 0 is top of the stack.
             mod_ast = this.root_ast.modules[this.pipeline_stack[0].next.qname[0]];
+            is_flow = true;
           }else{
             console.log("Next flow module not found for ", this.pipeline_stack[0].qname);
             return;
@@ -110,6 +144,7 @@ class DUSeq{
         }else{
           mod_ast = this.root_ast.modules[this.current_module];
         }
+
         var fdef_ast=null;
         var mod_name = null;
         if(mod_ast){
@@ -124,7 +159,7 @@ class DUSeq{
           var saved_scope_name = this.symtbl.getCurrentScope().name;
           var saved_mod_scope_name;
           this.symtbl.exitNestedScope();//of the caller          
-          if(mod_name){
+          if(is_flow){
             saved_mod_scope_name = this.symtbl.getCurrentScope().name;
             this.symtbl.exitNestedScope();//of the caller module
             this.symtbl.enterNestedScope(mod_name); 
@@ -132,13 +167,15 @@ class DUSeq{
             this.pipeline_stack.unshift(this.pipeline_stack[0].next);
             //console.log("Save and exit scope ", saved_mod_scope_name, " and enter ", mod_name);
           }          
+
           this.dynscope.enterFunctionCall(fdef_ast.id, ast.params);
 
           this.symtbl.enterNestedScope(fdef_ast.id);//of the calleee
+
           this.fdef(fdef_ast, seq);
           this.symtbl.exitNestedScope();//of the callee          
 
-          if(saved_mod_scope_name){
+          if(is_flow){
             this.pipeline_stack.shift();//remove top of the stack.
             this.symtbl.exitNestedScope();
             this.symtbl.enterNestedScope(saved_mod_scope_name); 
@@ -175,6 +212,19 @@ class DUSeq{
         this.fcall(ast.fcall, use_syms, def_syms, aggr_seq);
         aggr_seq.unshift({use: use_syms, def: def_syms});//add to beginning.        
       break;
+      case 'for':
+      case 'while':
+        var expr_seq = [];
+        if(ast.expr){
+          var use_syms = [], def_syms=[];
+          this.expr(ast.expr, use_syms, def_syms, expr_seq);
+          if(use_syms.length > 0 || def_syms.length > 0){
+            expr_seq.unshift({use: use_syms, def: def_syms});
+          }
+        }
+        var stmt_seq = this.stmt(ast.body);
+        aggr_seq = loop_merge(expr_seq, stmt_seq);
+      break;
       case 'assign':
         var use_syms = [], def_syms=[];
         this.expr(ast.expr, use_syms, def_syms, aggr_seq);
@@ -194,6 +244,7 @@ class DUSeq{
   }
 
   fdef(ast, seq){
+
     if(ast.vars){
       this.vardefs(ast.vars, seq);
     }

@@ -53,7 +53,13 @@ function loadPipelineBlock(block, basepath, symtbl){
 				var src = fs.readFileSync(filepath, 'utf8');
 				var tree = parse(filepath, src);
 				symtbl.createNestedScope(name);
-				ast.modules[name] = astBuilder.buildAst(tree, symtbl);
+				var mod_ast = astBuilder.buildAst(tree, symtbl);
+				if(mod_ast.name !== name){
+					console.log("Module name ", mod_ast.name, " does not match the file name for ", filepath);
+					process.exit(1);
+				}else{
+					ast.modules[name] = mod_ast;
+				}
 				symtbl.exitNestedScope();
 			}
 		}else{

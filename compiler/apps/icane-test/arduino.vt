@@ -1,24 +1,9 @@
 module arduino;
 
-@lang C++;
-
-@build {
-	headers {};
-	lib {};
-	template main.ino;
-	cmd arduino;
-}
-
-
-@init {
-	
-};
-
-config pins;
-
-
 @effect * : acquire system();
 @effect pinPeripheral(n,*) : acquire pin(pins[n]);
+
+@effect MPU::getFIFOBytes(buf, *) : write buf;
 
 @effect wire {
 	config idling_power, watt_per_hz;
@@ -28,8 +13,7 @@ config pins;
 	FastWire::setup(n,*) : clock = n;
 	MPU::getFIFOBytes(fifoBuffer, fifoPacketSize) : 
 		time cpu( (fifoPacketSize * 8)/clock )
-	  , power i2c(clock*watt_per_hz)
-	  , rw fifoBuffer(0, fifoPacketSize-1); 	
+	  , power i2c(clock*watt_per_hz);
 };
 
 @effect uart {
