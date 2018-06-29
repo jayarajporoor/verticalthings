@@ -662,18 +662,101 @@ function src_info(node){
 	return src;
 }
 
-function astEffectStmt(estmt, effects){
-	console.log(estmt);
+
+function astEffectTerm(term, params){
+//effectExpr: Identifier | exprConstant | StringLiteral | effectTerm ;
+//effectTerm: Identifier LP (effectExpr (COMMA effectExpr)*)? RP;
+	var termid = getId(term);
+	var expr = term.effectExpr();
+	var res = {id: termid, params:[]};
+	if(expr){
+		for(var i=0;i<expr.length;i++){
+			var paramid = getId(expr[i]);
+			paramidx = params[paramid];
+			if(typeof paramidx !== 'undefined'){
+				res.params.push(paramidx);
+			}else{
+				res.params.push(null);
+			}
+		}
+	}
+	return res;
+}
+
+function astEffectExpr(expr, params){
+	var ast = null;
+	var id = expr.Identifier();
+	var term = expr.effectTerm();
+	if(id){
+		id = id.getText();
+		var idx = params[id];
+		if(typeof idx !== 'undefined'){
+			ast = {param: idx};
+		}
+	}
+	if(term){
+		ast = astEffectTerm(term, params);
+	}
+	return ast;
+}
+
+function astEffectSpec(espec, params){
+/*effectSpec: Identifier effectExpr;
+effectExpr: Identifier | exprConstant | StringLiteral | effectTerm ;
+effectTerm: Identifier LP (effectExpr (COMMA effectExpr)*)? RP;*/
+	var effect = {kind: getId(espec), expr: astEffectExpr(espec.effectExpr(), params)};	
+	return effect;
+}
+
+function astEffectStmt(estmt, effectsmap){
+	//effectStmt: effectTarget (COMMA effectCtx)* EASSIGN effectSpec (COMMA effectSpec)*;
+	//effectTarget: qualIdentifier LP effectParam (COMMA effectParam)* RP;
+	//effectParam: ADDRESSOF? Identifier;	
+
+	var effectTarget = estmt.effectTarget();
+	var effectCtx = estmt.effectCtx();
+	var effectSpec = estmt.effectSpec();
+	var effectParam = effectTarget.effectParam();
+
+	var qid = getIdList(effectTarget.qualIdentifier());
+
+	var qname;
+	if(qid.length > 1){
+		qid.shift();//remove the first element - this it the object id.
+		qname = qid.join("_");
+	}else{
+		qname = qid[0];
+	}
+
+	var params = {};
+	if(effectParam){
+		for(var i=0;i<effectParam.length;i++){
+			var param_name = getId(effectParam[i]);
+			params[param_name] = i;
+		}
+	}
+
+	var effects = effectsmap[qname];
+	if(!effects){
+		effectsmap[qname] = effects = [];
+	}
+
+	for(var i=0;i<effectSpec.length;i++){
+		var effect = astEffectSpec(effectSpec[i], params);
+		if(effect){
+			effects.push(effect);
+		}
+	}
 }
 
 function astEffectsDef(ast){
-	var effects = {};
+	var effectsmap = {};
 	var estmts = ast.effectStmt();
 	for(var i=0;i<estmts.length;i++){
 		var estmt = estmts[i];
-		astEffectStmt(estmt, effects);
+		astEffectStmt(estmt, effectsmap);
 	}
-	return effects;
+	return effectsmap;
 }
 
 function astModule(moduleDef, ast) {
@@ -706,7 +789,7 @@ function astModule(moduleDef, ast) {
 	}
 	var effectsDef = moduleDef.effectsDef();
 	if(effectsDef){
-		ast.effects = astEffectsDef(effectsDef);
+		ast.effectsMap = astEffectsDef(effectsDef);
 	}
 	return ast;
 }

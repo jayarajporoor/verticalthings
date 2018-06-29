@@ -13,7 +13,7 @@ effectsDef: EFFECTS LB (effectStmt SEMI)* RB;
 
 effectStmt: effectTarget (COMMA effectCtx)* EASSIGN effectSpec (COMMA effectSpec)*;
 
-effectTarget: qualIdentifier LP effectParam (COMMA effectParam)* RP;
+effectTarget: qualIdentifier LP (effectParam (COMMA effectParam)*)? RP;
 
 effectParam: ADDRESSOF? Identifier;
 

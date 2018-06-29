@@ -124,12 +124,15 @@ class DUSeq{
       var fname = ast.qid[0];
       var qname= ast.qid[1];
       var is_flow = false;
+      var qid_unresolved = null;
 
       if(qname){
         if(ast_util.vector_ops.indexOf(qname) >= 0){
           var sym = this.dynscope.lookup_sym(fname);
           use_syms.push(sym);
           def_syms.push(sym);
+        }else{
+          qid_unresolved = ast.qid;
         }
       }else{
         var mod_ast;
@@ -184,7 +187,54 @@ class DUSeq{
           this.symtbl.enterNestedScope(saved_scope_name);//of the caller
           this.dynscope.exitFunctionCall();                    
         }else{
-          console.log("DUSeq: Fdef ast not found for: ", fname, "in module ", mod_name);
+          qid_unresolved = ast.qid;
+        }
+      }
+
+      if(qid_unresolved){
+        var mod_name = this.symtbl.getCurrentScope().parent.name;
+        var uses = this.root_ast.modules[mod_name].uses;
+        if(qid_unresolved.length > 1){
+          var firstname = qid_unresolved.shift();
+        }
+        var scoped_qname = qid_unresolved.join("_");
+        var write_params = [];
+
+        var effects;
+
+        for(var i=0; uses && (i < uses.length);i++){
+          var usename = uses[i].name;
+          var mod_use = this.root_ast.modules[usename];
+          effects = mod_use.effectsMap[scoped_qname];
+          if(effects){
+            for(var k=0;k<effects.length;k++){
+              var effect = effects[k];
+              if(effect.kind === 'write'){                
+                if(effect.expr){
+                  var writeparam = ast.params[effect.expr.param].expr;
+                  var sym = this.dynscope.lookup_sym(writeparam && ast_util.get_var_id(writeparam) );
+                  if(sym && sym.info.type.dim){
+                    def_syms.push(sym);
+                  }
+                  write_params.push(effect.expr.param);
+                }
+              }
+            }
+            //console.log("Effects for ", scoped_qname, effects);
+          }
+        }
+
+        for(var k=0;k<ast.params.length;k++){
+          if(write_params.indexOf(k) < 0){
+            var param = ast.params[k].expr;
+            var sym = this.dynscope.lookup_sym(ast_util.get_var_id(param) );
+            if(sym && sym.info.type.dim){
+              use_syms.push(sym);
+            }
+          }
+        }
+        if(!effects){
+          console.log("Unresolved function name ", qid_unresolved, " in scope ", this.symtbl.getCurrentScope().name);
         }
       }
   }
@@ -235,7 +285,7 @@ class DUSeq{
             def_syms.push(sym);
           }
         }else{
-          console.log("Symbol", id, "cannot be looked up");
+          console.log("Unresolved identifier ", id, " in scope ", this.symtbl.getCurrentScope().name);
         }
         aggr_seq.unshift({use: use_syms, def: def_syms});//add to beginning.
       break;

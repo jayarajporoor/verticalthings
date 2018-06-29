@@ -72,10 +72,21 @@ function get_scoped_name(sym, sep){
 	return sym.scope_names.join(sep) + sep + sym.name;
 }
 
+function get_var_id(ast_node){
+	if(ast_node.id){
+		return ast_node.id;
+	}else{
+		return ast_node.qid && ast_node.qid[0];
+	}
+}
+
+var vector_ops = ['push'];
+
 exports.find_default_flow = find_default_flow;
 exports.find_fdef = find_fdef;
 exports.find_flow = find_flow;
-exports.vector_ops = ['push'];
+exports.vector_ops = vector_ops;
 exports.resolve_matrix_expr = resolve_matrix_expr;
 exports.deep_copy = deep_copy;
 exports.get_scoped_name = get_scoped_name;
+exports.get_var_id = get_var_id;
