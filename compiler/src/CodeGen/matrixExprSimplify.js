@@ -11,6 +11,8 @@ function fdefs(ast,ctx){
 		ctx.symtbl.enterNestedScope(ast[i].id);
 		stmts(ast[i].body.stmts,ctx);
 		// console.log(JSON.stringify(ast[i].body.stmts));
+		// console.log(JSON.stringify(ctx.symtbl.lookup("$t0")));
+		// return 0;
 		ctx.symtbl.exitNestedScope();
 	}
 }
@@ -70,14 +72,17 @@ function is_varconst(ast){
 }
 
 function is_dim_resolved(ast,ctx){
-	if(typeof ast.id === 'undefined'){
-		return true;
-	}
 	var dim = 0;
 	if(typeof ast.dim != 'undefined'){
 		dim=ast.dim.dim.length;
 	}
-	// console.log(ast.id);
+	if(typeof ast.id === 'undefined'){
+	// console.log(ast.qid);
+		if(typeof ctx.symtbl.lookup(ast.qid[0]).info.type.dim != 'undefined'){
+			if(ctx.symtbl.lookup(ast.qid[0]).info.type.dim.dim.length > dim)
+				return false;
+		}
+	}
 	if(typeof ctx.symtbl.lookup(ast.id).info.type.dim != 'undefined'){
 		if(ctx.symtbl.lookup(ast.id).info.type.dim.dim.length > dim)
 			return false;
@@ -88,20 +93,22 @@ function is_dim_resolved(ast,ctx){
 function get_dim(ast,ctx){
 	var Left;
 	var Right;
-	console.log(astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl).dim);
+	// console.log(astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl).dim);
 	if(ast.op == "+" || ast.op == "-"){
 		if(typeof ast.lexpr.id != 'undefined'){
-			Left = ctx.symtbl.lookup(ast.lexpr.id);
-			return {dim : Left.info.type.dim, info:Left.info};
+			// console.log(Left);
+			Left = astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl);
+			return {dim : Left.dim, info: ctx.symtbl.lookup(ast.lexpr.id).info};
 		}
 		else{
-			Left = ctx.symtbl.lookup(ast.lexpr.qid[0]);
-			return {dim: Left.info.type.dim , info: Left.info};
+			Left = astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl);
+			// console.log(Left.dim);
+			return {dim: Left.dim , info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
 		}
 	}
 	else if(ast.op == "*"){
-		Left = astlib.resolve_matrix_expr(ast.lexpr);
-		Right = astlib.resolve_matrix_expr(ast.rexpr);
+		Left = astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl);
+		Right = astlib.resolve_matrix_expr(ast.rexpr,ctx.symtbl);
 		if(Left == 'null' && Right == 'null'){
 			if(typeof ast.lexpr.id != 'undefined')
 				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.id).info};
@@ -148,7 +155,7 @@ function get_dim(ast,ctx){
 function transform_expr(ast, ctx){
 	var details = get_dim(ast, ctx);
 	// console.log(details);
-	details.info.type.dim.dim = JSON.parse(JSON.stringify(details.dim.dim));
+	details.info.type.dim.dim = JSON.parse(JSON.stringify(details.dim));
 	// console.log(JSON.stringify(ast));
 	block_stmts.push({kind: "assign",id : "$t"+temp_ind,expr: JSON.parse(JSON.stringify(ast))});
 	ctx.symtbl.addSymbolToCurrentScope("$t"+temp_ind , details.info);
@@ -163,8 +170,11 @@ function expr(ast, ctx, isRoot){
 	}
 	if(lexpr_is_varconst && rexpr_is_varconst){
 		if(isRoot || (is_dim_resolved(ast.lexpr,ctx) && is_dim_resolved(ast.rexpr, ctx)))
+		{
 			return;
+		}
 		else{
+			// console.log("isRoot");
 			return transform_expr(ast,ctx);
 		}
 	}
