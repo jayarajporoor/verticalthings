@@ -1,27 +1,9 @@
 module arduino;
 
-@effect * : acquire system();
-@effect pinPeripheral(n,*) : acquire pin(pins[n]);
+@effects {	
+	pinPeripheral(n,_) := acquire pin(n);
 
-@effect MPU::getFIFOBytes(buf, *) : write buf;
+	mpu.getFIFOBytes(buf, size), mpu:MPU :=
+		write buf;
 
-@effect wire {
-	config idling_power, watt_per_hz;
-
-	Wire.begin(): clock = 10000, power i2c(idling_power);
-	Wire.setClock(n) : clock = n;
-	FastWire::setup(n,*) : clock = n;
-	MPU::getFIFOBytes(fifoBuffer, fifoPacketSize) : 
-		time cpu( (fifoPacketSize * 8)/clock )
-	  , power i2c(clock*watt_per_hz);
-};
-
-@effect uart {
-	config idling_power, watt_per_baud;
-
-	Uart u(&sercom$n, rx_pin, tx_pin, rx_pad, tx_pad) : acquire uart(n), acquire pin(rx_pin), pin(tx_pin);
-	u.begin(b) : power uart[n](idling_power);	
-	u.println(s) : time cpu(>= strlen(s) * b), power uart[n](b * watt_per_baud);
 }
-
-

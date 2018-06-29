@@ -662,6 +662,20 @@ function src_info(node){
 	return src;
 }
 
+function astEffectStmt(estmt, effects){
+	console.log(estmt);
+}
+
+function astEffectsDef(ast){
+	var effects = {};
+	var estmts = ast.effectStmt();
+	for(var i=0;i<estmts.length;i++){
+		var estmt = estmts[i];
+		astEffectStmt(estmt, effects);
+	}
+	return effects;
+}
+
 function astModule(moduleDef, ast) {
 	ast.name = getId(moduleDef);
 	ast.src = src_info(moduleDef);
@@ -689,6 +703,10 @@ function astModule(moduleDef, ast) {
 		for(var i=0;i<funcDef.length;i++){
 			ast.fdefs.push(astFuncDef(funcDef[i]));
 		}
+	}
+	var effectsDef = moduleDef.effectsDef();
+	if(effectsDef){
+		ast.effects = astEffectsDef(effectsDef);
 	}
 	return ast;
 }

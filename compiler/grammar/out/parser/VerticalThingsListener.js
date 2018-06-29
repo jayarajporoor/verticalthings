@@ -20,6 +20,78 @@ VerticalThingsListener.prototype.exitModule = function(ctx) {
 };
 
 
+// Enter a parse tree produced by VerticalThings#effectsDef.
+VerticalThingsListener.prototype.enterEffectsDef = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#effectsDef.
+VerticalThingsListener.prototype.exitEffectsDef = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#effectStmt.
+VerticalThingsListener.prototype.enterEffectStmt = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#effectStmt.
+VerticalThingsListener.prototype.exitEffectStmt = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#effectTarget.
+VerticalThingsListener.prototype.enterEffectTarget = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#effectTarget.
+VerticalThingsListener.prototype.exitEffectTarget = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#effectParam.
+VerticalThingsListener.prototype.enterEffectParam = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#effectParam.
+VerticalThingsListener.prototype.exitEffectParam = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#effectCtx.
+VerticalThingsListener.prototype.enterEffectCtx = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#effectCtx.
+VerticalThingsListener.prototype.exitEffectCtx = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#effectSpec.
+VerticalThingsListener.prototype.enterEffectSpec = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#effectSpec.
+VerticalThingsListener.prototype.exitEffectSpec = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#effectExpr.
+VerticalThingsListener.prototype.enterEffectExpr = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#effectExpr.
+VerticalThingsListener.prototype.exitEffectExpr = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#effectTerm.
+VerticalThingsListener.prototype.enterEffectTerm = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#effectTerm.
+VerticalThingsListener.prototype.exitEffectTerm = function(ctx) {
+};
+
+
 // Enter a parse tree produced by VerticalThings#pipelineDef.
 VerticalThingsListener.prototype.enterPipelineDef = function(ctx) {
 };
@@ -359,6 +431,15 @@ VerticalThingsListener.prototype.enterArrayExpr = function(ctx) {
 
 // Exit a parse tree produced by VerticalThings#arrayExpr.
 VerticalThingsListener.prototype.exitArrayExpr = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#addressExpr.
+VerticalThingsListener.prototype.enterAddressExpr = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#addressExpr.
+VerticalThingsListener.prototype.exitAddressExpr = function(ctx) {
 };
 
 

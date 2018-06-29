@@ -17,6 +17,46 @@ VerticalThingsVisitor.prototype.visitModule = function(ctx) {
 };
 
 
+// Visit a parse tree produced by VerticalThings#effectsDef.
+VerticalThingsVisitor.prototype.visitEffectsDef = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#effectStmt.
+VerticalThingsVisitor.prototype.visitEffectStmt = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#effectTarget.
+VerticalThingsVisitor.prototype.visitEffectTarget = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#effectParam.
+VerticalThingsVisitor.prototype.visitEffectParam = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#effectCtx.
+VerticalThingsVisitor.prototype.visitEffectCtx = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#effectSpec.
+VerticalThingsVisitor.prototype.visitEffectSpec = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#effectExpr.
+VerticalThingsVisitor.prototype.visitEffectExpr = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#effectTerm.
+VerticalThingsVisitor.prototype.visitEffectTerm = function(ctx) {
+};
+
+
 // Visit a parse tree produced by VerticalThings#pipelineDef.
 VerticalThingsVisitor.prototype.visitPipelineDef = function(ctx) {
 };
@@ -204,6 +244,11 @@ VerticalThingsVisitor.prototype.visitActualParams = function(ctx) {
 
 // Visit a parse tree produced by VerticalThings#arrayExpr.
 VerticalThingsVisitor.prototype.visitArrayExpr = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#addressExpr.
+VerticalThingsVisitor.prototype.visitAddressExpr = function(ctx) {
 };
 
 

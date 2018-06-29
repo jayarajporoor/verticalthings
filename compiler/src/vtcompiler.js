@@ -43,24 +43,37 @@ function parse(srcpath, input) {
     return tree;
 }
 
+function loadModule(ast, name, basepath, symtbl){
+	var filepath = basepath + "/" + name + ".vt";
+	var src;
+	try{
+		src = fs.readFileSync(filepath, 'utf8');
+	}catch(e){
+		console.log("Cannot load module ", name, ". File cannot be accessed: ", filepath);
+		process.exit(1);
+	}
+	var tree = parse(filepath, src);
+	symtbl.createNestedScope(name);
+	var mod_ast = astBuilder.buildAst(tree, symtbl);
+	if(mod_ast.name !== name){
+		console.log("Module name ", mod_ast.name, " does not match the file name for ", filepath);
+		process.exit(1);
+	}else{
+		ast.modules[name] = mod_ast;
+		for(var j=0;j<mod_ast.uses.length;j++){
+			loadModule(ast, mod_ast.uses[j].name, basepath, symtbl);
+		}
+	}
+	symtbl.exitNestedScope();
+}
+
 function loadPipelineBlock(block, basepath, symtbl){
 	for(var i=0;i<block.length;i++){
 		var entry = block[i];
 		if(entry.qname){
 			var name = entry.qname[0];
-			if(!ast.modules[name]) {				
-				var filepath = basepath + "/" + name + ".vt";
-				var src = fs.readFileSync(filepath, 'utf8');
-				var tree = parse(filepath, src);
-				symtbl.createNestedScope(name);
-				var mod_ast = astBuilder.buildAst(tree, symtbl);
-				if(mod_ast.name !== name){
-					console.log("Module name ", mod_ast.name, " does not match the file name for ", filepath);
-					process.exit(1);
-				}else{
-					ast.modules[name] = mod_ast;
-				}
-				symtbl.exitNestedScope();
+			if(!ast.modules[name]) {
+				loadModule(ast, name, basepath, symtbl);
 			}
 		}else{
 			loadPipelineBlock(entry, basepath, symtbl);//this is a nested block
