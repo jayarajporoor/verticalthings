@@ -1,7 +1,7 @@
 module arduino;
 
 @effects {	
-	pinPeripheral(n,_) := acquire pin(n);
+	pinPeripheral(n,_) := exclusive pin(n);
 
 	mpu.getFIFOBytes(buf, size), mpu:MPU :=
 		write buf;

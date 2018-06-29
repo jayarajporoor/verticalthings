@@ -45,8 +45,9 @@ function loop_merge(expr_seq, stmt_seq){
 }
 
 class DUSeq{
-  constructor() {
+  constructor(ctx) {
     this.seq = [];
+    this.ctx = ctx;
   }
 
   vardef(vr, init_syms, noinit_syms){
@@ -118,6 +119,66 @@ class DUSeq{
         this.fcall(ast.fcall, use_syms, def_syms, seq);
       }
     }
+  }
+
+  effects(ast, qid, use_syms, def_syms, write_params){
+      var effects_found = false;
+      var mod_name = this.symtbl.getCurrentScope().parent.name;
+      var uses = this.root_ast.modules[mod_name].uses;
+      if(qid.length > 1){
+        var firstname = qid.shift();
+      }
+      var scoped_qname = qid.join("_");
+
+      for(var i=0; uses && (i < uses.length);i++){
+        var usename = uses[i].name;
+        var mod_use = this.root_ast.modules[usename];
+        var effects = mod_use.effectsMap[scoped_qname];
+        if(effects){
+          effects_found = true;
+          for(var k=0;k<effects.length;k++){
+            var effect = effects[k];
+            switch(effect.kind){
+              case 'write':                 
+                var writeparam = ast.params[effect.expr.param].expr;
+                var sym = this.dynscope.lookup_sym(writeparam && ast_util.get_var_id(writeparam) );
+                if(sym && sym.info.type.dim){
+                  def_syms.push(sym);
+                }
+                write_params.push(effect.expr.param);
+              break;
+              case 'exclusive':
+                if(effect.expr.params){
+                  var effect_param_values = [];
+                  for(var k=0;k<effect.expr.params.length;k++){
+                    var eparam = effect.expr.params[k];
+                    var param = ast.params[eparam].expr;
+                    var val = param.iconst || param.fconst;
+                    if(typeof val === 'undefined'){
+                      val = this.dynscope.lookup_sym(param);
+                      if(val){
+                        val = val.info.value;
+                      }
+                    }
+                    if(typeof val !== 'undefined'){
+                      effect_param_values.push(val);
+                    }
+                  }
+                  var effect_term_str = effect.expr.id + "(" +  effect_param_values.join(",") + ")";
+                  if(!this.ctx.resources[effect_term_str]){
+                    this.ctx.resources[effect_term_str] = [];
+                  }
+                  if(this.ctx.resources[effect_term_str].indexOf(mod_name) < 0){
+                    this.ctx.resources[effect_term_str].push(mod_name);
+                  }
+                }
+              break;
+            }
+          }
+          //console.log("Effects for ", scoped_qname, effects);
+        }
+      }    
+      return effects_found;
   }
 
   fcall(ast, use_syms, def_syms, seq){
@@ -192,37 +253,9 @@ class DUSeq{
       }
 
       if(qid_unresolved){
-        var mod_name = this.symtbl.getCurrentScope().parent.name;
-        var uses = this.root_ast.modules[mod_name].uses;
-        if(qid_unresolved.length > 1){
-          var firstname = qid_unresolved.shift();
-        }
-        var scoped_qname = qid_unresolved.join("_");
         var write_params = [];
 
-        var effects;
-
-        for(var i=0; uses && (i < uses.length);i++){
-          var usename = uses[i].name;
-          var mod_use = this.root_ast.modules[usename];
-          effects = mod_use.effectsMap[scoped_qname];
-          if(effects){
-            for(var k=0;k<effects.length;k++){
-              var effect = effects[k];
-              if(effect.kind === 'write'){                
-                if(effect.expr){
-                  var writeparam = ast.params[effect.expr.param].expr;
-                  var sym = this.dynscope.lookup_sym(writeparam && ast_util.get_var_id(writeparam) );
-                  if(sym && sym.info.type.dim){
-                    def_syms.push(sym);
-                  }
-                  write_params.push(effect.expr.param);
-                }
-              }
-            }
-            //console.log("Effects for ", scoped_qname, effects);
-          }
-        }
+        var effects_found = this.effects(ast, qid_unresolved, use_syms, def_syms, write_params);
 
         for(var k=0;k<ast.params.length;k++){
           if(write_params.indexOf(k) < 0){
@@ -233,7 +266,7 @@ class DUSeq{
             }
           }
         }
-        if(!effects){
+        if(!effects_found){
           console.log("Unresolved function name ", qid_unresolved, " in scope ", this.symtbl.getCurrentScope().name);
         }
       }
@@ -351,6 +384,17 @@ class DUSeq{
 exports.DUSeq = DUSeq;
 
 exports.transform = function(ast, ctx){
-  var duseq = new DUSeq();
+  var duseq = new DUSeq(ctx);
   ctx.duseq = duseq.build(ast, ctx.symtbl);  
+  if(ctx.params["-resources"]){
+    for(var res in ctx.resources){
+      var usage = ctx.resources[res];
+      if(usage.length === 1){
+        console.log("Resource ", res, " exclusively used by module: ", usage[0]);
+      }else{
+        console.log("Resource conflict! The resource ", res
+                    , " is used by multiple modules in exclusive mode. Modules: ", usage.join(","));
+      }
+    }
+  }
 };

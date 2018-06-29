@@ -177,7 +177,7 @@ ast.modules = {};
 
 loadPipeline(ast, path.dirname(srcpath), symtbl);
 
-var transform_ctx = {symtbl: symtbl, params: mod_params};
+var transform_ctx = {symtbl: symtbl, params: mod_params, resources: {}};
 
 if(config_path){
 	transform_ctx.config = JSON.parse(fs.readFileSync(config_path));

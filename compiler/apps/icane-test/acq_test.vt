@@ -1,0 +1,13 @@
+module acq_test;
+
+use arduino;
+
+float[30] buf;
+
+default flow acq(){
+
+	pinPeripheral(3,4);
+	mpu.getFIFOBytes(buf, size);
+
+	next(buf);
+}

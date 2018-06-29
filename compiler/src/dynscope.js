@@ -33,7 +33,11 @@ class DynScope{
   		if(formal_param.type.dim){//this is an array passing.
   			aliased_id = actual_param.qid ? actual_param.qid[0] : actual_param.id;
   		}
-  		child.aliases[formal_param.id] = {id: aliased_id};
+      var alias_entry = {id: aliased_id};
+      if(actual_param.iconst || actual_param.fconst){//track numeric values.
+        alias_entry.value = actual_param.iconst || actual_param.fconst;
+      }      
+  		child.aliases[formal_param.id] = alias_entry;
   	}
   	this.current_scope = child;
   }
@@ -52,9 +56,12 @@ class DynScope{
   			if(alias.id){
   				name = alias.id;
   				dyn_scope = curr_scope.parent;
-  			}else{
-  				break;
+  			}else
+        if(typeof alias.value !== 'undefined')
+        {
+  				return {name: name, info: {value: alias.value, type:{primitive: 'num'}}};//return a pseudo symbol with the value.
   			}
+        break;
   		}else{
   			break;
   		}
