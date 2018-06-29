@@ -219,6 +219,11 @@ function allocate_addresses(){
 
 	for(var k in full_ltmap){
 		var sym = full_ltmap[k];
+
+		if(sym.info.type.is_const){
+			continue;//ignore constants.
+		}
+
 		var sym_alloc = {sym: sym, loc: next_loc};
 		alloc.push(sym_alloc);
 		next_loc += sym.info.size;
