@@ -40,16 +40,16 @@ function stmts(ast, ctx){
 					block(ast[i],ctx);
 					break;
 				case "for":
-					stmts(ast[i].body,ctx);
+					block(ast[i].body,ctx);
 					break;
 				case "if":
-					stmts(ast[i].if_body,ctx);
+					block(ast[i].if_body,ctx);
 					if(ast[i].else_body != 'undefined'){
-						stmts(ast[i].else_body,ctx);
+						block(ast[i].else_body,ctx);
 					}
 					break;
 				case "while":
-					stmts(ast[i].body,ctx);
+					block(ast[i].body,ctx);
 					break;
 			}
 		}
@@ -70,7 +70,13 @@ function assign(ast, ctx){
 	// console.log(JSON.stringify(expre));
 	if(block_stmts.length > 0){
 		if(typeof ast.qid != 'undefined'){
-			block_stmts.push({kind: "assign", id: ast.qid[0], expr: expre})
+			if(typeof ast.dim != 'undefined'){
+				block_stmts.push({kind: "assign", id: ast.qid[0], expr: expre, dim: ast.dim});
+			}
+			else{
+				block_stmts.push({kind: "assign", id: ast.qid[0], expr: expre});		
+				// console.log({kind: "assign", id: ast.qid[0], expr: expre, dim: ast.dim});
+			}
 		}
 		else if(typeof ast.id != 'undefined'){
 			var assign_stmt = JSON.parse(JSON.stringify(ast));
@@ -128,19 +134,19 @@ function get_dim(ast,ctx){
 	else if(ast.op == "*"){
 		Left = astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl);
 		Right = astlib.resolve_matrix_expr(ast.rexpr,ctx.symtbl);
-		if(Left == 'null' && Right == 'null'){
+		if(!Left && !Right){
 			if(typeof ast.lexpr.id != 'undefined')
 				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.id).info};
 			else 
 				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
 		}
-		else if(Left == 'null' && (Right.dim.length == 1 || Right.dim.length == 2)){
+		else if(!Left && (Right.dim.length == 1 || Right.dim.length == 2)){
 			if(typeof ast.rexpr.id != 'undefined')
 				return {dim: Right.dim, info: ctx.symtbl.lookup(ast.rexpr.id).info};
 			else
 				return {dim: Right.dim, info: ctx.symtbl.lookup(ast.rexpr.qid[0]).info};
 		}
-		else if((Left.dim.length == 1 || Left.dim.length == 2) && Right == 'null'){
+		else if((Left.dim.length == 1 || Left.dim.length == 2) && !Right){
 			if(typeof ast.lexpr.id != 'undefined')
 				return {dim: Left.dim, info: ctx.symtbl.lookup(ast.lexpr.id).info};
 			else if(typeof ast.lexpr.qid != 'undefined')
@@ -168,6 +174,13 @@ function get_dim(ast,ctx){
 			else if(typeof ast.lexpr.qid != 'undefined')
 				return {dim: [Left[0], Right[1]], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
 		}
+		else if(Left.dim.length == 1 && Right.dim.length == 1){
+		// console.log(Right);
+			if(typeof ast.lexpr.id != 'undefined')
+				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.id).info};
+			else if(typeof ast.lexpr.qid != 'undefined')
+				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
+		}
 	}
 }
 
@@ -178,6 +191,7 @@ function transform_expr(ast, ctx){
 	// console.log(JSON.stringify(ast));
 	block_stmts.push({kind: "assign",id : "$t"+temp_ind,expr: JSON.parse(JSON.stringify(ast))});
 	ctx.symtbl.addSymbolToCurrentScope("$t"+temp_ind , details.info);
+	// console.log(details.info.type.dim);
 	return {id : "$t"+temp_ind++};
 }
 
