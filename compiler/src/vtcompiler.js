@@ -10,7 +10,7 @@ var SymbolTable = require("./symtbl.js");
 var parseErrorListener = {};
 var errors=0;
 
-global.vtbuild ={errors: [], warnings: [], info: [], current_path: null};
+global.vtbuild ={errors: [], warnings: [], msgs: [], current_path: null};
 
 vtbuild.error = function(){
 	var str = Array.from(arguments).join(" ");
@@ -28,7 +28,7 @@ vtbuild.warning = function(){
 vtbuild.info = function(){
 	var str = Array.from(arguments).join(" ");	
 	var msg = {text: str};		
-	vtbuild.info.push(msg);
+	vtbuild.msgs.push(msg);
 }
 
 vtbuild. set_path = function(path){
@@ -152,17 +152,18 @@ function compile(argv)
 		return vtbuild.error("Please provide the pipeline definition file name to be compiled.");
 	}
 
+	srcpath = argv[0];
+	argv.shift();
+
 	try{
-		if(argv[1] !== "-bare"){
+		if(argv[0] !== "-bare"){
 			var paramspath = __dirname + "/vtparams.js";
 			var params = require(paramspath);
-			argv = argv.concat(params);
+			argv = params.concat(argv);
 		}
 	}catch(e){
 		vtbuild.warning("Default parameter file ", paramspath , "not accessible or properly formed.");
 	}
-
-	srcpath = argv[0];
 
 	for(var i=0;i<argv.length;i++){
 		switch(argv[i]){
@@ -253,7 +254,7 @@ function compile(argv)
 		if(!xmod.transform){
 			return vtbuild.error("The transform module ", ast_transforms[i], " do not have transform(ast, ctx) function defined.");
 		}else{			
-			console.log("Applying transform ", xmod.name);
+			vtbuild.info("Applying transform ", ast_transforms[i]);
 			xmod.transform(ast, transform_ctx);
 		}
 	}
