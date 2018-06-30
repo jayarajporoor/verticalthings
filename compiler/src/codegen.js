@@ -1,3 +1,7 @@
+var ast_util = require("./ast_util.js");
+
+var symtbl;
+
 function fcall(obj){
 	var s="";
 	if(obj.qid.join("_") != "next"){
@@ -102,7 +106,7 @@ function stmts(obj,str){
 	}
 }
 
-function type_resolve(obj){
+function stringify_type(obj){
 	// console.log(obj);
 	var primitive=obj.primitive;
 	var dim="";
@@ -113,14 +117,18 @@ function type_resolve(obj){
 	return {primitive: primitive, dim: dim};
 }
 
-function vars(obj){
+function vardef(obj)
+{	
 	var s="";
+	if(obj.type.dim && !obj.type.is_const){
+		return;//for RAM arrays we do our own memory allocation.
+	}
 	// console.log(obj.type.is_const);
 	if(typeof obj.type.is_const != 'undefined'){
 		if(obj.type.is_const === true)
 			s=s+"const ";
 	}
-	var type = type_resolve(obj.type);
+	var type = stringify_type(obj.type);
 	s=s+type.primitive+" ";
 	// console.log(s);
 	var temp=[];
@@ -140,7 +148,7 @@ function params(obj){
 		if(obj.type.is_const === true)
 			s=s+"const ";
 	}
-	var type=type_resolve(obj.type);
+	var type=stringify_type(obj.type);
 	if(typeof obj.init != 'undefined')
 		s=s+type.primitive+" "+obj.id+"="+expr(obj.init);	
 	else
@@ -148,8 +156,8 @@ function params(obj){
 	return s;
 }
 
-function fdefs(obj,str){
-	// console.log(code);
+function fdef(obj,str){
+    symtbl.enterNestedScope(obj.id);
 	var s="";
 	if(typeof obj.type != 'undefined'){
 		s=s+obj.type.primitive+" ";
@@ -170,10 +178,11 @@ function fdefs(obj,str){
 	// cur_ind=0;
 
 	for(var i in obj.vars){
-		str.push(vars(obj.vars[i])+";");
+		str.push(vardef(obj.vars[i])+";");
 	}
 	stmts(obj.body,str);
     str.push("}");
+    symtbl.exitNestedScope();
 }
 
 function getDefaultFlow(obj){
@@ -185,6 +194,28 @@ function getDefaultFlow(obj){
 	}
 }
 
+function str_parray(elemtype, name, dimstr){
+	return elemtype + "(*" + name + ")" + dimstr;
+}
+
+function memdefs(mem, code){
+	code.push("unsigned char __vtmem[" +  mem.total_alloc_size + "];");
+	for(var i=0;i<mem.alloc.length;i++){
+		var alloc = mem.alloc[i];
+		var scoped_name = "__" + ast_util.get_scoped_name(alloc.sym);
+		var scoped_name_p = "__" + ast_util.get_scoped_name(alloc.sym) + "__p";
+		var stype = stringify_type(alloc.sym.info.type);
+		var def = 	  str_parray(stype.primitive, scoped_name_p, stype.dim) 
+					+ "= (" 
+					+ str_parray(stype.primitive, "", stype.dim) 
+					+ ") "
+					+ "&__vtmem[" + alloc.loc + "];"
+					;
+		code.push(def);
+		def = "#define " + scoped_name + " (*" + scoped_name_p +")";
+		code.push(def);
+	}
+}
 
 function codeGen(obj,ctx){
 	// console.log("asdasd");
@@ -192,6 +223,9 @@ function codeGen(obj,ctx){
 		ctx.code = [];
 	}
 	var code = ctx.code;
+	symtbl = ctx.symtbl;
+
+	memdefs(ctx.mem, code);
    
     for(var i=0; i<obj.pipeline.block.length;i++){
         // console.log(i,obj.pipeline.block[i]);
@@ -200,9 +234,11 @@ function codeGen(obj,ctx){
     code.push("enum __" + obj.pipeline.name + "{__" + states.join(", __") + "} __state = __" + states[0] + ";");
     for(var j in states){
         cur_mod=states[j];
+        symtbl.enterNestedScope(cur_mod);
         for(var i in obj.modules[cur_mod].fdefs){
-            fdefs(obj.modules[cur_mod].fdefs[i],code);
+            fdef(obj.modules[cur_mod].fdefs[i],code);
         }
+        symtbl.exitNestedScope();
     }
     cur_state=states[0];
     code.push("void loop()");
@@ -245,6 +281,6 @@ var states=[];
 // codeGen(obj,code);
 exports.transform=codeGen;
 exports.stmt=stmts;
-exports.fdef=fdefs;
+exports.fdef=fdef;
 exports.fparam=params;
-exports.var=vars;
+exports.var=vardef;
