@@ -13,20 +13,20 @@ var errors=0;
 global.vtbuild ={errors: [], warnings: [], info: [], current_path: null};
 
 vtbuild.error = function(){
-	var str = arguments.join(" ");
+	var str = Array.from(arguments).join(" ");
 	var msg = {text: str};
 	vtbuild.errors.push(msg);
 	throw msg;
 }
 
 vtbuild.warning = function(){
-	var str = arguments.join(" ");	
+	var str = Array.from(arguments).join(" ");	
 	var msg = {text: str};	
 	vtbuild.warnings.push(msg);
 }
 
 vtbuild.info = function(){
-	var str = arguments.join(" ");	
+	var str = Array.from(arguments).join(" ");	
 	var msg = {text: str};		
 	vtbuild.info.push(msg);
 }
@@ -70,6 +70,10 @@ function parse(srcpath, input) {
 }
 
 function loadModule(ast, name, basepath, symtbl){
+	if(ast.modules[name]){
+		return;//already loaded.
+	}
+
 	var filepath = basepath + "/" + name + ".vt";
 	var src;
 	try{
@@ -81,6 +85,7 @@ function loadModule(ast, name, basepath, symtbl){
 	var tree = parse(filepath, src);
 	symtbl.createNestedScope(name);
 	var mod_ast = astBuilder.buildAst(tree, symtbl);
+	mod_ast.srcpath = filepath;
 	if(mod_ast.name !== name){
 		vtbuild.set_path(filepath);
 		return vtbuild.error("Module name ", mod_ast.name, " does not match the file name for ", filepath);
@@ -147,6 +152,16 @@ function compile(argv)
 		return vtbuild.error("Please provide the pipeline definition file name to be compiled.");
 	}
 
+	try{
+		if(argv[1] !== "-bare"){
+			var paramspath = __dirname + "/vtparams.js";
+			var params = require(paramspath);
+			argv = argv.concat(params);
+		}
+	}catch(e){
+		vtbuild.warning("Default parameter file ", paramspath , "not accessible or properly formed.");
+	}
+
 	srcpath = argv[0];
 
 	for(var i=0;i<argv.length;i++){
@@ -165,7 +180,7 @@ function compile(argv)
 			break;
 			case "-xast":
 				if(argv[i+1]){
-					ast_transforms.push(process.argv[i+1]);
+					ast_transforms.push(argv[i+1]);
 					i++;
 				}else{
 					return vtbuild.error("Please provide the compiler xast module file path.");
@@ -173,7 +188,7 @@ function compile(argv)
 			break;
 			case "-code":
 				if(argv[i+1]){
-					code_path = process.argv[i+1];
+					code_path = argv[i+1];
 					i++;
 				}else{
 					code_path = "";
@@ -181,7 +196,7 @@ function compile(argv)
 			break;
 			case "-ctx":
 				if(argv[i+1]){
-					ctx_attr = process.argv[i+1];
+					ctx_attr = argv[i+1];
 					i++;
 				}else{
 					ctx_attr = "";
@@ -189,7 +204,7 @@ function compile(argv)
 			break;
 			case "-config":
 				if(argv[i+1]){
-					config_path = process.argv[i+1];
+					config_path = argv[i+1];
 					i++;
 				}else{
 					return vtbuild.error("Please specify the configuration file after the -config parameter.");
@@ -219,6 +234,10 @@ function compile(argv)
 	var symtbl = new SymbolTable("<root>");
 	var ast = astBuilder.buildAst(tree, symtbl);
 
+	if(ast.pipeline){
+		ast.pipeline.srcpath = srcpath;
+	}
+
 	ast.modules = {};
 
 	loadPipeline(ast, path.dirname(srcpath), symtbl);
@@ -234,7 +253,7 @@ function compile(argv)
 		if(!xmod.transform){
 			return vtbuild.error("The transform module ", ast_transforms[i], " do not have transform(ast, ctx) function defined.");
 		}else{			
-			//console.log("Applying transform ", xmod.name);
+			console.log("Applying transform ", xmod.name);
 			xmod.transform(ast, transform_ctx);
 		}
 	}
@@ -274,6 +293,7 @@ function compile(argv)
 if(require.main === module){
 	process.argv.splice(0, 2);
 	compile(process.argv);
+	console.log(vtbuild.warnings);
 }else{
 	exports.compile = compile;
 }

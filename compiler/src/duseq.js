@@ -202,11 +202,11 @@ class DUSeq{
             mod_ast = this.root_ast.modules[this.pipeline_stack[0].next.qname[0]];
             is_flow = true;
           }else{
-            console.log("Next flow module not found for ", this.pipeline_stack[0].qname);
+            vtbuild.warning("Next flow module not found for ", this.pipeline_stack[0].qname);
             return;
           }
         }else{
-          mod_ast = this.root_ast.modules[this.current_module];
+          mod_ast = this.root_ast.modules[this.pipeline_stack[0].qname[0]];
         }
 
         var fdef_ast=null;
@@ -267,7 +267,7 @@ class DUSeq{
           }
         }
         if(!effects_found){
-          console.log("Unresolved function name ", qid_unresolved, " in scope ", this.symtbl.getCurrentScope().name);
+          vtbuild.warning("Unresolved function name ", qid_unresolved, " in scope ", this.symtbl.getCurrentScope().name);
         }
       }
   }
@@ -318,7 +318,7 @@ class DUSeq{
             def_syms.push(sym);
           }
         }else{
-          console.log("Unresolved identifier ", id, " in scope ", this.symtbl.getCurrentScope().name);
+          vtbuild.warning("Unresolved identifier ", id, " in scope ", this.symtbl.getCurrentScope().name);
         }
         aggr_seq.unshift({use: use_syms, def: def_syms});//add to beginning.
       break;
@@ -349,7 +349,7 @@ class DUSeq{
       this.symtbl.exitNestedScope();
       this.dynscope.exitFunctionCall();
     }else{
-      console.log("DUSeq: Flow name", flow_name, "not found");
+      vtbuild.warning("DUSeq: Flow name", flow_name, "not found");
     }
   }
 
@@ -357,7 +357,6 @@ class DUSeq{
     this.pipeline_stack = [entry];
     var name = entry.qname[0];
     var mod = this.root_ast.modules[name];
-    this.current_module = name;
     if(mod) {
       this.symtbl.enterNestedScope(name);
       this.flow(mod, entry.qname);
@@ -374,7 +373,7 @@ class DUSeq{
     if(ast.pipeline && ast.pipeline.block.length > 0){
       this.enter_pipeline(ast.pipeline.block[0]);
     }else{
-      console.log("DUSeq.build: No/empty pipeline found");
+      vtbuild.warning("DUSeq.build: No/empty pipeline found");
     }
     return this.seq;
   }
