@@ -1,0 +1,24 @@
+module test_mod;
+default flow test_func(){
+    int [20][20] a,b,c;
+    int __sum;
+    for k in [0,1]{
+        if (k > __sum){
+            for __i in [0,20]{
+                for __j in [0,20]{
+                    __sum = 0;
+                    for __k in [0,20]{
+                        __sum = __sum + a[__i][__k] * b[__k][__j];
+                    }
+                    c[__i][__j] = __sum;
+                }
+            }
+        }
+        else{
+            __sum = 0;
+            for __i in [0,20]{
+                __sum = __sum + __i;
+            }
+        }
+    }
+}
