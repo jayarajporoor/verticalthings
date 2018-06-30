@@ -133,8 +133,18 @@ function variabletime(word,words){
     }
     return time;
 }
+function removediscriminators(line){
+    if (!line.includes("discriminator")){
+        return line;
+    }
+    var iter = line.length - 1;
+    while (iter >= 0 && line[iter] != '('){
+        iter = iter - 1;
+    }
+    line = line.slice(0,iter);
+    return line;
+}
 //main code starts from here
-//analyseWCET();
 exports.analyseWCET = function(filename,source,arch,debugflag){
     debug = debugflag;
     var power;
@@ -142,16 +152,17 @@ exports.analyseWCET = function(filename,source,arch,debugflag){
     var asm = JSON.parse(fs.readFileSync("arch/"+arch+".json",'utf8'));
     jumpstatements = asm['jumpstatements'];
     overhead = asm['overhead'];
-    //var floatdata = JSON.parse(fs.readFileSync("float-data.json",'utf8'));
     var floatdata = asm['extern'];
     var code = source.code.split('\n');
-    //var lineReader = require('readline').createInterface({
-    //    input: require('fs').createReadStream('code.asm')
-    //});
+    // console.log(code);
+    // var lineReader = require('readline').createInterface({
+    //     input: require('fs').createReadStream('code.asm')
+    // });
     code.forEach(function (line) {
         if (!line || line.trim() == "..."){
             return;
         }
+        line = removediscriminators(line);
         if (line.indexOf(filename) != -1){
             //finding out if the line is not code but is used to denote line numbers
             var iter = line.length - 1;
@@ -219,12 +230,22 @@ exports.analyseWCET = function(filename,source,arch,debugflag){
             i.lineno = lineno;
             i.time = time;
             i.command = command;
+            if (i.command == "ldr" && line.includes('[') && line.includes(']')){
+                i.time = i.time + 1;
+            }
+            if (i.command == "str"){
+                i.time = i.time + 1;
+            }
             if (isjump(command)){
                 if (node.instructions.length != 0){
                     //finding out if there is a simple block above the jmp statement
                     path.push(node);
                 }
                 i.to = words[words.indexOf(i.command) + 1];
+                if (i.to == "0"){
+                    return;
+                }
+                console.log("going to " + i.to);
                 if (isfloat){
                     i.isfloat = true;
                     i.time = floatdata[floatop];
@@ -241,7 +262,9 @@ exports.analyseWCET = function(filename,source,arch,debugflag){
                 }
                 else{
                     node.power = power;
+                    console.log("power is " + power);
                     node.overhead = power*overhead;
+                    console.log("overhead is " + node.overhead);
                     power = undefined;
                 }
                 node.linestart = i.lineno;
@@ -265,9 +288,6 @@ exports.analyseWCET = function(filename,source,arch,debugflag){
         //finding out if there is a last block
         path.push(node);
     }
-    //console.log(Object.keys(unknowncommands));
-    //lineReader.close();
-    //console.log("makeblocks done");
     return splitblocks();
 }
 function splitblocks(){
@@ -284,10 +304,9 @@ function splitblocks(){
                 }
                 readlines.push(obj.instructions[0].lineno);
             }
-            // else{
-            //     console.log("not found " + obj.instructions[0].to);
-            //     console.log(obj);
-            // }
+            else{
+                console.log("not found");
+            }
         }
         else{
             obj.instructions.forEach(function(inst){
@@ -296,7 +315,6 @@ function splitblocks(){
         }
         i = i + 1;
     }
-   // console.log("split blocks done");
     return labelblocks();
 }
 function labelblocks(){
@@ -311,7 +329,6 @@ function labelblocks(){
         obj.time = time;
     });
     adjlist = new Array(count+1);
-    //console.log("labelblocks done");
     return linkblocks();
 }
 function linkblocks(){
@@ -320,9 +337,7 @@ function linkblocks(){
         oldnode.addedge(obj);
         if (obj.isbranch){
             if (obj.instructions[0].isfloat || typeof linetonode[obj.instructions[0].to] === "undefined"){
-                //not adding an edge to anything if it is float branch
-                //console.log("ghanta");
-                //console.log(obj);
+                console.log("bad again");
             }
             else{
                 obj.addedge(linetonode[obj.instructions[0].to]);
@@ -330,11 +345,11 @@ function linkblocks(){
         }
         oldnode = obj;
     });
-    //console.log("linkblocks done");
     return calculatelooptime();
 }
 
 function calculatelooptime(){
+    //displaygraph();
     path.forEach(function(obj){
         if (obj.isbranch && !obj.instructions[0].isfloat){
             visited = new Array(count+1);
@@ -345,7 +360,6 @@ function calculatelooptime(){
             }
             obj.time = obj.time * obj.power;
             visited[obj.nodeno] = true;
-            //console.log("power is " + obj.power + " type is " + typeof obj.power);
             addpower(linetonode[obj.instructions[0].to],obj.power);
         }
     });
@@ -359,6 +373,12 @@ function calculatelooptime(){
     return cyclecount;
 }
 function addpower(obj,power){
+    if (typeof obj === "undefined"){
+        console.log("bad");
+        //happens when we are trying to branch to a node which does not exist
+        //ex: b lr (link register does not exist with us)
+        return;
+    }
     if (obj.isbranch){
         obj.overhead = obj.overhead * power;
     }
@@ -366,6 +386,7 @@ function addpower(obj,power){
     obj.time = obj.time * power;
     obj.outedge.forEach(function(nextnode){
         if (!visited[nextnode.nodeno] && !(typeof nextnode === "undefined")){
+            //console.log(nextnode);
             addpower(nextnode,power);
         }
     });
@@ -384,6 +405,9 @@ function displaygraph(){
             });
         }
     });
-    //console.log(cyclecount);
+   //console.log(cyclecount);
     console.log(adjlist);
+    path.forEach(function(obj){
+        console.log(obj.time + " " + obj.overhead);
+    });
 }
