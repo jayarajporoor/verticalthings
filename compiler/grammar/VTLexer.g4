@@ -92,6 +92,12 @@ BOR: '|';
 BNOT: '~';
 BXOR: '^';
 
+ADDRESSOF: '&';
+
+EFFECTS: '@effects';
+
+EASSIGN: ':=';
+
 INT: 'int';
 FLOAT: 'float';
 BOOLEAN: 'boolean';

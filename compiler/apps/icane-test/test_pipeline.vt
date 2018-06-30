@@ -1,5 +1,6 @@
 module test_pipeline;
 
 pipeline icane_test {
+	acq_test,
 	protonn_test
 };
