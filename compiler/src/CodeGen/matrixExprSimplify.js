@@ -19,9 +19,7 @@ function fdefs(ast,ctx){
 
 function block(ast,ctx){
 	if(typeof ast.stmts != 'undefined'){
-		for(var i in ast.stmts){
-			stmts(ast.stmts[i],ctx);
-		}
+		stmts(ast.stmts,ctx);
 	}
 }
 
@@ -41,20 +39,44 @@ function stmts(ast, ctx){
 				case "block":
 					block(ast[i],ctx);
 					break;
+				case "for":
+					block(ast[i].body,ctx);
+					break;
+				case "if":
+					block(ast[i].if_body,ctx);
+					if(ast[i].else_body != 'undefined'){
+						block(ast[i].else_body,ctx);
+					}
+					break;
+				case "while":
+					block(ast[i].body,ctx);
+					break;
 			}
 		}
 	}
 }
+var change=0;
 
 function assign(ast, ctx){
 	var orig = astlib.deep_copy(ast);
-	var expre=expr(ast.expr, ctx, true);
+	var expre;
+	change =1;
+	while(change === 1){
+		change=0;
+	 	expre=expr(ast.expr, ctx, true);
+	}
 	// console.log(JSON.stringify(ast));
 	// console.log("-----------------------------");
 	// console.log(JSON.stringify(expre));
 	if(block_stmts.length > 0){
 		if(typeof ast.qid != 'undefined'){
-			block_stmts.push({kind: "assign", id: ast.qid[0], expr: expre})
+			if(typeof ast.dim != 'undefined'){
+				block_stmts.push({kind: "assign", id: ast.qid[0], expr: expre, dim: ast.dim});
+			}
+			else{
+				block_stmts.push({kind: "assign", id: ast.qid[0], expr: expre});		
+				// console.log({kind: "assign", id: ast.qid[0], expr: expre, dim: ast.dim});
+			}
 		}
 		else if(typeof ast.id != 'undefined'){
 			var assign_stmt = JSON.parse(JSON.stringify(ast));
@@ -73,17 +95,20 @@ function is_varconst(ast){
 
 function is_dim_resolved(ast,ctx){
 	var dim = 0;
+	// console.log("calling is dim resolved for ", ast);
+	// console.log(ast.id);
 	if(typeof ast.dim != 'undefined'){
 		dim=ast.dim.dim.length;
 	}
 	if(typeof ast.id === 'undefined'){
-	// console.log(ast.qid);
 		if(typeof ctx.symtbl.lookup(ast.qid[0]).info.type.dim != 'undefined'){
-			if(ctx.symtbl.lookup(ast.qid[0]).info.type.dim.dim.length > dim)
+			if(ctx.symtbl.lookup(ast.qid[0]).info.type.dim.dim.length > dim){
+				// console.log("returning false from is_dim_resolved");
 				return false;
+			}
 		}
 	}
-	if(typeof ctx.symtbl.lookup(ast.id).info.type.dim != 'undefined'){
+	else if(typeof ctx.symtbl.lookup(ast.id).info.type.dim != 'undefined'){
 		if(ctx.symtbl.lookup(ast.id).info.type.dim.dim.length > dim)
 			return false;
 	}
@@ -109,19 +134,19 @@ function get_dim(ast,ctx){
 	else if(ast.op == "*"){
 		Left = astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl);
 		Right = astlib.resolve_matrix_expr(ast.rexpr,ctx.symtbl);
-		if(Left == 'null' && Right == 'null'){
+		if(!Left && !Right){
 			if(typeof ast.lexpr.id != 'undefined')
 				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.id).info};
 			else 
 				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
 		}
-		else if(Left == 'null' && (Right.dim.length == 1 || Right.dim.length == 2)){
+		else if(!Left && (Right.dim.length == 1 || Right.dim.length == 2)){
 			if(typeof ast.rexpr.id != 'undefined')
 				return {dim: Right.dim, info: ctx.symtbl.lookup(ast.rexpr.id).info};
 			else
 				return {dim: Right.dim, info: ctx.symtbl.lookup(ast.rexpr.qid[0]).info};
 		}
-		else if((Left.dim.length == 1 || Left.dim.length == 2) && Right == 'null'){
+		else if((Left.dim.length == 1 || Left.dim.length == 2) && !Right){
 			if(typeof ast.lexpr.id != 'undefined')
 				return {dim: Left.dim, info: ctx.symtbl.lookup(ast.lexpr.id).info};
 			else if(typeof ast.lexpr.qid != 'undefined')
@@ -149,49 +174,62 @@ function get_dim(ast,ctx){
 			else if(typeof ast.lexpr.qid != 'undefined')
 				return {dim: [Left[0], Right[1]], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
 		}
+		else if(Left.dim.length == 1 && Right.dim.length == 1){
+		// console.log(Right);
+			if(typeof ast.lexpr.id != 'undefined')
+				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.id).info};
+			else if(typeof ast.lexpr.qid != 'undefined')
+				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
+		}
 	}
 }
 
 function transform_expr(ast, ctx){
 	var details = get_dim(ast, ctx);
-	// console.log(details);
+	// console.log(ast);
 	details.info.type.dim.dim = JSON.parse(JSON.stringify(details.dim));
 	// console.log(JSON.stringify(ast));
 	block_stmts.push({kind: "assign",id : "$t"+temp_ind,expr: JSON.parse(JSON.stringify(ast))});
 	ctx.symtbl.addSymbolToCurrentScope("$t"+temp_ind , details.info);
+	// console.log(details.info.type.dim);
 	return {id : "$t"+temp_ind++};
 }
 
 function expr(ast, ctx, isRoot){
 	// console.log(JSON.stringify(ast));
-	if(typeof ast.op != 'undefined'){
+	// if(typeof ast.op != 'undefined'){
 		var lexpr_is_varconst = is_varconst(ast.lexpr);
 		var rexpr_is_varconst = is_varconst(ast.rexpr);
-	}
+		// console.log(lexpr_is_varconst , rexpr_is_varconst);
+	// }
 	if(lexpr_is_varconst && rexpr_is_varconst){
 		if(isRoot || (is_dim_resolved(ast.lexpr,ctx) && is_dim_resolved(ast.rexpr, ctx)))
 		{
-			return;
+			return ast;
 		}
 		else{
 			// console.log("isRoot");
+			change=1;
 			return transform_expr(ast,ctx);
 		}
 	}
 	else{
 		if(!lexpr_is_varconst){
 			var texpr = expr(ast.lexpr, ctx, false);
-			if(texpr)
+			if(texpr){
 				ast.lexpr = texpr;
+			}
 		}
 		if(!rexpr_is_varconst){
 			var texpr = expr(ast.rexpr, ctx, false);
 			if(texpr){
+				// console.log(texpr);
 				ast.rexpr = texpr;
 			}
 		}
 	}
 	return ast;
+
 }
 
 var astlib=require("./../ast_util.js");

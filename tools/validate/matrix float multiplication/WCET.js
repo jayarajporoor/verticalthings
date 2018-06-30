@@ -145,9 +145,9 @@ exports.analyseWCET = function(filename,source,arch,debugflag){
     //var floatdata = JSON.parse(fs.readFileSync("float-data.json",'utf8'));
     var floatdata = asm['extern'];
     var code = source.code.split('\n');
-    var lineReader = require('readline').createInterface({
-        input: require('fs').createReadStream('code.asm')
-    });
+    //var lineReader = require('readline').createInterface({
+    //    input: require('fs').createReadStream('code.asm')
+    //});
     code.forEach(function (line) {
         if (!line || line.trim() == "..."){
             return;

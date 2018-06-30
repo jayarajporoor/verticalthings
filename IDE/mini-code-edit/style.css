@@ -5,7 +5,11 @@ body {
   margin-top: 5px;
   overflow: hidden;
 }
-
+.nav-tabs-justified{
+  overflow-x: hidden;
+  overflow-y: scroll;
+  max-height: 50px;
+}
 button {
   margin: 0;
 }

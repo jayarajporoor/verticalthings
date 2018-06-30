@@ -28,7 +28,6 @@ function handleDocumentChange(title) {
   if (title) {
     title = title.match(/[^/]+$/)[0];
     document.getElementById("title").innerHTML = title;
-    document.title = title;
     if (title.match(/.json$/)) {
       mode = {name: "javascript", json: true};
       modeName = "JavaScript (JSON)";

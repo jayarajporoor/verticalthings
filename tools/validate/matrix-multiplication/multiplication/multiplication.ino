@@ -1,6 +1,5 @@
-#define POI 1
-#define POIROW 1
-#define STOPOI 1
+#define STONORM 1
+#define ROWWISE 1
 #define MSIZE 40
 #define COUNT 100
 int first[MSIZE][MSIZE];

@@ -6,21 +6,21 @@
   "scripts": {
     "start": "nw"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nw":"^0.18.2",
+    "nw-builder":"^3.1.2"
+  },
   "window": {
-    "width": 400,
-    "height": 520,
+    "width": 1000,
+    "height": 800,
     "show": false,
     "title": "Verteditor",
     "toolbar": true
   },
   "dependencies": {
-    "angular": "^1.7.2",
-    "angular-ui-bootstrap": "^2.5.6",
     "bootstrap": "^4.1.1",
     "chart.js": "^2.7.2",
     "jquery": "^3.3.1",
-    "moment": "^2.22.2",
     "nw": "^0.30.2",
     "popper": "^1.0.1",
     "popper.js": "^1.14.3"
