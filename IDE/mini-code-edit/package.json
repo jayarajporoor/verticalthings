@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "bootstrap": "^4.1.1",
-    "bootstrap":"^3.7.7",
     "chart.js": "^2.7.2",
     "jquery": "^3.3.1",
     "nw": "^0.30.2",
