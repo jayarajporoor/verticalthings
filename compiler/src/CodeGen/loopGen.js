@@ -7,8 +7,7 @@ function loopGen(ast, ctx){
 }
 
 function fdefs(ast,ctx){
-	for(var i = 0; i < ast.length ; i++){
-		
+	for(var i = 0; i < ast.length ; i++){		
 		ctx.symtbl.enterNestedScope(ast[i].id);
 		stmts(ast[i].body.stmts,ctx);
 		ctx.symtbl.exitNestedScope();
@@ -45,7 +44,7 @@ function stmts(ast, ctx){
 					block(ast[i].body,ctx);
 					break;
 			}
-		}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+		}
 	}
 }
 
@@ -67,7 +66,10 @@ function checkIfLoopNeeded(ast,ctx){
 			if(Left && Right){
 				if(Left.dim.length==1 && Right.dim.length==1){
 					var temp=JSON.parse(JSON.stringify(ast));
-					var range= {from: {iconst: 0}, to: {iconst: Left.dim[0].iconst}, is_inclusive: false};
+					var range = { from: {iconst: 0}
+								, to: {iconst: Left.dim[0].iconst}
+								, is_inclusive: false
+								};
 					if(typeof temp.expr.lexpr.dim!='undefined'){
 						temp.expr.lexpr.dim.dim.push({id: '__i'});
 					}
@@ -78,30 +80,148 @@ function checkIfLoopNeeded(ast,ctx){
 					}
 					else
 						temp.expr.rexpr.dim={dim: [{id: '__i'}]};
-					ast = {kind: "for", ids: ['__i'], range: range, body: {stmts: [temp], kind: "block"}};
+					ast = {   kind: "for"
+							, ids: ['__i']
+							, range: range
+							, body: {     stmts: [temp]
+										, kind: "block"
+									}
+						};
 				}
 				else if(Left.dim.length==2 && Right.dim.length==2){
 					var temp=JSON.parse(JSON.stringify(ast));
-					var range1= {from: {iconst: 0}, to: {iconst: Left.dim[0].iconst}, is_inclusive: false};
-					var range2= {from: {iconst: 0}, to: {iconst: Left.dim[1].iconst}, is_inclusive: false};
-					if(typeof temp.expr.lexpr.dim!='undefined' && ((typeof temp.expr.lexpr.id != 'undefined' && temp.expr.lexpr.id.indexOf("__") != 0) || (typeof temp.expr.lexpr.qid != 'undefined' && temp.expr.lexpr.qid[0].indexOf("__") != 0))){
+				// console.log(Left);
+				// console.log(Right);
+					// console.log(temp);
+					var range1= { from: { iconst: 0 }
+								, to: { iconst: Left.dim[0].iconst }
+								, is_inclusive: false
+								};
+					var range2= { from: { iconst: 0 }
+								, to: { iconst: Left.dim[1].iconst }
+								, is_inclusive: false
+								};
+					if(typeof temp.expr.lexpr.dim!='undefined' && (temp.expr.lexpr.id.indexOf("__") != 0)){
 						temp.expr.lexpr.dim.dim.push({id: '__i'});
 						temp.expr.rexpr.dim.dim.push({id: '__j'});
 					}
-					else if((typeof temp.expr.lexpr.id != 'undefined' && temp.expr.lexpr.id.indexOf("__") != 0) || (typeof temp.expr.lexpr.qid != 'undefined' && temp.expr.lexpr.qid[0].indexOf("__") != 0))
-						temp.expr.lexpr.dim={dim: [{id: '__i'}, {id: '__j'}]};
-					if(typeof temp.expr.rexpr.dim!='undefined' && ((typeof temp.expr.rexpr.id != 'undefined' && temp.expr.rexpr.id.indexOf("__") != 0) || (typeof temp.expr.rexpr.qid != 'undefined' && temp.expr.rexpr.qid[0].indexOf("__") != 0))){
+					else if(temp.expr.lexpr.id.indexOf("__") != 0)
+						temp.expr.lexpr.dim={ dim: [ {id: '__i'}, {id: '__j'} ] };
+					if(typeof temp.expr.rexpr.dim!='undefined' && (temp.expr.rexpr.id.indexOf("__") != 0)){
 						temp.expr.rexpr.dim.dim.push({id: '__i'});
 						temp.expr.rexpr.dim.dim.push({id: '__j'});
 					}
-					else if((typeof temp.expr.rexpr.id != 'undefined' && temp.expr.rexpr.id.indexOf("__") != 0) || (typeof temp.expr.rexpr.qid != 'undefined' && temp.expr.rexpr.qid[0].indexOf("__") != 0))
+					else if(temp.expr.rexpr.id.indexOf("__") != 0)
 						temp.expr.rexpr.dim={dim: [{id: '__i'}, {id: '__j'}]};
-					ast = {kind: "for", ids: ['__i'], range: range1, body: {stmts: {kind: "for", ids: ['__j'], range: range2, body: {stmts: [temp], kind: "block"}}, kind: "block"}};
+					ast = {   kind: "for"
+							, ids: ['__i']
+							, range: range1
+							, body: { 
+								stmts: [{   kind: "for"
+										  , ids: ['__j']
+										  , range: range2
+										  , body: {   stmts: [temp]
+										  		    , kind: "block" 
+										  		  }
+										}]
+							  , kind: "block"
+							  }
+						  };
 				}
 			}
 		}
-		else if(ast.op == '*'){
-
+		else if(ast.expr.op == '*'){
+	// console.log(ast);
+			if(Left && Right){
+				var temp=JSON.parse(JSON.stringify(ast));
+				if(Left.dim.length==1 && Right.dim.length==1){
+					var range={from: {iconst: 0}, to: {iconst: Left.dim[0].iconst}, is_inclusive:false};
+					if(typeof temp.expr.lexpr.dim!='undefined'){
+						temp.expr.lexpr.dim.dim.push({id: '__i'});
+					}
+					else
+						temp.expr.lexpr.dim={dim: [{id: '__i'}]};
+					if(typeof temp.expr.rexpr.dim!='undefined'){
+						temp.expr.rexpr.dim.dim.push({id: '__i'});
+					}
+					else
+						temp.expr.rexpr.dim={dim: [{id: '__i'}]};
+					ast = { kind: "block"
+						  , stmts:  [ { kind: "assign"
+									  , id: temp.id
+									  , dim: temp.dim
+									  , expr: {iconst: 0}
+								      }
+									, {	kind: "for"
+									  , ids:['__i']
+									  ,range: range
+									  , body: { kind:"block"
+									  		  , stmts: [ { kind: "assign"
+									  			 		 , id: temp.id
+									  			 		 , dim: temp.dim
+									  			 		 , expr: { op: "+"
+									  			 		 		 , lexpr: temp.expr
+									  			 		 		 , rexpr: { id: temp.id, dim: temp.dim }
+									  			 		 }
+									  			 }
+									  		   ]
+									  		  }
+									  }
+									]
+						  };
+				}
+				else if(Left.dim.length==1 && Right.dim.length==2){
+					// console.log("*********************************");
+					var range2={from: {iconst: 0}, to: {iconst: Left.dim[0].iconst}, is_inclusive: false};
+					var range1={from: {iconst: 0}, to: {iconst: Right.dim[1].iconst}, is_inclusive: false};
+					if(typeof temp.expr.lexpr.dim!='undefined'){
+						temp.expr.lexpr.dim.dim.push({id: '__j'});
+					}
+					else
+						temp.expr.lexpr.dim={dim: [{id: '__j'}]};
+					if(typeof temp.expr.rexpr.dim!='undefined'){
+						temp.expr.rexpr.dim.dim.push({id: '__j'});
+						temp.expr.rexpr.dim.dim.push({id: '__i'});
+					}
+					else
+						temp.expr.rexpr.dim={dim: [{id: '__j'}, {id: '__i'}]};
+					ast = { kind: "block", stmts: [ { kind: "for", ids: ['__i'], range: range1, body: { kind: "block", stmts: [ { kind: "assign", id: temp.id, expr: {iconst:0}, dim: temp.dim }, { kind: "for", ids: ['__j'], range: range2, body: { kind: "block", stmts: [ { kind: "assign", id: temp.id, expr: { op: "+", lexpr: temp.expr, rexpr: { id: temp.id, dim: temp.dim } }, dim: temp.dim } ] } } ] } } ] };
+				}
+				else if(Left.dim.length==2 && Right.dim.length==1){
+					var range1={from: {iconst: 0}, to: {iconst: Left.dim[0].iconst}, is_inclusive: false};
+					var range2={from: {iconst: 0}, to: {iconst: Right.dim[0].iconst}, is_inclusive: false};
+					if(typeof temp.expr.lexpr.dim!='undefined'){
+						temp.expr.lexpr.dim.dim.push({id: '__i'});
+						temp.expr.lexpr.dim.dim.push({id: '__j'});
+					}
+					else
+						temp.expr.lexpr.dim={dim: [{id: '__i'},{id: '__j'}]};
+					if(typeof temp.expr.rexpr.dim!='undefined'){
+						temp.expr.rexpr.dim.dim.push({id: '__j'});
+					}
+					else
+						temp.expr.rexpr.dim={dim: [{id: '__j'}]};
+					ast = { kind: "block", stmts: [ { kind: "for", ids: ['__i'], range: range1, body: { kind: "block", stmts: [ { kind: "assign", id: temp.id, expr: {iconst:0}, dim: temp.dim }, { kind: "for", ids: ['__j'], range: range2, body: { kind: "block", stmts: [ { kind: "assign", id: temp.id, expr: { op: "+", lexpr: temp.expr, rexpr: { id: temp.id, dim: temp.dim} }, dim: temp.dim } ] } } ] } } ] };
+				}
+				else if(Left.dim.length==2 && Right.dim.length==2){
+					var range1={from: {iconst: 0}, to: {iconst: Left.dim[0]}, is_inclusive: false};
+					var range2={from: {iconst: 0}, to: {iconst: Right.dim[1]}, is_inclusive: false};
+					var range3={from: {iconst: 0}, to: {iconst: Right.dim[0]}, is_inclusive: false};
+					if(typeof temp.expr.lexpr.dim!='undefined'){
+						temp.expr.lexpr.dim.dim.push({id: '__i'});
+						temp.expr.lexpr.dim.dim.push({id: '__k'});
+					}
+					else
+						temp.expr.lexpr.dim={dim: [{id: '__i'},{id: '__k'}]};
+					if(typeof temp.expr.rexpr.dim!='undefined'){
+						temp.expr.rexpr.dim.dim.push({id: '__k'});
+						temp.expr.rexpr.dim.dim.push({id: '__j'});
+					}
+					else
+						temp.expr.rexpr.dim={dim: [{id: '__k'}, {id: '__j'}]};
+					ast = { kind: "block", stmts: [ {kind: "for", ids: ['__i'], range: range1, body: { kind: "block", stmts: [ { kind: "for", ids: ['__j'], range: range2, body: { kind: "block", stmts: [ { kind: "assign", id: temp.id, dim: temp.dim, expr: {iconst:0}}, { kind: "for", ids: ['__k'], range: range3, body: { kind: "block", stmts: [ {kind: "assign", id: temp.id, dim: temp.dim, expr: { op: "+", lexpr: temp.expr, rexpr: {id: temp.id, dim: temp.dim } } } ] } } ] } } ] } } ] };
+				}
+			}
 		}
 	}
 	return ast;

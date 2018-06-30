@@ -134,6 +134,7 @@ function get_dim(ast,ctx){
 	else if(ast.op == "*"){
 		Left = astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl);
 		Right = astlib.resolve_matrix_expr(ast.rexpr,ctx.symtbl);
+		// console.log(Left, Right);
 		if(!Left && !Right){
 			if(typeof ast.lexpr.id != 'undefined')
 				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.id).info};
@@ -168,11 +169,12 @@ function get_dim(ast,ctx){
 				return {dim: [Left.dim[0]], info: ctx.symtbl.lookup(ast.rexpr.qid[0]).info};
 			}	
 		}
-		else if(Left.length == 2 && Right.length == 2){
+		else if(Left.dim.length == 2 && Right.dim.length == 2){
+		// console.log("******************************");
 			if(typeof ast.lexpr.id != 'undefined')
-				return {dim: [Left[0], Right[1]], info: ctx.symtbl.lookup(ast.lexpr.id).info};
+				return {dim: [Left.dim[0], Right.dim[1]], info: ctx.symtbl.lookup(ast.lexpr.id).info};
 			else if(typeof ast.lexpr.qid != 'undefined')
-				return {dim: [Left[0], Right[1]], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
+				return {dim: [Left.dim[0], Right.dim[1]], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
 		}
 		else if(Left.dim.length == 1 && Right.dim.length == 1){
 		// console.log(Right);
@@ -186,7 +188,7 @@ function get_dim(ast,ctx){
 
 function transform_expr(ast, ctx){
 	var details = get_dim(ast, ctx);
-	// console.log(ast);
+	// console.log(details);
 	details.info.type.dim.dim = JSON.parse(JSON.stringify(details.dim));
 	// console.log(JSON.stringify(ast));
 	block_stmts.push({kind: "assign",id : "$t"+temp_ind,expr: JSON.parse(JSON.stringify(ast))});
