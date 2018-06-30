@@ -42,7 +42,7 @@ function expr(obj){
 		str = obj.iconst;
 	}
 	else if(typeof obj.id != 'undefined'){
-		console.log("calling for ", obj);
+		// console.log("calling for ", obj);
 		str = obj.id;
         if(typeof obj.dim != 'undefined'){
             for(var i in obj.dim.dim){
