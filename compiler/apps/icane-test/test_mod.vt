@@ -1,0 +1,21 @@
+module test_mod;
+
+int[10] xxx;
+
+default flow acquire(){
+	int[10] yyy;
+	int[10] zzz;
+	xxx = 4;
+	yyy = xxx * 3;
+	zzz = yyy * 4;
+	next(zzz);
+}
+
+/*
+mem xxx,
+undef yyy
+def yyy
+use yyy, def xxx
+def xxx
+def yyy, use xxx.
+*/

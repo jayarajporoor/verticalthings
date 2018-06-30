@@ -499,7 +499,7 @@ var CodeMirror = (function() {
     function onDragStart(e) {
       var txt = getSelection();
       e.dataTransfer.setData("Text", txt);
-      
+
       // Use dummy image instead of default browsers image.
       if (gecko || chrome) {
         var img = document.createElement('img');
@@ -764,9 +764,9 @@ var CodeMirror = (function() {
       if (scroller.clientHeight)
         code.style.height = (doc.height * textHeight() + 2 * paddingTop()) + "px";
     }
-    
+
     function computeMaxLength() {
-      var maxLineLength = 0; 
+      var maxLineLength = 0;
       maxLine = ""; maxWidth = null;
       doc.iter(0, doc.size, function(line) {
         var l = line.text;
@@ -2065,8 +2065,8 @@ var CodeMirror = (function() {
     "Ctrl-A": "selectAll", "Ctrl-D": "deleteLine", "Ctrl-Z": "undo", "Shift-Ctrl-Z": "redo", "Ctrl-Y": "redo",
     "Ctrl-Home": "goDocStart", "Alt-Up": "goDocStart", "Ctrl-End": "goDocEnd", "Ctrl-Down": "goDocEnd",
     "Ctrl-Left": "goWordLeft", "Ctrl-Right": "goWordRight", "Alt-Left": "goLineStart", "Alt-Right": "goLineEnd",
-    "Ctrl-Backspace": "delWordLeft", "Ctrl-Delete": "delWordRight", "Ctrl-S": "save", "Ctrl-F": "find",
-    "Ctrl-G": "findNext", "Shift-Ctrl-G": "findPrev", "Shift-Ctrl-F": "replace", "Shift-Ctrl-R": "replaceAll",
+    "Ctrl-Backspace": "delWordLeft", "Ctrl-Delete": "delWordRight", "Ctrl-S": "save", "Ctrl-F": "find" ,"Ctrl-C":"clear",
+    "Ctrl-Enter": "findNext", "Shift-Ctrl-G": "findPrev", "Shift-Ctrl-F": "replace", "Shift-Ctrl-R": "replaceAll",
     "Ctrl-[": "indentLess", "Ctrl-]": "indentMore",
     fallthrough: "basic"
   };

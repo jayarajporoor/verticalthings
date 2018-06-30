@@ -1,10 +1,15 @@
 body {
   margin: 0;
   padding: 0;
+` width: 100%;`
   margin-top: 5px;
   overflow: hidden;
 }
-
+.nav-tabs-justified{
+  overflow-x: hidden;
+  overflow-y: scroll;
+  max-height: 50px;
+}
 button {
   margin: 0;
 }
@@ -20,10 +25,10 @@ button {
   overflow-x: auto;
 }
 #tab-list .close{
-  margin-left: 7px;
+  margin-left: auto;
 }
 #CodeMirror{
-  position:absolute;
+  position:fixed;
   top: 50px;
   bottom: 24px;
   left: 0;
@@ -37,18 +42,27 @@ button {
   background: #ffffff;
   display: none;
 }
+#main{
+  position: fixed;
+  margin-left: 135px;
+  width:100%;
+}
 .activeline {
   background-color: rgb(211,211,211,0.1) !important;}
 .info {
   font-family: monospace;
   white-space: nowrap;
-  position: absolute ;
+  position: fixed ;
   bottom: 0;
   background: #eee;
   padding: 2px;
   height: 20px;
   left: 0;
   right: 0;
+  z-index: 9;
+}
+.container-fluid{
+  width:100%;
 }
 
 .info label {

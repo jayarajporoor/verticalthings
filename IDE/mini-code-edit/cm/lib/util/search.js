@@ -104,7 +104,7 @@
       });
     });
   }
-
+  CodeMirror.commands.clear=function(cm){clearSearch(cm);};
   CodeMirror.commands.find = function(cm) {clearSearch(cm); doSearch(cm);};
   CodeMirror.commands.findNext = doSearch;
   CodeMirror.commands.findPrev = function(cm) {doSearch(cm, true);};

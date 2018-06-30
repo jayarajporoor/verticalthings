@@ -43,18 +43,37 @@ function parse(srcpath, input) {
     return tree;
 }
 
+function loadModule(ast, name, basepath, symtbl){
+	var filepath = basepath + "/" + name + ".vt";
+	var src;
+	try{
+		src = fs.readFileSync(filepath, 'utf8');
+	}catch(e){
+		console.log("Cannot load module ", name, ". File cannot be accessed: ", filepath);
+		process.exit(1);
+	}
+	var tree = parse(filepath, src);
+	symtbl.createNestedScope(name);
+	var mod_ast = astBuilder.buildAst(tree, symtbl);
+	if(mod_ast.name !== name){
+		console.log("Module name ", mod_ast.name, " does not match the file name for ", filepath);
+		process.exit(1);
+	}else{
+		ast.modules[name] = mod_ast;
+		for(var j=0;j<mod_ast.uses.length;j++){
+			loadModule(ast, mod_ast.uses[j].name, basepath, symtbl);
+		}
+	}
+	symtbl.exitNestedScope();
+}
+
 function loadPipelineBlock(block, basepath, symtbl){
 	for(var i=0;i<block.length;i++){
 		var entry = block[i];
 		if(entry.qname){
 			var name = entry.qname[0];
-			if(!ast.modules[name]) {				
-				var filepath = basepath + "/" + name + ".vtl";
-				var src = fs.readFileSync(filepath, 'utf8');
-				var tree = parse(filepath, src);
-				symtbl.createNestedScope(name);
-				ast.modules[name] = astBuilder.buildAst(tree, symtbl);
-				symtbl.exitNestedScope();
+			if(!ast.modules[name]) {
+				loadModule(ast, name, basepath, symtbl);
 			}
 		}else{
 			loadPipelineBlock(entry, basepath, symtbl);//this is a nested block
@@ -85,6 +104,10 @@ var printJson = false;
 
 var ast_transforms = [];
 var code_path = null;
+var ctx_attr = null;
+var config_path;
+
+var mod_params = {};
 
 for(var i=3;i<process.argv.length;i++){
 	switch(process.argv[i]){
@@ -116,6 +139,32 @@ for(var i=3;i<process.argv.length;i++){
 				code_path = "";
 			}
 		break;
+		case "-ctx":
+			if(process.argv[i+1]){
+				ctx_attr = process.argv[i+1];
+				i++;
+			}else{
+				ctx_attr = "";
+			}			
+		break;
+		case "-config":
+			if(process.argv[i+1]){
+				config_path = process.argv[i+1];
+				i++;
+			}else{
+				console.log("Please specify the configuration file after the -config parameter.");
+			}					
+		break;
+		default:
+			var arg = process.argv[i];
+			var argval = true;
+			var next_arg = process.argv[i+1];
+			if(next_arg && next_arg[0] !== '-'){
+				argval = next_arg;
+				i++;
+			}
+			mod_params[arg] = argval;
+		break;
 	}
 }
 
@@ -128,7 +177,11 @@ ast.modules = {};
 
 loadPipeline(ast, path.dirname(srcpath), symtbl);
 
-var transform_ctx = {symtbl: symtbl};
+var transform_ctx = {symtbl: symtbl, params: mod_params, resources: {}};
+
+if(config_path){
+	transform_ctx.config = JSON.parse(fs.readFileSync(config_path));
+}
 
 for(var i=0;i<ast_transforms.length;i++){
 	var xmod = require(ast_transforms[i]);
@@ -139,13 +192,17 @@ for(var i=0;i<ast_transforms.length;i++){
 	}
 }
 
-if(printAst){
+function print_object(obj){
 	if(printJson){
-		console.log(JSON.stringify(ast, null, 4));
+		console.log(JSON.stringify(obj, null, 4));
 	}
 	else{
-		console.log(util.inspect(ast, false, 500, printColor));
-	}
+		console.log(util.inspect(obj, false, 500, printColor));
+	}	
+}
+
+if(printAst){
+	print_object(ast);
 }	
 
 if(printSymtbl){
@@ -162,5 +219,13 @@ if(code_path !== null){
 		}else{
 			fs.writeFileSync(code_path, code_str);
 		}
+	}
+}
+
+if(ctx_attr !== null){
+	if(ctx_attr === ""){
+		print_object(transform_ctx);
+	}else{
+		print_object(transform_ctx[ctx_attr]);
 	}
 }

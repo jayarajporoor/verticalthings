@@ -1,0 +1,50 @@
+module ble_send;
+
+use arduino;
+
+init() {
+	// Assign pins 0 & 1 SERCOM functionality
+	pinPeripheral(0, PIO_SERCOM);
+  	pinPeripheral(1, PIO_SERCOM);
+  	// Do not change this.
+  	Serial2.begin(9600) ;
+  	//For HC-05 use 38000 baud.
+ 	
+ //	panic("BLE set up failed") if bleSetup();
+}
+
+default flow send(int result){
+	// Communicate the gesture
+	// Serial.print("Class: ");
+	// Serial.print(result);
+	Serial.print(" Vote Result: ");
+	Serial.println(voteResult);
+
+	if(voteResult == 3){
+		Serial2.println("double_tap");
+		Serial.println("double_tap");
+	} else if(voteResult == 5){
+		Serial2.println("right_twist");
+		Serial.println("right_twist");
+	} else if(voteResult == 4){
+		Serial2.println("right_twist");
+		Serial.println("right_twist");
+	} else if(voteResult == 6){
+		// if (canSend){
+		// 	Serial2.println("jerk");
+		// 	lastSent = millis();
+		// }
+	} else if(voteResult == 7){
+		Serial2.println("twirl");
+		Serial.println("twirl");
+	} else if(voteResult == 9){
+		Serial2.println("double_swipe");
+		Serial.println("double_swipe");
+	} 
+}
+
+boolean bleSetup()
+{
+  delay(500);
+  return true;
+}

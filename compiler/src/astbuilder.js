@@ -3,7 +3,11 @@ var SymbolTable = require("./symtbl.js");
 var ctx = {};
 
 function addSymbol(name, info){
-	ctx.symtbl.addSymbol(name, info);
+	ctx.symtbl.addSymbolToCurrentScope(name, info);
+}
+
+function getSymbol(name){
+	return ctx.symtbl.lookup(name);
 }
 
 function getId(node) {
@@ -399,16 +403,62 @@ function astInitValue(initValue){
 	}
 }
 
+const primitive_sizes = {
+	'int': 4,
+	'float': 4,
+	'char' : 1
+};
+
+function primitive_size(t){
+	return primitive_sizes[t];
+}
+
+function computeDimensions(ast, val){
+	var dim = ast.type.dim.dim;
+	var nested_val = val && val.aconst;
+	var i;
+	var size = 1;
+	for(i=0;i<dim.length;i++){
+		var dimval = dim[i];
+		var dimsize = 0;
+		if(dimval.id){
+			var dimlen = nested_val && nested_val.length;
+			if(!dimlen){
+				var sym = getSymbol(dimval.id);
+				if(sym && sym.info.value && sym.info.value.iconst){
+					dimlen = sym.info.value.iconst;
+				}
+			}
+			//console.log(dimval.id, nested_val.length);
+	  		addSymbol(dimval.id, { type: {primitive: 'int', is_const: true}
+	  			                 , src: ast.src
+	  			                 , value: {iconst: dimlen}
+	  			                 , is_dim: true
+	  			                 } );
+	  		delete dimval.id;
+	  		dimval.iconst = dimlen;
+		}
+		if(dimval.iconst){
+			dimsize = dimval.iconst;
+		}
+		size *= dimsize;
+		nested_val = nested_val && nested_val[0].aconst;
+	}
+	size *= primitive_size(ast.type.primitive);
+	return size;
+}
+
 function astVarDef(def){
   //varIdDef: Identifier (ASSIGN initValue)?;
   var varType = def.varType();
   var varIdDef  = def.varIdDef();
   var ast = {
   	type : astVarType(varType),
-  	is_const: def.CONST() ? true : false,
   	defs : [],
 	src: src_info(def)  	
   };
+
+  ast.type.is_const = def.CONST() ? true : false;
 
   for(var i=0;i<varIdDef.length;i++){
   	  var def = {id: getId(varIdDef[i])};
@@ -416,7 +466,14 @@ function astVarDef(def){
 	  if(initValue){
 	  	def.init = astInitValue(initValue);
 	  }
-	  addSymbol(def.id, {type: ast.type, is_const: ast.is_const, src: ast.src, has_init: def.init ? true : false} );
+	  var syminfo = {type: ast.type, is_const: ast.is_const, src: ast.src, value: def.init};
+	  if(ast.type.dim){
+	  	var size = computeDimensions(ast, def.init);
+	  	if(size){
+	  		syminfo.size = size;
+	  	}
+	  }
+	  addSymbol(def.id, syminfo);
 	  ast.defs.push(def);
   }
   return ast;
@@ -527,7 +584,9 @@ function astStmt(stmt){
 		return astAssignStmt(assignStmt);
 	}else
 	if(functionCall){
-		return getFunctionCallAst(functionCall);
+		var ast = getFunctionCallAst(functionCall);
+		ast.kind = 'fcall';
+		return ast;
 	}else
 	if(forStmt){
 		return astForStmt(forStmt);
@@ -562,7 +621,7 @@ function astFuncDef(fdef){
 	ast.id = getId(fdef);
 	ast.params = [];
 
-	addSymbol(ast.id, {type:{ftype: ast.type, formal_params: ast.params}, src:  ast.src})
+	addSymbol(ast.id, {type:{is_func: true, ftype: ast.type, formal_params: ast.params}, src:  ast.src})
 
 	ctx.symtbl.createNestedScope(ast.id);
 
@@ -603,6 +662,103 @@ function src_info(node){
 	return src;
 }
 
+
+function astEffectTerm(term, params){
+//effectExpr: Identifier | exprConstant | StringLiteral | effectTerm ;
+//effectTerm: Identifier LP (effectExpr (COMMA effectExpr)*)? RP;
+	var termid = getId(term);
+	var expr = term.effectExpr();
+	var res = {id: termid, params:[]};
+	if(expr){
+		for(var i=0;i<expr.length;i++){
+			var paramid = getId(expr[i]);
+			paramidx = params[paramid];
+			if(typeof paramidx !== 'undefined'){
+				res.params.push(paramidx);
+			}else{
+				res.params.push(null);
+			}
+		}
+	}
+	return res;
+}
+
+function astEffectExpr(expr, params){
+	var ast = null;
+	var id = expr.Identifier();
+	var term = expr.effectTerm();
+	if(id){
+		id = id.getText();
+		var idx = params[id];
+		if(typeof idx !== 'undefined'){
+			ast = {param: idx};
+		}
+	}
+	if(term){
+		ast = astEffectTerm(term, params);
+	}
+	return ast;
+}
+
+function astEffectSpec(espec, params){
+/*effectSpec: Identifier effectExpr;
+effectExpr: Identifier | exprConstant | StringLiteral | effectTerm ;
+effectTerm: Identifier LP (effectExpr (COMMA effectExpr)*)? RP;*/
+	var effect = {kind: getId(espec), expr: astEffectExpr(espec.effectExpr(), params)};	
+	return effect;
+}
+
+function astEffectStmt(estmt, effectsmap){
+	//effectStmt: effectTarget (COMMA effectCtx)* EASSIGN effectSpec (COMMA effectSpec)*;
+	//effectTarget: qualIdentifier LP effectParam (COMMA effectParam)* RP;
+	//effectParam: ADDRESSOF? Identifier;	
+
+	var effectTarget = estmt.effectTarget();
+	var effectCtx = estmt.effectCtx();
+	var effectSpec = estmt.effectSpec();
+	var effectParam = effectTarget.effectParam();
+
+	var qid = getIdList(effectTarget.qualIdentifier());
+
+	var qname;
+	if(qid.length > 1){
+		qid.shift();//remove the first element - this it the object id.
+		qname = qid.join("_");
+	}else{
+		qname = qid[0];
+	}
+
+	var params = {};
+	if(effectParam){
+		for(var i=0;i<effectParam.length;i++){
+			var param_name = getId(effectParam[i]);
+			params[param_name] = i;
+		}
+	}
+
+	var effects = effectsmap[qname];
+	if(!effects){
+		effectsmap[qname] = effects = [];
+	}
+
+	for(var i=0;i<effectSpec.length;i++){
+		var effect = astEffectSpec(effectSpec[i], params);
+		if(effect){
+			effects.push(effect);
+		}
+	}
+}
+
+function astEffectsDef(ast){
+	var effectsmap = {};
+	var estmts = ast.effectStmt();
+	for(var i=0;i<estmts.length;i++){
+		var estmt = estmts[i];
+		astEffectStmt(estmt, effectsmap);
+	}
+	return effectsmap;
+}
+
 function astModule(moduleDef, ast) {
 	ast.name = getId(moduleDef);
 	ast.src = src_info(moduleDef);
@@ -630,6 +786,10 @@ function astModule(moduleDef, ast) {
 		for(var i=0;i<funcDef.length;i++){
 			ast.fdefs.push(astFuncDef(funcDef[i]));
 		}
+	}
+	var effectsDef = moduleDef.effectsDef();
+	if(effectsDef){
+		ast.effectsMap = astEffectsDef(effectsDef);
 	}
 	return ast;
 }

@@ -1,0 +1,12 @@
+module thresholding;
+
+
+float[N] scoreThreshold = {0,0,0,90000,60000, 70000,0, 70000, 0, 45000};
+
+default flow threshold(int[n] scores, int result) {
+	// Thresholding to establish tighter constraints
+	if (scores[result]<scoreThreshold[result]){
+		result = 1;
+	}
+	next(result);
+}

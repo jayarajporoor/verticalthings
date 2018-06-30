@@ -2,6 +2,7 @@ module m1;
 
 default flow lol(){
 	int[2][2]	a=0;
-	a=a+a;
+	int[2][2] b,c,d,e;
+	a=b+c+d+e;
 	next();
 }

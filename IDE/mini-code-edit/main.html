@@ -8,7 +8,6 @@
 <script src="editor.js"></script>
 
 <script src="cm/lib/codemirror.js"></script>
-<script src="cm/mode/css/css.js"></script>
 <script src="cm/mode/vertical/vertical.js"></script>
 <script src="Sortable.min.js"></script>
 
@@ -27,20 +26,12 @@
 	span.CodeMirror-matchhighlight { background-color: rgba(0, 255, 0, 0.3) }
 	.CodeMirror-focused span.CodeMirror-matchhighlight { background-color: rgba(0, 255, 0, 0.3) !important }
 </style>
-<!-- angular ,angular-ui-bootstrap
-<script src="node_modules/angular/angular.min.js"></script>
-<script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
-<script src="Sortable.min.js"></script>
 
--->
+<!--for using bootstrap-->
 <script src="node_modules/popper.js/dist/umd/popper.min.js"></script>
 <script src="node_modules/jquery/dist/jquery.slim.min.js"></script>
 <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
 <link rel="stylesheet" href="node_modules/bootstrap-3.3.7-dist/css/bootstrap.min.css">
-<!--for using bootstrap
-
-
--->
 
 
 <!-- For autocomplete -->
@@ -54,6 +45,42 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="cm/lib/codemirror.css">
 <link rel="stylesheet" href="cm/theme/lesser-dark.css">
+<style>
+.sidenav {
+    height: 100%;
+    width: 160px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    padding-top: 20px;
+}
+
+.sidenav a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.main {
+    margin-left: 160px; /* Same as the width of the sidenav */
+    font-size: 28px; /* Increased text to enable scrolling */
+    padding: 0px 10px;
+}
+
+@media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+}
+</style>
 </head>
 <body>
 <!--
@@ -63,27 +90,37 @@
 <button id="compile" class="btn btn-primary btn-md">Compile</button>
 <button id="btn-add-tab" type="button" class="btn btn-primary pull-right">Add Tab</button>
 -->
-<div id="c" class="container-fluid" >
-		<div class="row">
-		<div class="col-md-12">
-				<!-- Nav tabs -->
-				<ul id="tab-list" class="nav nav-tabs" role="tablist">
-						<li class="active">
-							<a href="#1" class="tab" data-toggle="tab">
-								<label></label>
-								<button class="close" type="button" title="Remove this page">×</button>
-							</a>
-						</li>
 
-				</ul>
+<div class="sidenav ">
+	<a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#clients">Clients</a>
+  <a href="#contact">Contact</a>
+</div>
+<div id="main" class="col-md-8">
+	<div id="c" class="container-fluid" >
+			<div class="row">
+				<div class="col-md-12">
+						<!-- Nav tabs -->
+						<ul id="tab-list" class="nav nav-tabs nav-tabs-justified" role="tablist">
+								<li class="active">
+									<a href="#1" class="tab" data-toggle="tab">
+										Untitled
+										<button class="close" type="button" title="Remove this page">×</button>
+									</a>
+								</li>
 
-				<!-- Tab panes -->
-				<div id="tab-content" class="tab-content">
-						<div class="tab-pane editor fade in active show" id="1"></div>
+						</ul>
+
+						<!-- Tab panes -->
+						<div id="tab-content" class="tab-content">
+								<div class="tab-pane editor fade in active show" id="1"></div>
+						</div>
 				</div>
-		</div>
+			</div>
+	</div>
 </div>
-</div>
+
 <div class="info" id ="info">
   <label>Filename:</label><span id="title"></span>
   <label>Mode: </label><span id="mode"></span>
@@ -95,23 +132,24 @@
 
 
 <script type="text/javascript">
-$(document).ready(function () {
-		$('.nav-tabs').on('click', 'li', function() {
-		    $('.nav-tabs li.active').removeClass('active');
-		    $(this).addClass('active');
+		$(document).ready(function () {
+			$('.nav-tabs').on('click', 'li', function() {
+				    $('.nav-tabs li.active').removeClass('active');
+				    $(this).addClass('active');
+						//resize();
 		});
 		$('#tab-list').on('click','.close',function(){
+
 				var tabID = $(this).parents('a').attr('href');
 				$(this).parents('li').remove();
         console.log(tabID);
 				$(tabID).remove();
-
 				//display first tab
 			  var tabFirst = $('#tab-list a:first');
 				tabFirst.tab('show');
 		});
     $('#tab-list').on('click','.tab',function(){
-        resize();
+
         console.log("hi");
 				var tabID = $(this).attr('href');
 				//$(this).parents('li').addClass('active');
@@ -121,11 +159,16 @@ $(document).ready(function () {
         $(this).html(name+'<button class="close" type="button" title="Remove this page">×</button>');
 				document.getElementById("title").innerHTML = name;
 
-
 				$('#tab-list').removeClass("active");
 				$(this).parents('li').tab('show');
+				//resize();
 
 		});
+		$('.nav-tabs').on('shown.bs.tab', function (e) {
+			e.target;
+			console.log("toggle tab")
+			resize();
+		})
 
 
 var list = document.getElementById("tab-list");

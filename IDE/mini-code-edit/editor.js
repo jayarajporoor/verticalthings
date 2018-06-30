@@ -16,7 +16,6 @@ var xmlhttp = new XMLHttpRequest();
 xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         modules   = JSON.parse(this.responseText);
-
     }
 };
 xmlhttp.open("GET", "moduleinfo.json", true);
@@ -29,7 +28,6 @@ function handleDocumentChange(title) {
   if (title) {
     title = title.match(/[^/]+$/)[0];
     document.getElementById("title").innerHTML = title;
-    document.title = title;
     if (title.match(/.json$/)) {
       mode = {name: "javascript", json: true};
       modeName = "JavaScript (JSON)";
@@ -63,12 +61,12 @@ function setFile(theFileEntry, isWritable) {
 
 function readFileIntoEditor(theFileEntry) {
   var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
-  console.log(id);
+  tabTextarea[id]["filePath"]=theFileEntry;
+  console.log(id+tabTextarea[id]["filePath"]);
   fs.readFile(theFileEntry, function (err, data) {
     if (err) {
       console.log("Read failed: " + err);
     }
-
     handleDocumentChange(theFileEntry);
     tabTextarea[id].setValue(String(data));
     var str=theFileEntry;
@@ -84,6 +82,9 @@ function readFileIntoEditor(theFileEntry) {
 function writeEditorToFile(theFileEntry) {
   var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
   var str = tabTextarea[id].getValue();
+  console.log(id);
+  console.log(str);
+  console.log(theFileEntry);
   fs.writeFile(theFileEntry, tabTextarea[id].getValue(), function (err) {
     if (err) {
       console.log("Write failed: " + err);
@@ -120,8 +121,17 @@ function handleNewButton() {
 function handleOpenButton() {
   $("#openFile").trigger("click");
 }
-
+function handleCtrls(){
+  var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
+  fileEntry=tabTextarea[id]["filePath"];
+  hasWriteAccess = true;
+  console.log(fileEntry);
+  writeEditorToFile(fileEntry);
+  hasWriteAccess= false ;
+}
 function handleSaveButton() {
+  console.log("I dont know whats happening");
+  alert("caller is"+handleSaveButton.caller);
   if (fileEntry && hasWriteAccess) {
     writeEditorToFile(fileEntry);
   } else {
@@ -137,6 +147,7 @@ function handleNewTab()
 
   console.log("hello");
   var id=tabID;
+  console.log(id);
   tabTextarea[tabID] = CodeMirror(
     document.getElementById(id),
     {
@@ -151,8 +162,7 @@ function handleNewTab()
         tabTextarea[tabID].matchHighlight("CodeMirror-matchhighlight");
       },
       extraKeys: {
-        "Cmd-S": function(instance) { handleSaveButton() },
-        "Ctrl-S": function(instance) { handleSaveButton() },
+        "Ctrl-S": function(instance) { handleCtrls()},
         "'{'": function(cm) { cm.bracketComplete(cm, '{'); },
         "'('": function(cm) { cm.bracketComplete(cm, '('); },
         "'['": function(cm) { cm.bracketComplete(cm, '['); },
@@ -161,6 +171,7 @@ function handleNewTab()
       }
     });
     tabTextarea[tabID]["fileName"]="Untitled";
+    tabTextarea[tabID]["filePath"]="Null";
     newFile();
     var containerWidth = window.innerWidth-20;
     var containerHeight = window.innerHeight-document.getElementById("analysis").offsetHeight-20;
@@ -266,7 +277,6 @@ function initContextMenu() {
 
     }
   }));
-
   window.addEventListener('contextmenu',
                                   function(ev) {
     ev.preventDefault();
@@ -301,17 +311,6 @@ function initContextMenu() {
 onload = function() {
   initContextMenu();
   initWindowMenu();
-  /*
-  newButton = document.getElementById("new");
-  openButton = document.getElementById("open");
-  saveButton = document.getElementById("save");
-  compileButton = document.getElementById("compile");
-
-
-  newButton.addEventListener("click", handleNewButton);
-  openButton.addEventListener("click", handleOpenButton);
-  saveButton.addEventListener("click", handleSaveButton);
-  */
 
   $("#saveFile").change(function(evt) {
     onChosenFileToSave($(this).val());
@@ -336,9 +335,8 @@ onload = function() {
         editor.matchHighlight("CodeMirror-matchhighlight");
       },
       extraKeys: {
-        "Cmd-S": function(instance) { handleSaveButton() },
-        "Ctrl-S": function(instance) { handleSaveButton() },
-        "'{'": function(cm) { cm.bracketComplete(cm, '{'); },
+        "Ctrl-S": function(instance) { handleCtrls()},
+         "'{'": function(cm) { cm.bracketComplete(cm, '{'); },
 				"'('": function(cm) { cm.bracketComplete(cm, '('); },
         "'['": function(cm) { cm.bracketComplete(cm, '['); },
         "Ctrl-N": function(instance) {handleNewTab()},
@@ -348,12 +346,12 @@ onload = function() {
     });
     tabTextarea[1]=editor;
     tabTextarea[1]["fileName"]="Untitled";
+    tabTextarea[1]["filePath"]="Null";
     var editordiv= document.getElementById("c");
     var infodiv=document.createElement("div");
     infodiv.id="analysis";
     editordiv.append(infodiv);
     var hlLine = editor.setLineClass(0, "activeline");
-    var tabsBar = document.getElementById("tab-list");
     newFile();
     onresize();
     gui.Window.get().show();
@@ -363,7 +361,8 @@ function resize()
   var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
   var containerWidth = window.innerWidth-30;
   var containerHeight = window.innerHeight-document.getElementById("analysis").offsetHeight-20;
-
+  console.log("resized");
+  console.log(id);
   var scrollerElement = tabTextarea[id] .getScrollerElement();
   scrollerElement.style.width = containerWidth + 'px';
   scrollerElement.style.height = containerHeight + 'px';

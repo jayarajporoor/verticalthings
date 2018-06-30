@@ -1,0 +1,36 @@
+module protonn;
+
+const float[5][5] ldProjectionMatrix;
+
+
+
+float gaussian(float[n] x, float[n] y, float gamma){
+	sumSq =  reduce(map(x - y, _ ** 2), sum);
+	sumSq = -1*gamma*gamma*sumSq;
+	sumSq = exp(sumSq);
+	return sumSq;
+}
+
+float rho(float[n] labelScores){
+	return reduce(labelScores, maxIndex); 
+}
+
+default flow predict(float[N] x){
+
+	float[N] x_cap;
+	float[N] y_cap;
+	float[N] scores;
+
+	y_cap = 0;
+ 
+ 	x_cap = ldProjectionMatrix * x; //denseLDProjection(x, x_cap);
+ 
+	for i in [0,M] { 
+		weight = gaussian(x_cap, prototypeMatrix[i], 1.0);
+		y_cap = y_cap + prototypeLabelMatrix[i] * weight;
+	}
+
+    scores = y_cap * 100000;
+
+//	next(scores, rho(y_cap));
+}

@@ -10,27 +10,44 @@ class SymbolTable{
   }
   
 
-  lookup(name, kind){//kind = 'vardef', 'fdef'
-  	var scope = this.current_scope;
+  lookup(name, kind, non_scoped){//kind = 'vardef', 'fdef'
+  	var scope = non_scoped ? this : this.current_scope;
   	do{
-  		var info = scope.symbols[name];
-  		if(info){
-        switch(kind){
-          case 'vardef': if(!info.is_formal_param && !info.ftype) return info; break;
-          case 'fdef' : if(info.ftype) return info; break;
-          default: return info; 
+  		var sym = scope.symbols[name];
+  		if(sym)
+      {
+        switch(kind)
+        {
+          case 'vardef': if(!sym.info.is_formal_param && !sym.info.type.is_func) return sym; break;
+          case 'fdef' : if(sym.info.type.is_func) return sym; break;
+          default: return sym; 
         }
   		}
   		scope = scope.parent;
-  	}while(scope.parent !== scope);
+  	}while(scope);
   	
   	return null;
   }
 
-  addSymbol(name, syminfo) {
-  	var sym = {name: name, info: syminfo};
+  addSymbolToCurrentScope(name, syminfo) {
+    var scope_names = [];
+    var scope = this.current_scope;
+    do{
+      scope_names.unshift(scope.name);//add to beginning of the array.
+      scope = scope.parent;
+    }while(scope && scope.parent);
+  
+  	var sym = {name: name, info: syminfo, scope_names: scope_names};
   	this.current_scope.symbols[name] = sym;
   	return sym;
+  }
+
+  removeSymbolFromCurrentScope(name){
+    if(this.current_scope.symbols[name]){
+      delete this.current_scope.symbols[name];
+      return true;
+    }
+    return false;
   }
 
   createNestedScope(scopename){

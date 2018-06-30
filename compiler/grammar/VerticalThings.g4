@@ -6,8 +6,24 @@ options {tokenVocab = VTLexer;}
 module
     :   MODULE Identifier SEMI
         useSpec* varDef*
-        (funcDef* | pipelineDef)
+        (funcDef* | pipelineDef | effectsDef)
     ;
+
+effectsDef: EFFECTS LB (effectStmt SEMI)* RB;    
+
+effectStmt: effectTarget (COMMA effectCtx)* EASSIGN effectSpec (COMMA effectSpec)*;
+
+effectTarget: qualIdentifier LP (effectParam (COMMA effectParam)*)? RP;
+
+effectParam: ADDRESSOF? Identifier;
+
+effectCtx: Identifier COLON Identifier;
+
+effectSpec: Identifier effectExpr;
+
+effectExpr: Identifier | exprConstant | StringLiteral | effectTerm ;
+
+effectTerm: Identifier LP (effectExpr (COMMA effectExpr)*)? RP;
 
 pipelineDef
     :  PIPELINE Identifier pipelineBlock SEMI?
@@ -147,6 +163,8 @@ actualParams
 arrayExpr: Identifier dimensionSpec;
 
 
+addressExpr: ADDRESSOF (arrayExpr | qualIdentifier);
+
 castExpr : castableType LP basicExpr RP;
 
 basicExpr
@@ -155,6 +173,7 @@ basicExpr
         castExpr |
         qualIdentifier |        
         arrayExpr |
+        addressExpr |
         functionCall |
         exprConstant |
         up=(BNOT|MINUS) basicExpr |
