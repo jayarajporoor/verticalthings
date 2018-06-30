@@ -7,7 +7,8 @@
     "start": "nw"
   },
   "devDependencies": {
-    "nw": "^0.18.2"
+    "nw":"^0.18.2",
+    "nw-builder":"^3.1.2"
   },
   "window": {
     "width": 1000,
@@ -17,7 +18,8 @@
     "toolbar": true
   },
   "dependencies": {
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^4.1.1",
+    "bootstrap":"^3.7.7",
     "chart.js": "^2.7.2",
     "jquery": "^3.3.1",
     "nw": "^0.30.2",
