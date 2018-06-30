@@ -41,7 +41,7 @@ function loop_merge(expr_seq, stmt_seq){
   for(var i=0;i<stmt_seq.length;i++){
     seq_merge(stmt_seq[i], use_syms, def_syms, use_found, def_found);
   }
-  return [{use_syms: use_syms, def_syms: def_syms}];
+  return [{use: use_syms, def: def_syms}];
 }
 
 class DUSeq{
@@ -398,3 +398,6 @@ exports.transform = function(ast, ctx){
     }
   }
 };
+
+exports.name = "duseq";
+

@@ -74,17 +74,19 @@ function init_regions(){
 	var max_lifetime = 0;
 	for(id in ltmap){
 		//initially create separate region for each object.
-		var ltentry = ltmap[id];		
-		var block = {lt_start: ltentry.start, lt_end: ltentry.end, size: ltentry.sym.info.size, lt_available: false,
-								owners: [{sym: ltentry.sym}] };
-		if(!block.size){
-			console.log("LT entry with unknown size ", id, " cannot be automatically allocated.");
-		}else{
-			regions.push({blocks: [block], size: block.size});
-			if(block.lt_end > max_lifetime){
-				max_lifetime = block.lt_end;
+		var ltentry = ltmap[id];
+		if(typeof ltentry.start !== 'undefined'){
+			var block = {lt_start: ltentry.start, lt_end: ltentry.end, size: ltentry.sym.info.size, lt_available: false,
+									owners: [{sym: ltentry.sym}] };
+			if(!block.size){
+				console.log("LT entry with unknown size ", id, " cannot be automatically allocated.");
+			}else{
+				regions.push({blocks: [block], size: block.size});
+				if(block.lt_end > max_lifetime){
+					max_lifetime = block.lt_end;
+				}
 			}
-		}
+		}	
 	}	
 	return max_lifetime;
 }
@@ -211,7 +213,7 @@ function optimize_regions(max_lifetime, merge_policy){
 	}while(changed);
 }
 
-function allocate_addresses(){
+function allocate_addresses(max_lifetime){
 	var next_loc = 0;
 	var address_assigned = {};
 	var alloc = [];	
@@ -224,7 +226,7 @@ function allocate_addresses(){
 			continue;//ignore constants.
 		}
 
-		var sym_alloc = {sym: sym, loc: next_loc};
+		var sym_alloc = {sym: sym, loc: next_loc, lifetime: {full: true, start: 0, end: max_lifetime}};
 		alloc.push(sym_alloc);
 		next_loc += sym.info.size;
 		total_alloc_size += sym_alloc.sym.info.size;
@@ -241,7 +243,8 @@ function allocate_addresses(){
 				var scoped_name = ast_util.get_scoped_name(sym);
 				if(!address_assigned[scoped_name]){
 					address_assigned[scoped_name] = true;
-					var sym_alloc = {sym: sym, loc: next_loc};
+					var ltmap_entry = ltmap[scoped_name];
+					var sym_alloc = {sym: sym, loc: next_loc, lifetime: {start: ltmap_entry.start, end: ltmap_entry.end}};
 					alloc.push(sym_alloc);
 					total_obj_size += sym_alloc.sym.info.size;
 				}
@@ -267,14 +270,17 @@ exports.transform = function(ast, ctx){
 	var max_lifetime = init_regions();
 
 	optimize_regions(max_lifetime, default_merge_policy);
-	var mem = allocate_addresses();
+	var mem = allocate_addresses(max_lifetime);
 //	console.log(regions);
 	ctx.mem = mem;
 	if(ctx.params['-printalloc']){
 		console.log("Total alloc size ", mem.total_alloc_size, ", total size of objects ", mem.total_obj_size);
 		for(var i=0;i<mem.alloc.length;i++){
 			var alloc = mem.alloc[i];
-			console.log(ast_util.get_scoped_name(alloc.sym, "'s "), " at ", alloc.loc, ", object size ", alloc.sym.info.size);
+			console.log(ast_util.get_scoped_name(alloc.sym, "'s "), " at "
+					, alloc.loc, ", object size ", alloc.sym.info.size, ", life time: ", alloc.lifetime.start+ ".."+ alloc.lifetime.end);
 		}
 	}
 };
+
+exports.name = "stdalloc";

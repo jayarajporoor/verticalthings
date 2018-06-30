@@ -20,7 +20,7 @@ float rho(float[n] labelScores){
 }
 
 
-default flow predict(float[30] buf){
+default flow predict(float[30] x){
 
 	float[10] x_cap;
 	float[10] y_cap;
@@ -30,7 +30,7 @@ default flow predict(float[30] buf){
 	pinPeripheral(3,4);
 
 
- 	x_cap = ldProjectionMatrix * buf; //denseLDProjection(buf, x_cap);
+ 	x_cap = ldProjectionMatrix * x; //denseLDProjection(buf, x_cap);
 
 	y_cap = 0;
 

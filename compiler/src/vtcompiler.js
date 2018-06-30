@@ -9,6 +9,32 @@ var SymbolTable = require("./symtbl.js");
 
 var parseErrorListener = {};
 var errors=0;
+
+global.vtbuild ={errors: [], warnings: [], info: [], current_path: null};
+
+vtbuild.error = function(){
+	var str = arguments.join(" ");
+	var msg = {text: str};
+	vtbuild.errors.push(msg);
+	throw msg;
+}
+
+vtbuild.warning = function(){
+	var str = arguments.join(" ");	
+	var msg = {text: str};	
+	vtbuild.warnings.push(msg);
+}
+
+vtbuild.info = function(){
+	var str = arguments.join(" ");	
+	var msg = {text: str};		
+	vtbuild.info.push(msg);
+}
+
+vtbuild. set_path = function(path){
+	vtbuild.current_path = path;
+}
+
 parseErrorListener.syntaxError = function(offendingToken, line, column, msg, err){
 //	console.log('stx', line);
 	errors++;
@@ -37,8 +63,8 @@ function parse(srcpath, input) {
     errors=0;
     var tree = parser.module();
     if(errors > 0) {
-    	console.log("Please fix the syntax errors in the module " + srcpath);
-    	process.exit(1);
+    	vtbuild.set_path(srcpath);
+    	return vtbuild.error("Please fix the syntax errors in the module ", srcpath);
     }
     return tree;
 }
@@ -49,15 +75,15 @@ function loadModule(ast, name, basepath, symtbl){
 	try{
 		src = fs.readFileSync(filepath, 'utf8');
 	}catch(e){
-		console.log("Cannot load module ", name, ". File cannot be accessed: ", filepath);
-		process.exit(1);
+		vtbuild.set_path(filepath);
+		return vtbuild.error("Cannot load module ", name, ". File cannot be accessed: ", filepath);
 	}
 	var tree = parse(filepath, src);
 	symtbl.createNestedScope(name);
 	var mod_ast = astBuilder.buildAst(tree, symtbl);
 	if(mod_ast.name !== name){
-		console.log("Module name ", mod_ast.name, " does not match the file name for ", filepath);
-		process.exit(1);
+		vtbuild.set_path(filepath);
+		return vtbuild.error("Module name ", mod_ast.name, " does not match the file name for ", filepath);
 	}else{
 		ast.modules[name] = mod_ast;
 		for(var j=0;j<mod_ast.uses.length;j++){
@@ -67,7 +93,7 @@ function loadModule(ast, name, basepath, symtbl){
 	symtbl.exitNestedScope();
 }
 
-function loadPipelineBlock(block, basepath, symtbl){
+function loadPipelineBlock(block, basepath, symtbl, ast){
 	for(var i=0;i<block.length;i++){
 		var entry = block[i];
 		if(entry.qname){
@@ -76,7 +102,7 @@ function loadPipelineBlock(block, basepath, symtbl){
 				loadModule(ast, name, basepath, symtbl);
 			}
 		}else{
-			loadPipelineBlock(entry, basepath, symtbl);//this is a nested block
+			loadPipelineBlock(entry, basepath, symtbl, ast);//this is a nested block
 		}
 	}
 }
@@ -84,115 +110,12 @@ function loadPipelineBlock(block, basepath, symtbl){
 function loadPipeline(ast, basepath, symtbl) {
 	var pipeline = ast.pipeline;
 	if(!pipeline) {
-		console.log("Pipeline definition not found.");
-		process.exit(1);
+		return vtbuild.error("Pipeline definition not found.");
 	}
-	loadPipelineBlock(ast.pipeline.block, basepath, symtbl);
+	loadPipelineBlock(ast.pipeline.block, basepath, symtbl, ast);
 }
 
-if(process.argv.length <= 2) {
-	console.log("Please provide the pipeline definition file name to be compiled.");
-	process.exit(1);
-}
-
-var srcpath = process.argv[2];
-
-var printAst = false;
-var printSymtbl = false;
-var printColor = false;
-var printJson = false;
-
-var ast_transforms = [];
-var code_path = null;
-var ctx_attr = null;
-var config_path;
-
-var mod_params = {};
-
-for(var i=3;i<process.argv.length;i++){
-	switch(process.argv[i]){
-		case "-ast" :
-			printAst = true;
-		break;
-		case "-symtbl":
-			printSymtbl = true;
-		break;
-		case "-color":
-			printColor = true;
-		break;
-		case "-json":
-			printJson = true;
-		break;
-		case "-xast":
-			if(process.argv[i+1]){
-				ast_transforms.push(process.argv[i+1]);
-				i++;
-			}else{
-				console.log("Please provide the AST transform module file path.");
-			}
-		break;
-		case "-code":
-			if(process.argv[i+1]){
-				code_path = process.argv[i+1];
-				i++;
-			}else{
-				code_path = "";
-			}
-		break;
-		case "-ctx":
-			if(process.argv[i+1]){
-				ctx_attr = process.argv[i+1];
-				i++;
-			}else{
-				ctx_attr = "";
-			}			
-		break;
-		case "-config":
-			if(process.argv[i+1]){
-				config_path = process.argv[i+1];
-				i++;
-			}else{
-				console.log("Please specify the configuration file after the -config parameter.");
-			}					
-		break;
-		default:
-			var arg = process.argv[i];
-			var argval = true;
-			var next_arg = process.argv[i+1];
-			if(next_arg && next_arg[0] !== '-'){
-				argval = next_arg;
-				i++;
-			}
-			mod_params[arg] = argval;
-		break;
-	}
-}
-
-var input = fs.readFileSync(srcpath, 'utf8');
-var tree = parse(srcpath, input);
-var symtbl = new SymbolTable("<root>");
-var ast = astBuilder.buildAst(tree, symtbl);
-
-ast.modules = {};
-
-loadPipeline(ast, path.dirname(srcpath), symtbl);
-
-var transform_ctx = {symtbl: symtbl, params: mod_params, resources: {}};
-
-if(config_path){
-	transform_ctx.config = JSON.parse(fs.readFileSync(config_path));
-}
-
-for(var i=0;i<ast_transforms.length;i++){
-	var xmod = require(ast_transforms[i]);
-	if(!xmod.transform){
-		console.log("The transform module ", ast_transforms[i], " do not have transform(ast, ctx) function defined.");
-	}else{
-		xmod.transform(ast, transform_ctx);
-	}
-}
-
-function print_object(obj){
+function print_object(obj, printJson, printColor){
 	if(printJson){
 		console.log(JSON.stringify(obj, null, 4));
 	}
@@ -201,31 +124,156 @@ function print_object(obj){
 	}	
 }
 
-if(printAst){
-	print_object(ast);
-}	
+function compile(argv)
+{
+	var srcpath;
+	var printAst = false;
+	var printSymtbl = false;
+	var printColor = false;
+	var printJson = false;
 
-if(printSymtbl){
-	console.log(util.inspect(symtbl, false, 500, printColor));
-}
+	var ast_transforms = [];
+	var code_path = null;
+	var ctx_attr = null;
+	var config_path;
 
-if(code_path !== null){
-	if(!transform_ctx.code || transform_ctx.code.length === 0){
-		console.log("Code not generated!");
-	}else{
-		var code_str = transform_ctx.code.join("\n");
-		if(code_path === ""){
-			console.log(code_str);
-		}else{
-			fs.writeFileSync(code_path, code_str);
+	var mod_params = {};
+
+	vtbuild.errors = [];
+	compiler_warnings = [];
+	compiler_info = [];
+
+	if(argv.length === 0) {
+		return vtbuild.error("Please provide the pipeline definition file name to be compiled.");
+	}
+
+	srcpath = argv[0];
+
+	for(var i=0;i<argv.length;i++){
+		switch(argv[i]){
+			case "-ast" :
+				printAst = true;
+			break;
+			case "-symtbl":
+				printSymtbl = true;
+			break;
+			case "-color":
+				printColor = true;
+			break;
+			case "-json":
+				printJson = true;
+			break;
+			case "-xast":
+				if(argv[i+1]){
+					ast_transforms.push(process.argv[i+1]);
+					i++;
+				}else{
+					return vtbuild.error("Please provide the compiler xast module file path.");
+				}
+			break;
+			case "-code":
+				if(argv[i+1]){
+					code_path = process.argv[i+1];
+					i++;
+				}else{
+					code_path = "";
+				}
+			break;
+			case "-ctx":
+				if(argv[i+1]){
+					ctx_attr = process.argv[i+1];
+					i++;
+				}else{
+					ctx_attr = "";
+				}			
+			break;
+			case "-config":
+				if(argv[i+1]){
+					config_path = process.argv[i+1];
+					i++;
+				}else{
+					return vtbuild.error("Please specify the configuration file after the -config parameter.");
+				}					
+			break;
+			default:
+				var arg = argv[i];
+				var argval = true;
+				var next_arg = argv[i+1];
+				if(next_arg && next_arg[0] !== '-'){
+					argval = next_arg;
+					i++;
+				}
+				mod_params[arg] = argval;
+			break;
 		}
 	}
+
+	var input;
+
+	try{
+		input  = fs.readFileSync(srcpath, 'utf8');
+	}catch(e){
+		return vtbuild.error("Cannot access source file " + srcpath);
+	}
+	var tree = parse(srcpath, input);
+	var symtbl = new SymbolTable("<root>");
+	var ast = astBuilder.buildAst(tree, symtbl);
+
+	ast.modules = {};
+
+	loadPipeline(ast, path.dirname(srcpath), symtbl);
+
+	var transform_ctx = {symtbl: symtbl, params: mod_params, resources: {}};
+
+	if(config_path){
+		transform_ctx.config = JSON.parse(fs.readFileSync(config_path));
+	}
+
+	for(var i=0;i<ast_transforms.length;i++){
+		var xmod = require(ast_transforms[i]);
+		if(!xmod.transform){
+			return vtbuild.error("The transform module ", ast_transforms[i], " do not have transform(ast, ctx) function defined.");
+		}else{			
+			//console.log("Applying transform ", xmod.name);
+			xmod.transform(ast, transform_ctx);
+		}
+	}
+
+	if(printAst){
+		print_object(ast, printJson, printColor);
+	}	
+
+	if(printSymtbl){
+		console.log(util.inspect(symtbl, false, 500, printColor));
+	}
+
+	if(code_path !== null){
+		if(!transform_ctx.code || transform_ctx.code.length === 0){
+			console.log("Code not generated!");
+		}else{
+			var code_str = transform_ctx.code.join("\n");
+			if(code_path === ""){
+				console.log(code_str);
+			}else{
+				fs.writeFileSync(code_path, code_str);
+			}
+		}
+	}
+
+	if(ctx_attr !== null){
+		if(ctx_attr === ""){
+			print_object(transform_ctx, printJson, printColor);
+		}else{
+			print_object(transform_ctx[ctx_attr], printJson, printColor);
+		}
+	}
+
+	return {ast: ast, ctx: transform_ctx};
 }
 
-if(ctx_attr !== null){
-	if(ctx_attr === ""){
-		print_object(transform_ctx);
-	}else{
-		print_object(transform_ctx[ctx_attr]);
-	}
+if(require.main === module){
+	process.argv.splice(0, 2);
+	compile(process.argv);
+}else{
+	exports.compile = compile;
 }

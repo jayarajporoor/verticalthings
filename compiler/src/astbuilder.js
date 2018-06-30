@@ -148,6 +148,9 @@ function getFunctionCallAst(fcall){
 	var actualParams = fcall.actualParams();
 	if(qualIdentifier){
 		ast.qid = getIdList(qualIdentifier);
+		if(ast.qid.length === 1){
+			ast.id = ast.qid[0];
+		}
 	}else
 	if(cppQualIdentifier){
 		ast.qidCpp = getIdList(cppQualIdentifier);
@@ -192,6 +195,9 @@ function getBasicExprAst(expr){
 	}else
 	if(qualIdentifier){
 		ast = {qid: getIdList(qualIdentifier)};
+		if(ast.qid.length === 1){
+			ast.id = ast.qid[0];
+		}
 	}else
 	if(arrayExpr){
 		ast = astArrayExpr(arrayExpr);
@@ -336,6 +342,9 @@ function astVarType(varType){
 
 	if(qualIdentifier){
 		ast.qid = getIdList(qualIdentifier);
+		if(ast.qid.length === 1){
+			ast.id = ast.qid[0];
+		}
 	}else
 	if(cppQualIdentifier){
 		ast.qidCpp = getIdList(cppQualIdentifier);
@@ -499,6 +508,9 @@ function astAssignStmt(stmt){
 		expr: getExprAst(stmt.expr()),
 		src: src_info(stmt)		
 	};
+	if(ast.qid.length === 1){
+		ast.id = ast.qid[0];
+	}
 	var dimSpec = stmt.dimensionSpec();
 	if(dimSpec){
 		ast.dim = getDimensionSpec(dimSpec);

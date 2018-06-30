@@ -7,6 +7,7 @@ float[30] buf;
 default flow acq(){
 
 	pinPeripheral(3,4);
+	//buf =  3;
 	mpu.getFIFOBytes(buf, size);
 
 	next(buf);
