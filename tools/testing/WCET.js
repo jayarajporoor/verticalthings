@@ -87,6 +87,13 @@ var count;
 var debug;
 var jumpstatements;
 var overhead;
+function init(){
+    path = [];
+    node = new Node();
+    startnode = new Node();
+    readlines = [];
+    linetonode = {};
+}
 function count(words,c){
     var count = 0;
     words.forEach(function(el){
@@ -146,6 +153,7 @@ function removediscriminators(line){
 }
 //main code starts from here
 exports.analyseWCET = function(filename,source,arch,debugflag){
+    init();
     debug = debugflag;
     var power;
     var fs = require('fs');
@@ -154,7 +162,7 @@ exports.analyseWCET = function(filename,source,arch,debugflag){
     overhead = asm['overhead'];
     var floatdata = asm['extern'];
     var code = source.code.split('\n');
-    // console.log(code);
+    //console.log(code);
     // var lineReader = require('readline').createInterface({
     //     input: require('fs').createReadStream('code.asm')
     // });
@@ -245,7 +253,7 @@ exports.analyseWCET = function(filename,source,arch,debugflag){
                 if (i.to == "0"){
                     return;
                 }
-                console.log("going to " + i.to);
+                //console.log("going to " + i.to);
                 if (isfloat){
                     i.isfloat = true;
                     i.time = floatdata[floatop];
@@ -262,9 +270,9 @@ exports.analyseWCET = function(filename,source,arch,debugflag){
                 }
                 else{
                     node.power = power;
-                    console.log("power is " + power);
+                    //console.log("power is " + power);
                     node.overhead = power*overhead;
-                    console.log("overhead is " + node.overhead);
+                    //console.log("overhead is " + node.overhead);
                     power = undefined;
                 }
                 node.linestart = i.lineno;
@@ -305,7 +313,7 @@ function splitblocks(){
                 readlines.push(obj.instructions[0].lineno);
             }
             else{
-                console.log("not found");
+                //console.log("not found");
             }
         }
         else{
@@ -337,7 +345,7 @@ function linkblocks(){
         oldnode.addedge(obj);
         if (obj.isbranch){
             if (obj.instructions[0].isfloat || typeof linetonode[obj.instructions[0].to] === "undefined"){
-                console.log("bad again");
+                
             }
             else{
                 obj.addedge(linetonode[obj.instructions[0].to]);
@@ -374,7 +382,9 @@ function calculatelooptime(){
 }
 function addpower(obj,power){
     if (typeof obj === "undefined"){
-        console.log("bad");
+        if (debug){
+            console.log("lost a branch");
+        }
         //happens when we are trying to branch to a node which does not exist
         //ex: b lr (link register does not exist with us)
         return;
