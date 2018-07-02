@@ -87,6 +87,7 @@ function assign(ast, ctx){
 }
 
 function is_varconst(ast){
+	// console.log(ast);
 	if(typeof ast.id != 'undefined' || typeof ast.qid != 'undefined' || typeof ast.is_const != 'undefined')
 		return true;
 	return false;
@@ -170,6 +171,10 @@ function transform_expr(ast, ctx){
 }
 
 function expr(ast, ctx, isRoot){
+	// console.log(ast);
+	if(typeof ast.id != 'undefined' || typeof ast.iconst != 'undefined'){
+		return ast;
+	}
 	var lexpr_is_varconst = is_varconst(ast.lexpr);
 	var rexpr_is_varconst = is_varconst(ast.rexpr);
 	if(lexpr_is_varconst && rexpr_is_varconst){

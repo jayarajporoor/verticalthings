@@ -48,9 +48,12 @@ function stmts(ast, ctx){
 }
 
 function assign(ast, ctx){
-	if(ast.expr.id != 'undefined'){
+		// if(ast.expr.id != 'undefined'){
 
-	}
+		// }
+		// else if(ast.expr.iconst != 'undefined'){
+
+		// } 
 	return addLoop(ast,ctx);
 }
 
@@ -95,6 +98,33 @@ function checkIfLoopNeeded(ast,ctx){
 				}
 				else if(temp.expr.id.indexOf("__")!=0)
 					temp.expr.dim={dim: [{id:'__i'},{id: '__j'}]};
+				ast = { kind: "for", ids: ['__i'], range: range1, body: { kind: "block", stmts: [{ kind: "for", ids: ['__j'], range: range2, body: { kind: "block", stmts: [temp] } } ] } };
+			}
+		}
+	}
+	else if(typeof ast.expr.iconst!='undefined'){
+		var lvalue=astlib.resolve_matrix_expr(ast,ctx.symtbl);
+		if(lvalue){
+			if(lvalue.dim.length==1){
+				var temp=astlib.deep_copy(ast);
+				var range={from: {iconst: 0}, to: {iconst: lvalue.dim[0]}, is_inclusive: false};
+				if(typeof temp.dim!='undefined' && temp.id.indexOf("__")!=0){
+					temp.dim.dim.push({id: '__i'});
+				}
+				else if(temp.id.indexOf("__")!=0)
+					temp.dim={dim: [{id: '__i'}]};
+				ast={kind: "for",ids: ['__i'], range: range, body: {kind: "block", stmts: [temp]}};	
+			}
+			else if(lvalue.dim.length==2){
+				var temp= astlib.deep_copy(ast);
+				var range1={from: {iconst:0}, to: {iconst: lvalue.dim[0].iconst}, is_inclusive: false};
+				var range2={from: {iconst:0}, to: {iconst: lvalue.dim[1].iconst}, is_inclusive: false};
+				if(typeof temp.dim!='undefined' && temp.id.indexOf("__")!=0){
+					temp.dim.dim.push({id: '__i'});
+					temp.dim.dim.push({id: '__j'});
+				}
+				else if(temp.id.indexOf("__")!=0)
+					temp.dim={dim: [{id: '__i'},{id: '__j'}]};
 				ast = { kind: "for", ids: ['__i'], range: range1, body: { kind: "block", stmts: [{ kind: "for", ids: ['__j'], range: range2, body: { kind: "block", stmts: [temp] } } ] } };
 			}
 		}
