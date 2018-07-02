@@ -1,4 +1,5 @@
 module test_pipe;
+
 pipeline test_pipe{
     test_mod
 };
