@@ -14,6 +14,7 @@ function fdefs(ast,ctx){
 			ast[i].vars.push({type: {primitive: get_primitive_type("__t"+j,ctx), is_const: false}, defs: [{id: "__t"+j}]});
 		}
 		ctx.symtbl.exitNestedScope();
+		temp_ind=0;
 	}
 }
 
