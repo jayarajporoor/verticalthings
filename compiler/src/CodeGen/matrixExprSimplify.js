@@ -118,8 +118,15 @@ function is_dim_resolved(ast,ctx){
 function get_dim(ast,ctx){
 	var Left;
 	var Right;
+	// console.log(ast);
 	// console.log(astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl).dim);
-	if(ast.op == "+" || ast.op == "-"){
+	if(typeof ast.id != 'undefined'){
+		Left= astlib.resolve_matrix_expr(ast,ctx.symtbl);
+		// console.log("******************");
+		// conosle.log(Left);
+		return {dim: Left.dim, info: astlib.deep_copy(ctx.symtbl.lookup(ast.id).info)};
+	}
+	else if(ast.op == "+" || ast.op == "-"){
 		if(typeof ast.lexpr.id != 'undefined'){
 			// console.log(Left);
 			Left = astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl);
@@ -127,6 +134,7 @@ function get_dim(ast,ctx){
 		}
 		else{
 			Left = astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl);
+		// console.log(Left, Right);
 			// console.log(Left.dim);
 			return {dim: Left.dim , info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
 		}
@@ -134,54 +142,53 @@ function get_dim(ast,ctx){
 	else if(ast.op == "*"){
 		Left = astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl);
 		Right = astlib.resolve_matrix_expr(ast.rexpr,ctx.symtbl);
-		// console.log(Left, Right);
 		if(!Left && !Right){
 			if(typeof ast.lexpr.id != 'undefined')
-				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.id).info};
+				return {dim: [], info: astlib.deep_copy(ctx.symtbl.lookup(ast.lexpr.id).info)};
 			else 
-				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
+				return {dim: [], info: astlib.deep_copy(ctx.symtbl.lookup(ast.lexpr.qid[0]).info)};
 		}
 		else if(!Left && (Right.dim.length == 1 || Right.dim.length == 2)){
 			if(typeof ast.rexpr.id != 'undefined')
-				return {dim: Right.dim, info: ctx.symtbl.lookup(ast.rexpr.id).info};
+				return {dim: Right.dim, info: astlib.deep_copy(ctx.symtbl.lookup(ast.rexpr.id).info)};
 			else
-				return {dim: Right.dim, info: ctx.symtbl.lookup(ast.rexpr.qid[0]).info};
+				return {dim: Right.dim, info: astlib.deep_copy(ctx.symtbl.lookup(ast.rexpr.qid[0]).info)};
 		}
 		else if((Left.dim.length == 1 || Left.dim.length == 2) && !Right){
 			if(typeof ast.lexpr.id != 'undefined')
-				return {dim: Left.dim, info: ctx.symtbl.lookup(ast.lexpr.id).info};
+				return {dim: Left.dim, info: astlib.deep_copy(ctx.symtbl.lookup(ast.lexpr.id).info)};
 			else if(typeof ast.lexpr.qid != 'undefined')
-				return {dim: Left.dim, info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};			
+				return {dim: Left.dim, info: astlib.deep_copy(ctx.symtbl.lookup(ast.lexpr.qid[0]).info)};			
 		}
 		else if(Left.dim.length == 1 && Right.dim.length == 2){
 			if(typeof ast.lexpr.id != 'undefined'){
-				return {dim: [Right.dim[1]], info: ctx.symtbl.lookup(ast.lexpr.id).info};
+				return {dim: [Right.dim[1]], info: astlib.deep_copy(ctx.symtbl.lookup(ast.lexpr.id).info)};
 			}
 			else if(typeof ast.lexpr.qid != 'undefined'){
-				return {dim: [Right.dim[1]], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
+				return {dim: [Right.dim[1]], info: astlib.deep_copy(ctx.symtbl.lookup(ast.lexpr.qid[0]).info)};
 			}
 		}
 		else if(Left.dim.length == 2 && Right.dim.length == 1){
 			if(typeof ast.rexpr.id != 'undefined'){
-				return {dim: [Left.dim[0]], info: ctx.symtbl.lookup(ast.rexpr.id).info};
+				return {dim: [Left.dim[0]], info: astlib.deep_copy(ctx.symtbl.lookup(ast.rexpr.id).info)};
 			}
 			else if(typeof ast.rexpr.qid != 'undefined'){
-				return {dim: [Left.dim[0]], info: ctx.symtbl.lookup(ast.rexpr.qid[0]).info};
+				return {dim: [Left.dim[0]], info: astlib.deep_copy(ctx.symtbl.lookup(ast.rexpr.qid[0]).info)};
 			}	
 		}
 		else if(Left.dim.length == 2 && Right.dim.length == 2){
 		// console.log("******************************");
 			if(typeof ast.lexpr.id != 'undefined')
-				return {dim: [Left.dim[0], Right.dim[1]], info: ctx.symtbl.lookup(ast.lexpr.id).info};
+				return {dim: [Left.dim[0], Right.dim[1]], info: astlib.deep_copy(ctx.symtbl.lookup(ast.lexpr.id).info)};
 			else if(typeof ast.lexpr.qid != 'undefined')
-				return {dim: [Left.dim[0], Right.dim[1]], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
+				return {dim: [Left.dim[0], Right.dim[1]], info: astlib.deep_copy(ctx.symtbl.lookup(ast.lexpr.qid[0]).info)};
 		}
 		else if(Left.dim.length == 1 && Right.dim.length == 1){
 		// console.log(Right);
 			if(typeof ast.lexpr.id != 'undefined')
-				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.id).info};
+				return {dim: [], info: astlib.deep_copy(ctx.symtbl.lookup(ast.lexpr.id).info)};
 			else if(typeof ast.lexpr.qid != 'undefined')
-				return {dim: [], info: ctx.symtbl.lookup(ast.lexpr.qid[0]).info};
+				return {dim: [], info: astlib.deep_copy(ctx.symtbl.lookup(ast.lexpr.qid[0]).info)};
 		}
 	}
 }
@@ -189,12 +196,15 @@ function get_dim(ast,ctx){
 function transform_expr(ast, ctx){
 	var details = get_dim(ast, ctx);
 	// console.log(details);
-	details.info.type.dim.dim = JSON.parse(JSON.stringify(details.dim));
-	// console.log(JSON.stringify(ast));
-	block_stmts.push({kind: "assign",id : "$t"+temp_ind,expr: JSON.parse(JSON.stringify(ast))});
-	ctx.symtbl.addSymbolToCurrentScope("$t"+temp_ind , details.info);
+	details.info.type.dim.dim = astlib.deep_copy(details.dim);
+	details.info.is_temp=true;
+	// console.log((ast));
+	// console.log(details.info.dim);
+	// delete details.info.type.dim;
+	block_stmts.push({kind: "assign",id : "__t"+temp_ind,expr: astlib.deep_copy(ast)});
+	ctx.symtbl.addSymbolToCurrentScope("__t"+temp_ind , details.info);
 	// console.log(details.info.type.dim);
-	return {id : "$t"+temp_ind++};
+	return {id : "__t"+temp_ind++};
 }
 
 function expr(ast, ctx, isRoot){
@@ -207,6 +217,10 @@ function expr(ast, ctx, isRoot){
 	if(lexpr_is_varconst && rexpr_is_varconst){
 		if(isRoot || (is_dim_resolved(ast.lexpr,ctx) && is_dim_resolved(ast.rexpr, ctx)))
 		{
+			if(isRoot && ast.op=='*')
+			{
+				return transform_expr(ast,ctx);
+			}
 			return ast;
 		}
 		else{
