@@ -50,21 +50,24 @@ function fcall(ast){
 function expr(ast){
 	// console.log(ast);
 	var str="";
+	var id = ast.id || ast.qid;	
 	if(typeof ast.op != 'undefined'){
 		// console.log(ast);
 		str = "("+expr(ast.lexpr) + ast.op + expr(ast.rexpr)+")";
 	}
-	else if(typeof ast.qid != 'undefined'){
-		if(ast.qid.length > 1){
+	else if(id){
+		if(ast.qid && ast.qid.length > 1){
 			//Variables used with '.' operator must be simply expanded.
 			str = str + get_scoped_name(ast.qid);
 		}else{
-			var sym = symtbl.lookup(ast.qid[0]);					
-			if(sym){
+			var sym = symtbl.lookup(id);
+			if(sym && !sym.info.is_temp){
 				str = str + ast_util.get_scoped_name(sym, "_", PVAR);
 			}else{
-				str = str + get_scoped_name(ast.qid);//loop variables are not in symbol table now.
-				vtbuild.warning("Symbol ", ast.qid[0] , " not found");
+				str = str + id;//loop variables are not in symbol table now.
+				if(!sym){
+					vtbuild.warning("Symbol ", id , " not found");
+				}
 			}
 		}
         if(typeof ast.dim != 'undefined'){
@@ -75,20 +78,6 @@ function expr(ast){
 	}
 	else if(typeof ast.iconst != 'undefined'){
 		str = ast.iconst;
-	}
-	else if(typeof ast.id != 'undefined'){
-		var sym = symtbl.lookup(ast.id);					
-		if(sym){
-			str = str + ast_util.get_scoped_name(sym, "_", PVAR);
-		}else{
-			str = str + get_scoped_name(ast.id);//loop variables are not in symbol table now.
-			vtbuild.warning("Symbol ", ast.id , " not found");
-		}		
-        if(typeof ast.dim != 'undefined'){
-            for(var i in ast.dim.dim){
-                str=str + "[" + expr(ast.dim.dim[i]) + "]";
-            }
-        }
 	}
 	else if(typeof ast.fcall != 'undefined'){
 		str = fcall(ast.fcall);
@@ -121,7 +110,7 @@ function stmt(ast,strbuf){
 			}
 			break;
 		case "for":
-			var idxstr = get_scoped_name(ast.ids[0]);
+			var idxstr = ast.ids[0];
 			strbuf.push("for(int " + idxstr + "=" + expr(ast.range.from) + "; " + idxstr + "<" + expr(ast.range.to) + "; " + idxstr + "++)");
 			stmt(ast.body,strbuf);
 			break;
@@ -171,7 +160,8 @@ function vardef(ast)
 	var temp=[];
 	for(var i in ast.defs){
 		var def = ast.defs[i];
-		var name = get_scoped_name(def.id, PVAR);
+		var sym = symtbl.lookup(def.id);
+		var name = (!sym || sym.info.is_temp) ? def.id : get_scoped_name(def.id, PVAR);
 		if(typeof def.init != 'undefined')
 			temp.push(name+type.dim+"="+expr(def.init));
 		else

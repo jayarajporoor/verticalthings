@@ -23,17 +23,17 @@ typedef enum { __test_mod_acquire, __test_mod2_process}  __icane_test;
 void _test_mod_acquire_acquire()
 {
 {
-for(int test_mod_acquire_i=0; test_mod_acquire_i<10; test_mod_acquire_i++)
+for(int i=0; i<10; i++)
 {
-test_mod_xxx[test_mod_acquire_i]=test_mod_acquire_i;
+test_mod_xxx[i]=i;
 }
-for(int test_mod_acquire_i=0; test_mod_acquire_i<10; test_mod_acquire_i++)
+for(int i=0; i<10; i++)
 {
-test_mod_acquire_yyy[test_mod_acquire_i]=(test_mod_xxx[test_mod_acquire_i]*3);
+test_mod_acquire_yyy[i]=(test_mod_xxx[i]*3);
 }
-for(int test_mod_acquire_i=0; test_mod_acquire_i<10; test_mod_acquire_i++)
+for(int i=0; i<10; i++)
 {
-test_mod_acquire_zzz[test_mod_acquire_i]=(test_mod_acquire_yyy[test_mod_acquire_i]*4);
+test_mod_acquire_zzz[i]=(test_mod_acquire_yyy[i]*4);
 }
 test_mod2_process_val_p = &(test_mod_acquire_zzz); __state = __test_mod2_process;
 }
@@ -42,9 +42,9 @@ void _test_mod2_process_process()
 {
 const int test_mod2_process_x=3;
 {
-for(int test_mod2_process_i=0; test_mod2_process_i<10; test_mod2_process_i++)
+for(int i=0; i<10; i++)
 {
-test_mod2_fff[test_mod2_process_i]=(test_mod2_process_val[test_mod2_process_i]+test_mod2_process_x);
+test_mod2_fff[i]=(test_mod2_process_val[i]+test_mod2_process_x);
 }
 }
 }
