@@ -10,8 +10,15 @@ function fdefs(ast,ctx){
 	for(var i = 0; i < ast.length ; i++){
 		ctx.symtbl.enterNestedScope(ast[i].id);
 		stmts(ast[i].body.stmts,ctx);
+		for(var j=0;j<temp_ind;j++){
+			ast[i].vars.push({type: {primitive: get_primitive_type("__t"+j,ctx), is_const: false}, defs: [{id: "__t"+j}]});
+		}
 		ctx.symtbl.exitNestedScope();
 	}
+}
+
+function get_primitive_type(id,ctx){
+	return ctx.symtbl.lookup(id).info.type.primitive;
 }
 
 function block(ast,ctx){
