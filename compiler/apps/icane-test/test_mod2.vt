@@ -1,8 +1,11 @@
 module test_mod2;
 
+use arduino;
+
 int[10] fff;
 default flow process(int[10] val){
     const int x = 3;
+    pinPeripheral(3,4);
 	for i in [0,10] {
 	    fff[i] = val[i] + x;
 	}
