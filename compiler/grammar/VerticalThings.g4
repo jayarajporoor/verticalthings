@@ -5,7 +5,7 @@ options {tokenVocab = VTLexer;}
 
 module
     :   MODULE Identifier SEMI
-        useSpec* varDef*
+        useSpec* includeSpec* varDef*
         (funcDef* | pipelineDef | effectsDef)
     ;
 
@@ -42,6 +42,10 @@ pipelineList
 
 useSpec
     :   USE Identifier SEMI
+    ;
+
+includeSpec
+    :   INCLUDE Identifier SEMI
     ;
 
 

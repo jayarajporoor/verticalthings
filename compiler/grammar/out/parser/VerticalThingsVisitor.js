@@ -82,6 +82,11 @@ VerticalThingsVisitor.prototype.visitUseSpec = function(ctx) {
 };
 
 
+// Visit a parse tree produced by VerticalThings#includeSpec.
+VerticalThingsVisitor.prototype.visitIncludeSpec = function(ctx) {
+};
+
+
 // Visit a parse tree produced by VerticalThings#booleanLiteral.
 VerticalThingsVisitor.prototype.visitBooleanLiteral = function(ctx) {
 };

@@ -307,6 +307,14 @@ function astUseSpec(useSpec){
 	return uses;
 }
 
+function astIncludeSpec(incSpec){
+	var inc = [];
+	for(var i=0;i<incSpec.length;i++){
+		inc.push({name: getId(incSpec[i])});
+	}
+	return inc;
+}
+
 function astNumVal(numVal){
 	var identifier = numVal.Identifier();
 	var numConstant = numVal.numConstant();
@@ -483,6 +491,10 @@ function astVarDef(def){
 	  	}
 	  }
 	  addSymbol(def.id, syminfo);
+	  if(ast.type.dim && ast.type.dim.is_ring){
+	  	var sym_ringpos = {type: {primitive: 'int'}, is_const: false, src: ast.src, value: {iconst: 0}};
+	  	addSymbol("__pos_" + def.id, sym_ringpos);
+	  }
 	  ast.defs.push(def);
   }
   return ast;
@@ -779,6 +791,12 @@ function astModule(moduleDef, ast) {
 	ast.name = getId(moduleDef);
 	ast.src = src_info(moduleDef);
 	var useSpec = moduleDef.useSpec();
+	var incSpec = moduleDef.includeSpec();
+	if(incSpec){
+		ast.includes = astIncludeSpec(incSpec);
+	}else{
+		ast.includes = [];
+	}
 	if(useSpec){
 		ast.uses = astUseSpec(useSpec);
 	}else{

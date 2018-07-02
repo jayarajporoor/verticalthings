@@ -6,11 +6,12 @@ int[10][10] matrix;
 
 default flow acquire(){
 	const int size = 10;
-	int[size] buf;
+	int ring[size] buf;
 	int[size] ybuf;
 
 	pinPeripheral(3,4);
 
+	buf.push(3);
 	mpu.getFIFOBytes(buf, size);
 
 	ybuf = matrix * buf + buf;

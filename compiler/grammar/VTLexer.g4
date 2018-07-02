@@ -43,6 +43,8 @@ IN
     :   'in'
     ;
 
+INCLUDE : 'include';
+
 VOID: 'void';
 WHILE: 'while';
 

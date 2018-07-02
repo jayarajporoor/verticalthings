@@ -10,12 +10,45 @@ const PFUNC = "_";
 const PVAR = "";
 const SPTR = "_p";
 
+
+function array_method_call(ast){
+	var id = ast.qid[0];	
+	var fn = ast.qid[1];
+	var sym = symtbl.lookup(id);	
+
+	if(!sym.info.type.dim){
+		return null;
+	}
+	var sym_pos;
+	if(sym.info.type.dim.is_ring){
+		sym_pos = symtbl.lookup("__pos_" + id);
+	}
+	switch(fn){
+		case 'push': 
+			if(!sym_pos || ast.params.length === 0) return null;
+			var size = sym.info.type.dim.dim[0].iconst;
+
+			var id_str = ast_util.get_scoped_name(sym, "_", PVAR);
+			var pos_str = ast_util.get_scoped_name(sym_pos, "_", PVAR);
+			var idx_expr_str  = pos_str + " = (" + pos_str + " + 1 == " + size + " ? 0: " + pos_str + " + 1)";
+			var expr_str = expr(ast.params[0].expr);
+			return  "(" + id_str + "[" + idx_expr_str + "] = " +  expr_str + ")";
+		break;
+	}
+	return null;
+}
+
 function fcall(ast){
 	var str="";
 	if(ast.qid.length > 1 || ast.qid[0] !== "next"){
 		var name;
 		if(ast.qid.length > 1){
-			name = ast.qid.join(".");
+			var str_amethod = array_method_call(ast);
+			if(str_amethod){
+				return str_amethod;
+			}else{
+				name = ast.qid.join(".");
+			}
 		}else{
 			var sym = symtbl.lookup(ast.qid[0]);
 			if(sym){
@@ -149,18 +182,30 @@ function stringify_type(ast){
 	// console.log(ast);
 	var primitive=ast.primitive;
 	var dim="";
-	if(typeof ast.dim != 'undefined')
+	if(typeof ast.dim != 'undefined'){
 		for(var i in ast.dim.dim){
 			dim=dim+"["+expr(ast.dim.dim[i])+"]";
 		}
-	return {primitive: primitive, dim: dim};
+	}
+	var astr = {primitive: primitive, dim: dim};
+	return astr;
 }
 
 function vardef(ast)
 {	
 	var s="";
 	if(ast.type.dim && !ast.type.is_const){
-		return null;//for RAM arrays we do our own memory allocation.
+		//for RAM arrays we do our own memory allocation. However, for ring bufs we need to add a vardef for
+		//ring pos.
+		if(ast.type.dim.is_ring){
+			for(var i in ast.defs){
+				var def = ast.defs[i];
+				var sym = symtbl.lookup("__pos_" + def.id);
+				var str_ringpos = "int " + ast_util.get_scoped_name(sym, "_", PVAR) + " = 0;";
+				strglobals.push(str_ringpos);
+			}			
+		}
+		return null;
 	}
 	// console.log(ast.type.is_const);
 	if(typeof ast.type.is_const != 'undefined'){

@@ -4,8 +4,6 @@ const float[M][N] ldProjectionMatrix ={{1},{2}};
 const float[M][N] prototypeMatrix  ={{2}, {1}};
 const float[M][N] prototypeLabelMatrix ={{1}, {2}};
 
-
-
 float gaussian(float[n] x, float[n] y, float gamma){
 	sumSq =  reduce(map(x - y, _ ** 2), sum);
 	sumSq = -1*gamma*gamma*sumSq;

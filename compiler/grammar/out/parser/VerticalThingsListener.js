@@ -137,6 +137,15 @@ VerticalThingsListener.prototype.exitUseSpec = function(ctx) {
 };
 
 
+// Enter a parse tree produced by VerticalThings#includeSpec.
+VerticalThingsListener.prototype.enterIncludeSpec = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#includeSpec.
+VerticalThingsListener.prototype.exitIncludeSpec = function(ctx) {
+};
+
+
 // Enter a parse tree produced by VerticalThings#booleanLiteral.
 VerticalThingsListener.prototype.enterBooleanLiteral = function(ctx) {
 };

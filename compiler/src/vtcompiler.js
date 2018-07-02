@@ -85,6 +85,7 @@ function loadModule(ast, name, basepath, symtbl){
 	var tree = parse(filepath, src);
 	symtbl.createNestedScope(name);
 	var mod_ast = astBuilder.buildAst(tree, symtbl);
+	//TODO: for each includes read, parse, build and merge the ast.
 	symtbl.exitNestedScope();
 	mod_ast.srcpath = filepath;
 	if(mod_ast.name !== name){

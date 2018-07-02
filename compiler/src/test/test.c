@@ -14,6 +14,7 @@ int (*test_mod_acquire_ybuf_p)[10]= (int (*)[10]) &__vtmem[480];
 /*End of managed memory variables*/
 /*Module vars for test_mod*/
 /*End of module vars for test_mod*/
+int test_mod_acquire___pos_buf = 0;
 /*Module vars for arduino*/
 /*End of module vars for arduino*/
 /*Module vars for test_mod2*/
@@ -28,6 +29,7 @@ const int test_mod_acquire_size=10;
 int __t0;
 {
 pinPeripheral(3, 4);
+(test_mod_acquire_buf[test_mod_acquire___pos_buf = (test_mod_acquire___pos_buf + 1 == 10 ? 0: test_mod_acquire___pos_buf + 1)] = 3);
 getFIFOBytes(test_mod_acquire_buf, test_mod_acquire_size);
 for(int __i=0; __i<10; __i++)
 {

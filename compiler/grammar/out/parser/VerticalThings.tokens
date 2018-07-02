@@ -66,6 +66,7 @@ Whitespace=65
 Newline=66
 BlockComment=67
 LineComment=68
+INCLUDE=69
 'module'=1
 'pipeline'=2
 'flow'=3
