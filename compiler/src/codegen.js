@@ -79,6 +79,9 @@ function expr(ast){
 	else if(typeof ast.iconst != 'undefined'){
 		str = ast.iconst;
 	}
+	else if(typeof ast.fconst != 'undefined'){
+		str = ast.fconst;
+	}
 	else if(typeof ast.fcall != 'undefined'){
 		str = fcall(ast.fcall);
 	}

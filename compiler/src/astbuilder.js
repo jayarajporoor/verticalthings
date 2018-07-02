@@ -699,12 +699,16 @@ function astEffectExpr(expr, params){
 	var ast = null;
 	var id = expr.Identifier();
 	var term = expr.effectTerm();
+	var exprConstant = expr.exprConstant();
 	if(id){
 		id = id.getText();
 		var idx = params[id];
 		if(typeof idx !== 'undefined'){
 			ast = {param: idx};
 		}
+	}else
+	if(exprConstant){
+		ast = getExprConstAst(exprConstant);
 	}
 	if(term){
 		ast = astEffectTerm(term, params);

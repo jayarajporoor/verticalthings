@@ -93,6 +93,29 @@ function first_pipeline_entry(root_ast){
     return null;
 }
 
+function lookup_effect(root_ast, uses, qid, kind){
+	if(!uses || uses.length === 0) return null;
+
+	var fname = Array.isArray(qid) ? ( qid.length == 1 ? qid[0] : qid[1] ) : qid;
+
+	for(var i=0;i< uses.length;i++){
+		var mod_ast = root_ast.modules[uses[i]];
+		if(mod_ast && mod_ast.effectsMap){
+			var effects = mod_ast.effectsMap[fname];
+			if(!effects) continue;
+			for(var j=0;j<effects.length;j++){
+				var effect = effects[j];
+				if(effect.kind === kind){
+					return effect.expr;
+				}
+			}
+		}else{
+			vtbuild.warning("Module definition not found/improper for the used module ", uses[i]);
+		}
+	}
+
+}
+
 var vector_ops = ['push'];
 
 exports.find_default_flow = find_default_flow;
@@ -104,3 +127,4 @@ exports.deep_copy = deep_copy;
 exports.get_scoped_name = get_scoped_name;
 exports.get_var_id = get_var_id;
 exports.first_pipeline_entry = first_pipeline_entry;
+exports.lookup_effect = lookup_effect;

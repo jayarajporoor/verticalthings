@@ -14,6 +14,8 @@ int (*test_mod2_fff_p)[10]= (int (*)[10]) &__vtmem[40];
 /*End of managed memory variables*/
 /*Module vars for test_mod*/
 /*End of module vars for test_mod*/
+/*Module vars for arduino*/
+/*End of module vars for arduino*/
 /*Module vars for test_mod2*/
 /*End of module vars for test_mod2*/
 int (*test_mod2_process_val_p)[10];
@@ -23,6 +25,7 @@ typedef enum { __test_mod_acquire, __test_mod2_process}  __icane_test;
 void _test_mod_acquire_acquire()
 {
 {
+_test_mod_acquire_pinPeripheral(3, 4);
 for(int i=0; i<10; i++)
 {
 test_mod_xxx[i]=i;
@@ -42,6 +45,7 @@ void _test_mod2_process_process()
 {
 const int test_mod2_process_x=3;
 {
+_test_mod2_process_pinPeripheral(3, 4);
 for(int i=0; i<10; i++)
 {
 test_mod2_fff[i]=(test_mod2_process_val[i]+test_mod2_process_x);
