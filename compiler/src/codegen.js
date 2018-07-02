@@ -114,9 +114,16 @@ function expr(ast){
 			}
 		}
         if(typeof ast.dim != 'undefined'){
-            for(var i in ast.dim.dim){
-                str=str + "[" + expr(ast.dim.dim[i]) + "]";
-            }
+			if(sym.info.type.dim.is_ring){
+				var sym_pos = symtbl.lookup("__pos_" + id);
+				var size = sym.info.type.dim.dim[0].iconst;	
+				var pos_str = ast_util.get_scoped_name(sym_pos, "_", PVAR);
+				str=str + "[ ( (" + expr(ast.dim.dim[0]) + ") + " + pos_str + ") % " + size + "]";
+			}else{
+	            for(var i in ast.dim.dim){
+	                str=str + "[" + expr(ast.dim.dim[i]) + "]";
+	            }
+        	}
         }
 	}
 	else if(typeof ast.iconst != 'undefined'){
@@ -124,6 +131,13 @@ function expr(ast){
 	}
 	else if(typeof ast.fconst != 'undefined'){
 		str = ast.fconst;
+	}else if(typeof ast.aconst !== 'undefined'){		
+		str = "{ ";
+		for(var i=0;i<ast.aconst.length;i++){
+			if(i > 0) str += ", ";
+			str += expr(ast.aconst[i]);
+		}
+		str += "} ";
 	}
 	else if(typeof ast.fcall != 'undefined'){
 		str = fcall(ast.fcall);
@@ -220,8 +234,9 @@ function vardef(ast)
 		var def = ast.defs[i];
 		var sym = symtbl.lookup(def.id);
 		var name = (!sym || sym.info.is_temp) ? def.id : get_current_scoped_name(def.id, PVAR);
-		if(typeof def.init != 'undefined')
+		if(typeof def.init != 'undefined'){
 			temp.push(name+type.dim+"="+expr(def.init));
+		}
 		else
 			temp.push(name+type.dim);
 	}

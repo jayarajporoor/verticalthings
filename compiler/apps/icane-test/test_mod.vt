@@ -2,7 +2,7 @@ module test_mod;
 
 use arduino;
 
-int[10][10] matrix;
+include model;
 
 default flow acquire(){
 	const int size = 10;
@@ -14,7 +14,7 @@ default flow acquire(){
 	buf.push(3);
 	mpu.getFIFOBytes(buf, size);
 
-	ybuf = matrix * buf + buf;
+	ybuf = modelData * buf + modelData * buf;
 	next(ybuf);
 }
 

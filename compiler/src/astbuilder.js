@@ -309,9 +309,11 @@ function astUseSpec(useSpec){
 
 function astIncludeSpec(incSpec){
 	var inc = [];
+
 	for(var i=0;i<incSpec.length;i++){
 		inc.push({name: getId(incSpec[i])});
 	}
+
 	return inc;
 }
 

@@ -69,6 +69,19 @@ function parse(srcpath, input) {
     return tree;
 }
 
+function loadInclude(name, basepath, symtbl){
+	var filepath = basepath + "/" + name + ".vt";
+	var src;
+	try{
+		src = fs.readFileSync(filepath, 'utf8');
+	}catch(e){
+		vtbuild.set_path(filepath);
+		return vtbuild.error("Cannot load module ", name, ". File cannot be accessed: ", filepath);
+	}
+	var tree = parse(filepath, src);
+	return astBuilder.buildAst(tree, symtbl);
+}
+
 function loadModule(ast, name, basepath, symtbl){
 	if(ast.modules[name]){
 		return;//already loaded.
@@ -85,7 +98,16 @@ function loadModule(ast, name, basepath, symtbl){
 	var tree = parse(filepath, src);
 	symtbl.createNestedScope(name);
 	var mod_ast = astBuilder.buildAst(tree, symtbl);
-	//TODO: for each includes read, parse, build and merge the ast.
+
+	for(var j=0;j<mod_ast.includes.length;j++){
+		var inc_ast = loadInclude(mod_ast.includes[j].name, basepath, symtbl);
+		for(k=0;k<inc_ast.fdefs.length;k++){
+			mod_ast.fdefs.push(inc_ast.fdefs[k]);
+		}
+		for(k=0;k<inc_ast.vars.length;k++){
+			mod_ast.vars.push(inc_ast.vars[k]);
+		}		
+	}
 	symtbl.exitNestedScope();
 	mod_ast.srcpath = filepath;
 	if(mod_ast.name !== name){
