@@ -67,9 +67,10 @@ function resolve_matrix_expr(ast, symtbl){
 	return resolv;
 }
 
-function get_scoped_name(sym, sep){
+function get_scoped_name(sym, sep, pfx){
+	if(!pfx) pfx = "";
 	sep = !sep ? "_" : sep;
-	return sym.scope_names.join(sep) + sep + sym.name;
+	return pfx + sym.scope_names.join(sep) + sep + sym.name;
 }
 
 function get_var_id(ast_node){
@@ -78,6 +79,18 @@ function get_var_id(ast_node){
 	}else{
 		return ast_node.qid && ast_node.qid[0];
 	}
+}
+
+function first_pipeline_entry(root_ast){
+    if(root_ast.pipeline && root_ast.pipeline.block.length > 0){
+    	var entry = root_ast.pipeline.block[0];
+    	while(entry[0]){
+    		entry = entry[0];//go through the nested blocks till first element is a non-block.
+    	}
+    	return entry;
+    }
+    vtbuild.error("astutil.first_pipeline_entry: Empty pipeline found");
+    return null;
 }
 
 var vector_ops = ['push'];
@@ -90,3 +103,4 @@ exports.resolve_matrix_expr = resolve_matrix_expr;
 exports.deep_copy = deep_copy;
 exports.get_scoped_name = get_scoped_name;
 exports.get_var_id = get_var_id;
+exports.first_pipeline_entry = first_pipeline_entry;

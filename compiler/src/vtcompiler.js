@@ -85,6 +85,7 @@ function loadModule(ast, name, basepath, symtbl){
 	var tree = parse(filepath, src);
 	symtbl.createNestedScope(name);
 	var mod_ast = astBuilder.buildAst(tree, symtbl);
+	symtbl.exitNestedScope();
 	mod_ast.srcpath = filepath;
 	if(mod_ast.name !== name){
 		vtbuild.set_path(filepath);
@@ -95,7 +96,6 @@ function loadModule(ast, name, basepath, symtbl){
 			loadModule(ast, mod_ast.uses[j].name, basepath, symtbl);
 		}
 	}
-	symtbl.exitNestedScope();
 }
 
 function loadPipelineBlock(block, basepath, symtbl, ast){
@@ -129,13 +129,14 @@ function print_object(obj, printJson, printColor){
 	}	
 }
 
+var printColor = false;
+var printJson = false;
+
 function compile(argv)
 {
 	var srcpath;
 	var printAst = false;
 	var printSymtbl = false;
-	var printColor = false;
-	var printJson = false;
 
 	var ast_transforms = [];
 	var code_path = null;
@@ -293,8 +294,18 @@ function compile(argv)
 
 if(require.main === module){
 	process.argv.splice(0, 2);
-	compile(process.argv);
-	console.log(vtbuild.warnings);
+	try{
+		compile(process.argv);
+	}catch(e){
+		console.log("Compile has errors: ");
+		print_object(e, printJson, printColor);
+		print_object(vtbuild.errors, printJson, printColor);
+	}
+
+	if(vtbuild.warnings.length > 0){
+		console.log("Warnings: ");
+		print_object(vtbuild.warnings, printJson, printColor);
+	}
 }else{
 	exports.compile = compile;
 }

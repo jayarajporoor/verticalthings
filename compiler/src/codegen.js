@@ -1,209 +1,261 @@
-var ast_util = require("./ast_util.js");
+const ast_util = require("./ast_util.js");
 
 var symtbl;
+var pipeline_next_state = {};
+var pipeline_states = [];
+var curr_mod_ast = null;
+var scope_names = [];
+var strglobals = [];
 
-function fcall(obj){
-	var s="";
-	if(obj.qid.join("_") != "next"){
-		s=s+obj.qid.join("_")+"(";
-		for(var i in obj.params)
-			s=s+expr(obj.params[i].expr)+", ";
-		if(obj.params.length>0)
-			return (s.substring(0,s.length-2)+")");
-		else return s+")";
+const PFUNC = "_";
+const PVAR = "";
+const SPTR = "_p";
+
+function fcall(ast){
+	var str="";
+	if(ast.qid.join("_") !== "next"){
+		str = str + get_scoped_name(ast.qid, PFUNC) +"(";
+		for(var i=0;i<ast.params.length;i++){
+			if(i > 0) str += ", ";
+			str = str + expr(ast.params[i].expr);
+		}
+		str += ")";
 	}
 	else
 	{
-		var ind=states.indexOf(cur_mod);
-		ind++;
-		if(ind<states.length){
-			// cur_state=states[ind];
-			return "__state = __"+states[ind];
+		var scoped_name = get_scoped_name();//get the scoped name of current flow.
+		var next_state = pipeline_next_state[scoped_name];
+		next_state = pipeline_states[next_state];
+		var flow_params = next_state.flowdef.params;
+		for(var i=0;i<ast.params.length;i++){
+			var flow_param = flow_params[i];
+			var scoped_param_name = PVAR + next_state.qname + "_" + flow_param.id;
+			if(flow_param){
+				var expr_str = expr(ast.params[i].expr);
+				if(flow_param.type.dim){//array param
+					expr_str = "&(" + expr_str + ")";//assign address.
+					scoped_param_name = scoped_param_name + SPTR;
+				}
+				var param_assign = scoped_param_name + " = " + expr_str + "; ";
+				str += param_assign;
+			}else{
+				vtbuild.error("Flow param mismatch for ", next_state.name, ". flow from ", scoped_name);
+			}
 		}
-		else{
-			// cur_state=states[0];
-			return "__state = __"+states[0];
-		}
-	}
-}
-
-function expr(obj){
-	// console.log(obj);
-	var str="";
-	if(typeof obj.op != 'undefined'){
-		// console.log(obj);
-		str = "("+expr(obj.lexpr) + obj.op + expr(obj.rexpr)+")";
-	}
-	else if(typeof obj.qid != 'undefined'){
-		str = str + obj.qid.join(".");
-        if(typeof obj.dim != 'undefined'){
-            for(var i in obj.dim.dim){
-                str=str + "[" + expr(obj.dim.dim[i]) + "]";
-            }
-        }
-	}
-	else if(typeof obj.iconst != 'undefined'){
-		str = obj.iconst;
-	}
-	else if(typeof obj.id != 'undefined'){
-		console.log("calling for ", obj);
-		str = obj.id;
-        if(typeof obj.dim != 'undefined'){
-            for(var i in obj.dim.dim){
-                str=str + "[" + expr(obj.dim.dim[i]) + "]";
-            }
-        }
-	}
-	else if(typeof obj.fcall != 'undefined'){
-		str = fcall(obj.fcall);
+		str +=  "__state = __" + next_state.qname;
 	}
 	return str;
 }
 
-function block(obj,str){
+function expr(ast){
+	// console.log(ast);
+	var str="";
+	if(typeof ast.op != 'undefined'){
+		// console.log(ast);
+		str = "("+expr(ast.lexpr) + ast.op + expr(ast.rexpr)+")";
+	}
+	else if(typeof ast.qid != 'undefined'){
+		if(ast.qid.length > 1){
+			//Variables used with '.' operator must be simply expanded.
+			str = str + get_scoped_name(ast.qid);
+		}else{
+			var sym = symtbl.lookup(ast.qid[0]);					
+			if(sym){
+				str = str + ast_util.get_scoped_name(sym, "_", PVAR);
+			}else{
+				str = str + get_scoped_name(ast.qid);//loop variables are not in symbol table now.
+				vtbuild.warning("Symbol ", ast.qid[0] , " not found");
+			}
+		}
+        if(typeof ast.dim != 'undefined'){
+            for(var i in ast.dim.dim){
+                str=str + "[" + expr(ast.dim.dim[i]) + "]";
+            }
+        }
+	}
+	else if(typeof ast.iconst != 'undefined'){
+		str = ast.iconst;
+	}
+	else if(typeof ast.id != 'undefined'){
+		var sym = symtbl.lookup(ast.id);					
+		if(sym){
+			str = str + ast_util.get_scoped_name(sym, "_", PVAR);
+		}else{
+			str = str + get_scoped_name(ast.id);//loop variables are not in symbol table now.
+			vtbuild.warning("Symbol ", ast.id , " not found");
+		}		
+        if(typeof ast.dim != 'undefined'){
+            for(var i in ast.dim.dim){
+                str=str + "[" + expr(ast.dim.dim[i]) + "]";
+            }
+        }
+	}
+	else if(typeof ast.fcall != 'undefined'){
+		str = fcall(ast.fcall);
+	}
+	return str;
+}
+
+function block(ast,str){
 	str.push("{");
-	if(typeof obj.stmts != 'undefined'){
-		for(var i in obj.stmts){
-			stmts(obj.stmts[i],str);
+	if(typeof ast.stmts != 'undefined'){
+		for(var i in ast.stmts){
+			stmt(ast.stmts[i],str);
 		}
 	}
 	str.push("}");
 }
 
-function stmts(obj,str){
-	if(typeof obj.kind != 'undefined'){
-		switch(obj.kind){
-			case "assign":
-				str.push(expr(obj) + "=" + expr(obj.expr) + ";");
-				break;
-			case "if":
-				// console.log(obj);
-				str.push("if(" + expr(obj.expr) + ")");
-				stmts(obj.if_body,str);
-				if(typeof obj.else_body !='undefined'){
-					str.push("else");
-					stmts(obj.else_body,str)
-				}
-				break;
-			case "for":
-				str.push("for(int " + obj.ids[0] + "=" + expr(obj.range.from) + "; " + obj.ids[0] + "<" + expr(obj.range.to) + "; " + obj.ids[0] + "++)");
-				stmts(obj.body,str);
-				break;
-			case "while":
-				str.push("while(" + expr(obj.expr) + ")");
-				stmts(obj.body,str);
-				break;
-			case "return":
-				str.push("return " + expr(obj.expr));
-				break;
-			case "block":
-				block(obj,str);
-				break;
-		}
+function stmt(ast,strbuf){
+	switch(ast.kind){
+		case "assign":
+			strbuf.push(expr(ast) + "=" + expr(ast.expr) + ";");
+			break;
+		case "if":
+			// console.log(ast);
+			strbuf.push("if(" + expr(ast.expr) + ")");
+			stmt(ast.if_body,strbuf);
+			if(typeof ast.else_body !='undefined'){
+				strbuf.push("else");
+				stmt(ast.else_body,strbuf)
+			}
+			break;
+		case "for":
+			var idxstr = get_scoped_name(ast.ids[0]);
+			strbuf.push("for(int " + idxstr + "=" + expr(ast.range.from) + "; " + idxstr + "<" + expr(ast.range.to) + "; " + idxstr + "++)");
+			stmt(ast.body,strbuf);
+			break;
+		case "while":
+			strbuf.push("while(" + expr(ast.expr) + ")");
+			stmt(ast.body,str);
+			break;
+		case "return":
+			strbuf.push("return " + expr(ast.expr));
+			break;
+		case "block":
+			block(ast,strbuf);
+			break;
+		case "fcall":
+			var s = fcall(ast.fcall) + ";" ;
+			strbuf.push(s);
+		break;
 	}
-	else if(typeof obj.fcall != 'undefined'){
-		str.push(fcall(obj.fcall)+";");
-	}
+
 }
 
-function stringify_type(obj){
-	// console.log(obj);
-	var primitive=obj.primitive;
+function stringify_type(ast){
+	// console.log(ast);
+	var primitive=ast.primitive;
 	var dim="";
-	if(typeof obj.dim != 'undefined')
-		for(var i in obj.dim.dim){
-			dim=dim+"["+expr(obj.dim.dim[i])+"]";
+	if(typeof ast.dim != 'undefined')
+		for(var i in ast.dim.dim){
+			dim=dim+"["+expr(ast.dim.dim[i])+"]";
 		}
 	return {primitive: primitive, dim: dim};
 }
 
-function vardef(obj)
+function vardef(ast)
 {	
 	var s="";
-	if(obj.type.dim && !obj.type.is_const){
-		return;//for RAM arrays we do our own memory allocation.
+	if(ast.type.dim && !ast.type.is_const){
+		return null;//for RAM arrays we do our own memory allocation.
 	}
-	// console.log(obj.type.is_const);
-	if(typeof obj.type.is_const != 'undefined'){
-		if(obj.type.is_const === true)
+	// console.log(ast.type.is_const);
+	if(typeof ast.type.is_const != 'undefined'){
+		if(ast.type.is_const === true)
 			s=s+"const ";
 	}
-	var type = stringify_type(obj.type);
+	var type = stringify_type(ast.type);
 	s=s+type.primitive+" ";
 	// console.log(s);
 	var temp=[];
-	for(var i in obj.defs){
-		if(typeof obj.defs[i].init != 'undefined')
-			temp.push(obj.defs[i].id+type.dim+"="+expr(obj.defs[i].init));
+	for(var i in ast.defs){
+		var def = ast.defs[i];
+		var name = get_scoped_name(def.id, PVAR);
+		if(typeof def.init != 'undefined')
+			temp.push(name+type.dim+"="+expr(def.init));
 		else
-			temp.push(obj.defs[i].id+type.dim);
+			temp.push(name+type.dim);
 	}
 	s=s+temp.join(", ");
 	return s;
 }
 
-function params(obj){
+function fparam(ast){
 	var s="";
-	if(typeof obj.type.is_const != 'undefined'){
-		if(obj.type.is_const === true)
+	if(typeof ast.type.is_const != 'undefined'){
+		if(ast.type.is_const === true)
 			s=s+"const ";
 	}
-	var type=stringify_type(obj.type);
-	if(typeof obj.init != 'undefined')
-		s=s+type.primitive+" "+obj.id+"="+expr(obj.init);	
+	var type=stringify_type(ast.type);
+	var name = get_scoped_name(ast.id, PVAR);
+
+	if(typeof ast.init != 'undefined')
+		s=s+type.primitive+" "+ name + "="+expr(ast.init);	
 	else
-		s=s+type.primitive+" "+obj.id;	
+		s=s+type.primitive+" " + name;	
 	return s;
 }
 
-function fdef(obj,str){
-    symtbl.enterNestedScope(obj.id);
-	var s="";
-	if(typeof obj.type != 'undefined'){
-		s=s+obj.type.primitive+" ";
+function fdef(ast,strbuf){
+    symtbl.enterNestedScope(ast.id);
+	var hdr="";
+	if(typeof ast.type != 'undefined'){
+		hdr = hdr + ast.type.primitive + " ";
 	}
-	else
-		s=s+"void ";
-	s=s+"__"+cur_mod+obj.id+"(";
-	var temp=[];
-	for(var i in obj.params){
-		temp.push(params(obj.params[i]));
+	else{
+		hdr= hdr+"void ";
 	}
-	s=s+temp.join(", ");
-	s=s+")";
-	str.push(s);
+	hdr = hdr + get_scoped_name(ast.id, PFUNC) + "(";
+	if(ast.flow){
+		//for flow routines params are globally assigned.
+		for(var i=0;i<ast.params.length;i++){
+			var param = ast.params[i];
+			var stype = stringify_type(param.type);
+			var scoped_name = PVAR + get_scoped_name(param.id);
+			var scoped_name_p = scoped_name + SPTR;
+			var def =  str_parray(stype.primitive, scoped_name_p, stype.dim) + ";" ;
+			strglobals.push(def);
+			def = "#define " + scoped_name + " (*" + scoped_name_p +")";
+			strglobals.push(def);
+		}
 
-	str.push("{");
+	}else{
+		var params=[];
+		for(var i in ast.params){
+			params.push(fparam(ast.params[i]));
+		}	
+		hdr = hdr+ params.join(", ");
+	}
+	hdr = hdr + ")";
+	strbuf.push(hdr);
+
+	strbuf.push("{");
 	// str.push("__state = __" + states[0] + ";");
 	// cur_ind=0;
 
-	for(var i in obj.vars){
-		str.push(vardef(obj.vars[i])+";");
+	for(var i =0;i<ast.vars.length;i++){
+		var strdef = vardef(ast.vars[i]);
+		if(strdef){
+			strbuf.push(strdef + ";");
+		}
 	}
-	stmts(obj.body,str);
-    str.push("}");
+	stmt(ast.body,strbuf);
+    strbuf.push("}");
     symtbl.exitNestedScope();
 }
 
-function getDefaultFlow(obj){
-	var s="";
-	for(var i in obj){
-		if(obj[i].flow === "default"){
-			return obj[i].id;
-		}
-	}
-}
-
 function str_parray(elemtype, name, dimstr){
-	return elemtype + "(*" + name + ")" + dimstr;
+	return elemtype + " (*" + name + ")" + dimstr;
 }
 
-function memdefs(mem, code){
-	code.push("unsigned char __vtmem[" +  mem.total_alloc_size + "];");
+function memdefs(mem){
+	strglobals.push("/*Managed memory variables*/");
+	strglobals.push("unsigned char __vtmem[" +  mem.total_alloc_size + "];");
 	for(var i=0;i<mem.alloc.length;i++){
 		var alloc = mem.alloc[i];
-		var scoped_name = "__" + ast_util.get_scoped_name(alloc.sym);
-		var scoped_name_p = "__" + ast_util.get_scoped_name(alloc.sym) + "__p";
+		var scoped_name = PVAR + ast_util.get_scoped_name(alloc.sym);
+		var scoped_name_p =  scoped_name + SPTR;
 		var stype = stringify_type(alloc.sym.info.type);
 		var def = 	  str_parray(stype.primitive, scoped_name_p, stype.dim) 
 					+ "= (" 
@@ -211,66 +263,142 @@ function memdefs(mem, code){
 					+ ") "
 					+ "&__vtmem[" + alloc.loc + "];"
 					;
-		code.push(def);
+		strglobals.push(def);
 		def = "#define " + scoped_name + " (*" + scoped_name_p +")";
-		code.push(def);
+		strglobals.push(def);
+	}
+	strglobals.push("/*End of managed memory variables*/");
+}
+
+function get_scoped_name(n, pfx){
+	if(Array.isArray(n)){
+		if(n.length > 1){//this is already a scoped name. so don't add our scopes to it.
+			return n.join(".");
+		}else{
+			n = n[0];
+		}
+	}
+	if(!pfx){
+		pfx = "";
+	}
+	if(!n || n === ""){//just return scoped name of the current scope stack.
+		return pfx + scope_names.join("_");
+	}else{
+		return pfx + scope_names.join("_") + "_" + n;
 	}
 }
 
-function codeGen(obj,ctx){
+
+function boiler_plate(){
+	strglobals.push("/************************************************************");
+	strglobals.push("This code is automatically generated by the VerticalThings compiler. DO NOT EDIT!");
+	strglobals.push("************************************************************/");
+}
+
+function code_gen(ast,ctx){
 	// console.log("asdasd");
+
+	boiler_plate();
+
 	if(!ctx.code){
 		ctx.code = [];
 	}
 	var code = ctx.code;
 	symtbl = ctx.symtbl;
 
-	memdefs(ctx.mem, code);
+	memdefs(ctx.mem);
    
-    for(var i=0; i<obj.pipeline.block.length;i++){
-        // console.log(i,obj.pipeline.block[i]);
-        states.push(obj.pipeline.block[i].qname.join('_'));
+    var current_pipeline_entry = ast_util.first_pipeline_entry(ast);
+
+	var pipeline_state_names = [];
+
+	var curr_idx = 0;
+    while(current_pipeline_entry){
+    	var qname = current_pipeline_entry.qname;
+   		var mod_ast = ast.modules[qname[0]];
+   		var flow_def = ast_util.find_flow(mod_ast, qname[1]);
+
+    	if(qname.length === 1){
+    		qname.push(flow_def.id);//add the default flow's id to the qname.
+    	}
+
+   		qname =  qname.join("_");
+
+    	var next_idx = 0;//default to the first state.
+    	if(current_pipeline_entry.next){
+    		next_idx = curr_idx + 1;
+    	}
+    	
+    	pipeline_next_state[qname] = next_idx;
+    	
+    	pipeline_states.push({qname: qname, flowdef: flow_def});
+    	
+    	pipeline_state_names.push(qname);//for convenience.
+
+    	current_pipeline_entry = current_pipeline_entry.next;    	
+    	curr_idx++;
     }
-    code.push("enum __" + obj.pipeline.name + "{__" + states.join(", __") + "} __state = __" + states[0] + ";");
-    for(var j in states){
-        cur_mod=states[j];
-        symtbl.enterNestedScope(cur_mod);
-        for(var i in obj.modules[cur_mod].fdefs){
-            fdef(obj.modules[cur_mod].fdefs[i],code);
+
+    code.push("typedef enum " + "{ __" + pipeline_state_names.join(", __") + "} " + " __" + ast.pipeline.name + ";");
+    code.push( " __" + ast.pipeline.name + " __state = __" + pipeline_state_names[0] + ";");
+
+    for(var mod_name in ast.modules){
+    	scope_names.push(mod_name);
+        symtbl.enterNestedScope(mod_name);    	
+        var mod_ast = ast.modules[mod_name];
+        curr_mod_ast = mod_ast;
+	
+		strglobals.push("/*Module vars for " + mod_name + "*/");
+		for(var i =0;i<mod_ast.vars.length;i++){
+			var strdef = vardef(mod_ast.vars[i]);
+			if(strdef){
+				strglobals.push(strdef + ";");
+			}
+		}
+		strglobals.push("/*End of module vars for " + mod_name + "*/");
+
+        for(var i=0;i<mod_ast.fdefs.length;i++){
+        	scope_names.push(mod_ast.fdefs[i].id);
+            fdef(mod_ast.fdefs[i], code);
+            scope_names.pop();
         }
+        scope_names.pop();
         symtbl.exitNestedScope();
     }
-    cur_state=states[0];
+
     code.push("void loop()");
     code.push("{");
     code.push("switch(__state)");
     code.push("{");
-    for(var i in states){
-        code.push("case __" + states[i] + ":");
-        code.push("__state = __"+states[0]+";");
-        if(obj.pipeline.block[i].qname.length > 1)
-            code.push("__" + states[i] + "();");
-        else{
-            code.push("__" + states[i] + getDefaultFlow(obj.modules[states[i]].fdefs) + "();");
-        }
+    for(var i=0;i<pipeline_state_names.length;i++){
+    	var curr_state_name = pipeline_state_names[i];
+        code.push("case __" + curr_state_name + ":");
+        code.push("__state = "+ "__" + pipeline_state_names[0] +";");
+        code.push("___" + pipeline_state_names[i] + "();");
         code.push("break;");
     }
     code.push("default :");
-    code.push("__state = __" + states[0] + ";");
+    code.push("__state = __" + pipeline_state_names[0] + ";");
     code.push("}");
     code.push("}");
 
     code.push("void setup()");
     code.push("{");
     // Calling all inits
-    for(var i in states){
-        // console.log(obj.modules[states[i]].fdefs.indexOf("init"));
-        for(var j in obj.modules[states[i]].fdefs){
-            if(obj.modules[states[i]].fdefs[j].id === "init")
-                code.push("__"+states[i]+"init();");
-        }
-    }    
+    for(var i =0; i< ast.modules.length;i++){
+    	var mod_ast= ast.modules[i];
+    	var ast_init = ast_util.find_fdef(mod_ast, "init")
+       if(ast_init){
+            code.push(PFUNC + mod_ast.name +"_init();");
+       }
+    }
     code.push("}");
+
+    if(strglobals.length > 0){
+    	//add defines to the beginning of code.
+		var splice_args = [0, 0].concat(strglobals);
+		Array.prototype.splice.apply(code, splice_args);    
+	}
     // console.log("CODE :");
     // console.log(code);
     // return code;
@@ -278,9 +406,9 @@ function codeGen(obj,ctx){
 
 var cur_mod="";
 var states=[];
-// codeGen(obj,code);
-exports.transform=codeGen;
-exports.stmt=stmts;
+// codeGen(ast,code);
+exports.transform=code_gen;
+exports.stmt=stmt;
 exports.fdef=fdef;
-exports.fparam=params;
+exports.fparam=fparam;
 exports.var=vardef;

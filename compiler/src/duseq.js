@@ -371,7 +371,7 @@ class DUSeq{
     this.mods_visited = {};
     this.dynscope = new DynScope(symtbl);
     if(ast.pipeline && ast.pipeline.block.length > 0){
-      this.enter_pipeline(ast.pipeline.block[0]);
+      this.enter_pipeline(ast_util.first_pipeline_entry(ast));
     }else{
       vtbuild.warning("DUSeq.build: No/empty pipeline found");
     }

@@ -12,20 +12,20 @@ function pipeline_block(block){
 				next = next_stack.pop();
 			}
 			if(next){
-				if(next[0]){//this is another nested block
-					curr.next = next[0];
-				}else{
-					curr.next = next;
+				var n = next;
+				while(n[0]){//get the first non-block element.
+					n = n[0];
 				}
+				curr.next = n;
 			}	
 		}	
 	}
 }
 
 exports.name = "pseq";
+
 exports.transform = function(ast, ctx){
 	if(ast.pipeline){
 		pipeline_block(ast.pipeline.block);
 	}
 };
-

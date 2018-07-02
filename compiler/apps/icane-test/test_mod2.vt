@@ -1,13 +1,9 @@
 module test_mod2;
 
-int x;
 int[10] fff;
 default flow process(int[10] val){
-	fff = 5;
-	x = val * fff;
-	if(true){
-		next(fff);
-	}else{
-		next(fff);
+    const int x = 3;
+	for i in [0,10] {
+	    fff[i] = val[i] + x;
 	}
 }
