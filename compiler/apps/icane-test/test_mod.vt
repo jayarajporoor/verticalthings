@@ -2,25 +2,18 @@ module test_mod;
 
 use arduino;
 
-int[10] xxx;
+int[10][10] matrix;
 
 default flow acquire(){
-	int[10] yyy;
-	int[10] zzz;
+	const int size = 10;
+	int[size] buf;
+	int[size] ybuf;
 
 	pinPeripheral(3,4);
 
-	for i in [0,10] {
-		xxx[i] = i;
-	}
+	mpu.getFIFOBytes(buf, size);
 
-	for i in [0, 10]{
-		yyy[i]  = xxx[i] * 3;
-	}
-
-	for i in [0,10]{
-	   zzz[i] = yyy[i] * 4;
-	}
-	next(zzz);
+	ybuf = matrix * buf + buf;
+	next(ybuf);
 }
 
