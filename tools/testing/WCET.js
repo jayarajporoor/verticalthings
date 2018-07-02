@@ -94,14 +94,14 @@ function init(){
     readlines = [];
     linetonode = {};
 }
-function count(words,c){
-    var count = 0;
+function countwords(words,c){
+    var temp = 0;
     words.forEach(function(el){
         if (el == c){
-            count = count + 1;
+            temp = temp + 1;
         }
     });
-    return count;
+    return temp;
 }
 function isjump(word){
     word = word.toUpperCase();
@@ -120,14 +120,14 @@ function isjump(word){
 function variabletime(word,words){
     var time = 0;
     if (word.toUpperCase() == "PUSH"){
-        time = 1 + count(words,',');
+        time = 1 + countwords(words,',');
     }    
     if (word.toUpperCase() == "POP"){
         if (word.toUpperCase().search("PC") != -1){
-            time = 3 + count(words,',');
+            time = 3 + countwords(words,',');
         }
         else{
-            time = 1 + count(words,',');
+            time = 1 + countwords(words,',');
         }
     }
     if (word.toUpperCase() == "ADD"){
