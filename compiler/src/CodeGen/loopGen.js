@@ -56,7 +56,6 @@ function assign(ast, ctx){
 }
 
 function is_varconst(ast){
-	// console.log(ast);
 	if(typeof ast.id != 'undefined' || typeof ast.qid != 'undefined' || typeof ast.iconst != 'undefined')
 		return true;
 	return false;
@@ -64,7 +63,6 @@ function is_varconst(ast){
 
 function checkIfLoopNeeded(ast,ctx){
 	if(typeof ast.expr.id!='undefined'){
-		// console.log(ast);
 		var lvalue=astlib.resolve_matrix_expr(ast,ctx.symtbl);
 		var rvalue=astlib.resolve_matrix_expr(ast.expr,ctx.symtbl);
 		if(lvalue && rvalue){
@@ -138,9 +136,6 @@ function checkIfLoopNeeded(ast,ctx){
 				}
 				else if(Left.dim.length==2 && Right.dim.length==2){
 					var temp=JSON.parse(JSON.stringify(ast));
-				// console.log(Left);
-				// console.log(Right);
-					console.log(astlib.resolve_matrix_expr(ast,ctx.symtbl));
 					var range1= { from: { iconst: 0 }
 								, to: { iconst: Left.dim[0].iconst }
 								, is_inclusive: false
@@ -185,7 +180,6 @@ function checkIfLoopNeeded(ast,ctx){
 			}
 		}
 		else if(ast.expr.op == '*'){
-	// console.log(ast);
 			if(Left && Right){
 				var temp=astlib.deep_copy(ast);
 				if(Left.dim.length==1 && Right.dim.length==1){
@@ -268,8 +262,6 @@ function checkIfLoopNeeded(ast,ctx){
 					var range1={from: {iconst: 0}, to: {iconst: Left.dim[0].iconst}, is_inclusive: false};
 					var range2={from: {iconst: 0}, to: {iconst: Right.dim[1].iconst}, is_inclusive: false};
 					var range3={from: {iconst: 0}, to: {iconst: Right.dim[0].iconst}, is_inclusive: false};
-					// console.log("*********************************");
-					// console.log(range1);
 					if(typeof temp.expr.lexpr.dim!='undefined' && temp.expr.lexpr.id.indexOf("__")!=0){
 						temp.expr.lexpr.dim.dim.push({id: '__i'});
 						temp.expr.lexpr.dim.dim.push({id: '__k'});
@@ -298,7 +290,6 @@ function checkIfLoopNeeded(ast,ctx){
 
 function addLoop(ast,ctx){
 	return checkIfLoopNeeded(ast,ctx);
-					// console.log(JSON.stringify(ast));
 }
 
 var astlib=require("./../ast_util.js");
