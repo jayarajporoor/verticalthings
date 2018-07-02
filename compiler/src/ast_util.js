@@ -99,7 +99,7 @@ function lookup_effect(root_ast, uses, qid, kind){
 	var fname = Array.isArray(qid) ? ( qid.length == 1 ? qid[0] : qid[1] ) : qid;
 
 	for(var i=0;i< uses.length;i++){
-		var mod_ast = root_ast.modules[uses[i]];
+		var mod_ast = root_ast.modules[uses[i].name];
 		if(mod_ast && mod_ast.effectsMap){
 			var effects = mod_ast.effectsMap[fname];
 			if(!effects) continue;

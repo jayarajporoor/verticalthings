@@ -178,10 +178,10 @@ basicExpr
         exprConstant |
         up=(BNOT|MINUS) basicExpr |
         basicExpr op=(BAND|BOR|BXOR) basicExpr |
-        basicExpr op=(LSHIFT|RSHIFT) basicExpr |        
-        basicExpr op=(MUL|DIV|MOD) basicExpr |
+        basicExpr op=(LSHIFT|RSHIFT) basicExpr |
+        basicExpr op=CAT basicExpr |        
+        basicExpr op=(HPROD | MUL|DIV|MOD) basicExpr |
         basicExpr op=(PLUS|MINUS) basicExpr |
-        basicExpr op=(HPROD|CAT) basicExpr |
         LP basicExpr RP
     ;
 

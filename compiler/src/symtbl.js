@@ -30,13 +30,9 @@ class SymbolTable{
   }
 
   addSymbolToCurrentScope(name, syminfo) {
-    var scope_names = [];
+    var scope_names = this.getScopeNames();
     var scope = this.current_scope;
-    do{
-      scope_names.unshift(scope.name);//add to beginning of the array.
-      scope = scope.parent;
-    }while(scope && scope.parent);
-  
+
   	var sym = {name: name, info: syminfo, scope_names: scope_names};
   	this.current_scope.symbols[name] = sym;
   	return sym;
@@ -81,6 +77,16 @@ class SymbolTable{
 
   getCurrentScope(){
     return this.current_scope;
+  }
+
+  getScopeNames(){
+    var scope_names = [];
+    var scope = this.current_scope;
+    do{
+      scope_names.unshift(scope.name);//add to beginning of the array.
+      scope = scope.parent;
+    }while(scope && scope.parent);
+    return scope_names;
   }
 }
 
