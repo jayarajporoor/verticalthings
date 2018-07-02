@@ -21,7 +21,6 @@ function block(ast,ctx){
 }
 
 function stmts(ast, ctx){
-	// console.log(ast);
 	for(var i=0;i<ast.length;i++){
 		if(typeof ast[i].kind != 'undefined'){
 			switch(ast[i].kind){
