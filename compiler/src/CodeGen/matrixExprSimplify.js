@@ -117,7 +117,7 @@ function get_dim(ast,ctx){
 		Left= astlib.resolve_matrix_expr(ast,ctx.symtbl);
 		return {dim: Left.dim, info: astlib.deep_copy(ctx.symtbl.lookup(ast.id).info)};
 	}
-	else if(ast.op == "+" || ast.op == "-"){
+	else if(ast.op == "+" || ast.op == "-" || ast.op == "(*)"){
 		if(typeof ast.lexpr.id != 'undefined'){
 			Left = astlib.resolve_matrix_expr(ast.lexpr,ctx.symtbl);
 			return {dim : Left.dim, info: ctx.symtbl.lookup(ast.lexpr.id).info};

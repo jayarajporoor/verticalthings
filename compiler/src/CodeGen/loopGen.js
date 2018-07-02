@@ -104,6 +104,8 @@ function checkIfLoopNeeded(ast,ctx){
 		var Right = astlib.resolve_matrix_expr(ast.expr.rexpr,ctx.symtbl);
 		var lvalue= astlib.resolve_matrix_expr(ast,ctx.symtbl);
 		if(ast.expr.op == '+' || ast.expr.op == '-' || ast.expr.op == '(*)'){
+			if(ast.expr.op == "(*)")
+				ast.expr.op = "*";
 			if(Left && Right){
 				if(Left.dim.length==1 && Right.dim.length==1){
 					var temp=astlib.deep_copy(ast);
