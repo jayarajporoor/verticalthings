@@ -297,9 +297,13 @@ if(require.main === module){
 	try{
 		compile(process.argv);
 	}catch(e){
-		console.log("Compile has errors: ");
-		print_object(e, printJson, printColor);
-		print_object(vtbuild.errors, printJson, printColor);
+		if(vtbuild.errors.length > 0){
+			console.log("Compile has errors: ");
+			print_object(e, printJson, printColor);		
+			print_object(vtbuild.errors, printJson, printColor);
+		}else{
+			throw e;
+		}
 	}
 
 	if(vtbuild.warnings.length > 0){
