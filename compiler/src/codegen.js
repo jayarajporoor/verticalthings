@@ -132,7 +132,7 @@ function stmt(ast,strbuf){
 			stmt(ast.body,str);
 			break;
 		case "return":
-			strbuf.push("return " + expr(ast.expr));
+			strbuf.push("return " + expr(ast.expr) + ";");
 			break;
 		case "block":
 			block(ast,strbuf);
@@ -193,10 +193,12 @@ function fparam(ast){
 	var type=stringify_type(ast.type);
 	var name = get_current_scoped_name(ast.id, PVAR);
 
-	if(typeof ast.init != 'undefined')
-		s=s+type.primitive+" "+ name + "="+expr(ast.init);	
-	else
-		s=s+type.primitive+" " + name;	
+	s = s + type.primitive + " " + name + type.dim;	
+
+	if(typeof ast.init != 'undefined'){
+		s = s + "=" + expr(ast.init);	
+	}
+
 	return s;
 }
 
