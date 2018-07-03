@@ -23,11 +23,13 @@ function get_primitive_type(id,ctx){
 }
 
 function block(ast,ctx){
+	// console.log(ast);
 	if(typeof ast.stmts != 'undefined'){
 		stmts(ast.stmts,ctx);
 	}
 }
 
+					// console.log(ast[i].body);
 function stmts(ast, ctx){
 	for(var i=0;i<ast.length;i++){
 		if(typeof ast[i].kind != 'undefined'){
@@ -48,7 +50,7 @@ function stmts(ast, ctx){
 					break;
 				case "if":
 					block(ast[i].if_body,ctx);
-					if(ast[i].else_body != 'undefined'){
+					if(typeof ast[i].else_body != 'undefined'){
 						block(ast[i].else_body,ctx);
 					}
 					break;
@@ -59,9 +61,11 @@ function stmts(ast, ctx){
 		}
 	}
 }
+					// console.log(ast[i]);
 var change=0;
 
 function assign(ast, ctx){
+	// console.log(ast);
 	var orig = astlib.deep_copy(ast);
 	var expre;
 	change =1;
@@ -165,16 +169,18 @@ function get_dim(ast,ctx){
 }
 
 function transform_expr(ast, ctx){
+	// console.log(ast);
 	var details = get_dim(ast, ctx);
 	details.info.type.dim.dim = astlib.deep_copy(details.dim);
+	// console.log(details.info.type.dim);
 	details.info.is_temp=true;
 	block_stmts.push({kind: "assign",id : "__t"+temp_ind,expr: astlib.deep_copy(ast)});
+	// console.log(block_stmts[block_stmts.length-1]);
 	ctx.symtbl.addSymbolToCurrentScope("__t"+temp_ind , details.info);
 	return {id : "__t"+temp_ind++};
 }
 
 function expr(ast, ctx, isRoot){
-	// console.log(ast);
 	if(typeof ast.id != 'undefined' || typeof ast.iconst != 'undefined' || typeof ast.fcall != 'undefined'){
 		return ast;
 	}
@@ -185,6 +191,7 @@ function expr(ast, ctx, isRoot){
 		{
 			if(isRoot && ast.op=='*')
 			{
+	// console.log(ast)	;
 				return transform_expr(ast,ctx);
 			}
 			return ast;

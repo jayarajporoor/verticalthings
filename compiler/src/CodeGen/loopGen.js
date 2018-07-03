@@ -31,7 +31,7 @@ function stmts(ast, ctx){
 					block(ast[i],ctx);
 					break;
 				case "for":
-					block(ast[i].body.stmts,ctx);
+					block(ast[i].body,ctx);
 					break;
 				case "if":
 					block(ast[i].if_body,ctx);

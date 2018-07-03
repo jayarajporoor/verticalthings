@@ -1,8 +1,25 @@
 module m1;
 
-default flow lol(){
-	int[2]	a=0;
-	int[2][2] b,c,d,e,f,g;
-	a=0;
-	next();
+float[30] buf;
+
+default flow test_func(){
+    int sum;
+    //pinPeripheral(3,4);
+	//mpu.getFIFOBytes(buf, size);
+    anothertemp();
+}
+
+void anothertemp(){
+    int sum = 0;
+    int[20][20] A;
+    int[20][20] B;
+    int[20][20] C;
+    A = 0;
+    B = 0;
+    C = 0;
+    for i in [0,10]{
+        if (i > 5){
+            C = A * B;
+        }
+    }
 }

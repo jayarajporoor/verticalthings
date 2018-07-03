@@ -1,5 +1,4 @@
 module test_pipeline;
-
-pipeline nandu {
-	m1
-};
+pipeline abc{
+    m1
+}
