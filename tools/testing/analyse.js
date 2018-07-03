@@ -6,6 +6,7 @@ class source{
     }
 }
 function checkstat(declarations){
+    //check's if it is compiler generated code
     var flag = true;
     declarations.forEach(function(variable){
         if (!variable.startsWith("__")){
@@ -50,7 +51,7 @@ function WCETfor(stat,power){
     var tmpobj = tmp.fileSync({ mode: parseInt('0644', 8), prefix: 'code', postfix: '.c' });
     fs.writeFileSync(tmpobj.name,str);
     var execSync = require('child_process').execSync;
-    var command = paths['arduino'] + "/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin/arm-none-eabi-g++ -mcpu=cortex-m0plus -mthumb -c -g -Os -w -std=gnu++11 -ffunction-sections -fdata-sections -fno-threadsafe-statics -nostdlib --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -MMD -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_MKR1000 -DARDUINO_ARCH_SAMD  -D__SAMD21G18A__ -DUSB_VID=0x2341 -DUSB_PID=0x804e -DUSBCON" + '-DUSB_MANUFACTURER="Arduino LLC"' + '-DUSB_PRODUCT="Arduino MKR1000"' + "-I"+paths['arduinopath']+"/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include/ -I"+paths['arduinopath']+"/packages/arduino/tools/CMSIS-Atmel/1.1.0/CMSIS/Device/ATMEL/ -I"+paths['arduinopath']+"/packages/arduino/hardware/samd/1.6.18/cores/arduino -I"+paths['arduinopath']+"/packages/arduino/hardware/samd/1.6.18/variants/mkr1000 " + tmpobj.name + " -o " + tmpobj.name + ".o";
+    var command = paths['arduino'] + "/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin/arm-none-eabi-g++ -mcpu=cortex-m0plus -mthumb -c -g -Os -w -std=gnu++11 -ffunction-sections -fdata-sections -fno-threadsafe-statics -nostdlib --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -MMD -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_MKR1000 -DARDUINO_ARCH_SAMD  -D__SAMD21G18A__ -DUSB_VID=0x2341 -DUSB_PID=0x804e -DUSBCON" + '-DUSB_MANUFACTURER="Arduino LLC"' + '-DUSB_PRODUCT="Arduino MKR1000"' + "-I"+paths['arduino']+"/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include/ -I"+paths['arduino']+"/packages/arduino/tools/CMSIS-Atmel/1.1.0/CMSIS/Device/ATMEL/ -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/cores/arduino -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/variants/mkr1000 -I"+paths['arduino']+"/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include " + tmpobj.name + " -o " + tmpobj.name + ".o";
     //console.log(command);
     execSync(command);
     command = paths['objdump'] + " -d -l " + tmpobj.name +".o > " + tmpobj.name +".asm";
@@ -102,19 +103,14 @@ function WCETstat(stat,power){
                 return true;
             });
             if (flag){
-                if (Object.keys(computed).indexOf(stat['fcall']['qid'][0]) != -1){
-                    result += computed[stat['fcall']['qid'][0]];
+                if (Object.keys(computing).indexOf(stat['fcall']['qid'][0]) != -1 && computing[stat['fcall']['qid'][0]]){
+                    //throw compiler error the function is trying to call another function which is already open!!!
                 }
                 else{
-                    if (Object.keys(computing).indexOf(stat['fcall']['qid'][0]) != -1){
-                        //throw compiler error
-                    }
-                    else{
-                        var thisfunc = temp;
-                        calculatefunction(next);
-                        result += power*computed[stat['fcall']['qid'][0]];
-                        set(thisfunc);
-                    }
+                    var thisfunc = temp;
+                    var count = calculatefunction(next);
+                    result += power*count;
+                    set(thisfunc);
                 }
             }
             else{
@@ -135,7 +131,7 @@ function WCETif(data,power){
             elsecycle += WCETstat(stat,power);                
         });
     }
-    return Math.max(power*ifcycle,power*elsecycle);
+    return Math.max(ifcycle,elsecycle);
 }
 var mod;
 var modvars;
@@ -146,20 +142,21 @@ var fs = require('fs');
 var lookup = require('../../compiler/src/ast_util.js');
 var paths;
 var uses;
-var computed = {};
 var computing = [];
 var WCET = {};
 var modulename;
 var temp;
 function set(func){
+    //set's the parameters of the function
     funcparams = func['params'];
     funcvars = func['vars'];
 }
 function reset(){
-    computed = {};
+    WCET = {};
     computing = {};
 }
 function calculatefunction(func){
+   // console.log(func);
     temp = func;
     computing[func['id']] = true;
     set(func);
@@ -167,29 +164,38 @@ function calculatefunction(func){
     func['body']['stmts'].forEach(function(stat){
         cyclecount += WCETstat(stat,1);
     });
-    computed[func['id']] = cyclecount;
-    console.log("jack shit " + cyclecount);
-    WCET[modulename][func['id']] = cyclecount;
+    //console.log("time taken for " +func['id'] + " " + cyclecount);
+    if (Object.keys(func).indexOf("flow") != -1){
+        WCET['time'] = cyclecount;
+    }
     computing[func['id']] = false;
+    return cyclecount;
 }
 function WCETanalysis(data,ctx){
+    var start = lookup.first_pipeline_entry(data);
     ast = data;
     paths = ctx.config['build'];
-    var modules = Object.keys(data['modules']);
-    modules.forEach(function(modname){
+    ctx.WCET = [];
+    while (true){
         reset();
-        WCET[modname] = {};
-        modulename = modname;
-        mod = data['modules'][modname];
+        modulename = start['qname'][0];
+        WCET["name"] = start['qname'];
+        mod = data['modules'][modulename];
         modvars = mod['vars'];
         uses = mod['uses'];
-        mod['fdefs'].forEach(function(func){
-            if (Object.keys(computed).indexOf(func['id']) == -1){
-                calculatefunction(func);    
-            }      
+        mod['fdefs'].every(function(func){
+            if (func['id'] == start['qname'][1]){
+                calculatefunction(func);
+                return false;
+            }
+            return true;
         });
-    });
-    ctx.WCET = WCET;
-    console.log(ctx);
+        ctx.WCET.push(WCET);
+        if (Object.keys(start).indexOf("next") == -1){
+            break;
+        }
+        start = start.next;
+    }
+    console.log(ctx.WCET);
 }
 exports.transform = WCETanalysis;

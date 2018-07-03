@@ -1,3 +1,23 @@
 Parsing test_pipe.vt
 Parsing ./test_mod.vt
 Parsing ./arduino.vt
+Parsing ./test_mod1.vt
+Parsing ./test_mod2.vt
+[ { name: [ 'test_mod', 'test_func' ], time: 18978100 },
+  { name: [ 'test_mod1', 'f1' ], time: 0 },
+  { name: [ 'test_mod2', 'f2' ], time: 0 } ]
+Warnings: 
+[ { text: 'Symbol  size  not found' },
+  { text: 'Symbol  __i  not found' },
+  { text: 'Symbol  __k  not found' },
+  { text: 'Symbol  __k  not found' },
+  { text: 'Symbol  __j  not found' },
+  { text: 'Symbol  __i  not found' },
+  { text: 'Symbol  __j  not found' },
+  { text: 'Symbol  i  not found' },
+  { text: 'Symbol  __i  not found' },
+  { text: 'Symbol  __k  not found' },
+  { text: 'Symbol  __k  not found' },
+  { text: 'Symbol  __j  not found' },
+  { text: 'Symbol  __i  not found' },
+  { text: 'Symbol  __j  not found' } ]

@@ -1,0 +1,5 @@
+module test_mod1;
+
+default flow f1(){
+    int sum1;
+}

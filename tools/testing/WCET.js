@@ -415,7 +415,6 @@ function displaygraph(){
             });
         }
     });
-   //console.log(cyclecount);
     console.log(adjlist);
     path.forEach(function(obj){
         console.log(obj.time + " " + obj.overhead);

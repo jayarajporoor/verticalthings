@@ -65,6 +65,9 @@ function setFile(theFileEntry, isWritable) {
 
 function readFileIntoEditor(theFileEntry) {
   var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
+  var obj=document.getElementsByClassName('tab active show')[0];
+  console.log("printing the obj");
+  console.log(obj);
   tabTextarea[id]["filePath"]=theFileEntry;
   console.log(id+tabTextarea[id]["filePath"]);
   fs.readFile(theFileEntry, function (err, data) {
@@ -77,8 +80,10 @@ function readFileIntoEditor(theFileEntry) {
     var words=str.split("/");
     tabTextarea[id]["fileName"]=words[words.length-1];
     console.log(tabTextarea[id]["fileName"]);
-    var name=tabTextarea[tabID[1]]["fileName"];
-    $(this).html(name+'<button class="close" type="button" title="Remove this page">×</button>');
+    var name=tabTextarea[id]["fileName"];
+    console.log("before")
+    obj.innerHTML= name+'<button class="close" type="button" title="Remove this page">×</button>';
+    console.log("after");
 
   });
 }
@@ -146,8 +151,13 @@ function handleSaveButton() {
 function handleNewTab()
 {
   tabID++;
-  $('#tab-list').append($('<li><a href="#' + tabID + '" class="tab" data-toggle="tab">Untitled<button class="close" type="button" title="Remove this page">×</button></a></li>'));
+  //$('#tab-list').removeClass("active");
+  //$('.nav-tabs li.active').removeClass('active');
+
+  $('#tab-list').append($('<li class='+'"active show"><a href="#' + tabID + '" class="tab show active" data-toggle="tab">Untitled<button class="close" type="button" title="Remove this page">×</button></a></li>'));
   $('#tab-content').append($('<div class=" editor tab-pane in fade" id="' + tabID + '"></div>'));
+  //highlighting the latest tab
+  //$('#2').parents('li').tab('show');
 
   console.log("hello");
   var id=tabID;
@@ -155,7 +165,6 @@ function handleNewTab()
   tabTextarea[tabID] = CodeMirror(
     document.getElementById(id),
     {
-
       mode: "vertical",
       lineNumbers: true,
       theme: "lesser-dark",
