@@ -5,7 +5,14 @@ default flow test_func(){
     int sum;
     pinPeripheral(3,4);
 	mpu.getFIFOBytes(buf, size);
-    for __i in [0,20]{
-        sum = sum + 10;
+    for i in [0,20]{
+        temp();
     }
+}
+flow temp(){
+    int sum1;
+    int[20][20] A;
+    int[20][20] B;
+    int[20][20] C;
+    C = A*B;
 }

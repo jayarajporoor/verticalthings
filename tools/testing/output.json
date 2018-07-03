@@ -27,7 +27,8 @@
         "block": [
             {
                 "qname": [
-                    "test_mod"
+                    "test_mod",
+                    "test_func"
                 ]
             }
         ],
@@ -43,7 +44,7 @@
                     "col": 0
                 },
                 "end": {
-                    "line": 11,
+                    "line": 14,
                     "col": 0
                 }
             },
@@ -362,6 +363,68 @@
                             }
                         }
                     }
+                },
+                {
+                    "src": {
+                        "start": {
+                            "line": 12,
+                            "col": 0
+                        },
+                        "end": {
+                            "line": 14,
+                            "col": 0
+                        }
+                    },
+                    "flow": "normal",
+                    "id": "temp",
+                    "params": [],
+                    "vars": [
+                        {
+                            "type": {
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 13,
+                                        "col": 4
+                                    },
+                                    "end": {
+                                        "line": 13,
+                                        "col": 4
+                                    }
+                                },
+                                "is_const": false
+                            },
+                            "defs": [
+                                {
+                                    "id": "sum1"
+                                }
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 13,
+                                    "col": 4
+                                },
+                                "end": {
+                                    "line": 13,
+                                    "col": 12
+                                }
+                            }
+                        }
+                    ],
+                    "body": {
+                        "stmts": [],
+                        "kind": "block",
+                        "src": {
+                            "start": {
+                                "line": 12,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 14,
+                                "col": 0
+                            }
+                        }
+                    }
                 }
             ],
             "srcpath": "./test_mod.vt"
@@ -422,3 +485,9 @@
         }
     }
 }
+Warnings: 
+[
+    {
+        "text": "Symbol  size  not found"
+    }
+]

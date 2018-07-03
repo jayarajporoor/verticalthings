@@ -90,7 +90,37 @@ function WCETstat(stat,power){
         if (x && Object.keys(x).indexOf("iconst") != -1){
             result += x.iconst;
         }
-        
+        else{
+            var flag = false;
+            var next;
+            mod['fdefs'].every(function(func){
+                if (func['id'] == stat['fcall']['qid'][0]){
+                    flag = true;
+                    next = func;
+                    return false;
+                }
+                return true;
+            });
+            if (flag){
+                if (Object.keys(computed).indexOf(stat['fcall']['qid'][0]) != -1){
+                    result += computed[stat['fcall']['qid'][0]];
+                }
+                else{
+                    if (Object.keys(computing).indexOf(stat['fcall']['qid'][0]) != -1){
+                        //throw compiler error
+                    }
+                    else{
+                        var thisfunc = temp;
+                        calculatefunction(next);
+                        result += power*computed[stat['fcall']['qid'][0]];
+                        set(thisfunc);
+                    }
+                }
+            }
+            else{
+                //called function is neither there in supporting modules (arduino etc) nor in the present module as well
+            }
+        }
     }
     return result;
 }
@@ -116,25 +146,50 @@ var fs = require('fs');
 var lookup = require('../../compiler/src/ast_util.js');
 var paths;
 var uses;
+var computed = {};
+var computing = [];
+var WCET = {};
+var modulename;
+var temp;
+function set(func){
+    funcparams = func['params'];
+    funcvars = func['vars'];
+}
+function reset(){
+    computed = {};
+    computing = {};
+}
+function calculatefunction(func){
+    temp = func;
+    computing[func['id']] = true;
+    set(func);
+    var cyclecount = 0;
+    func['body']['stmts'].forEach(function(stat){
+        cyclecount += WCETstat(stat,1);
+    });
+    computed[func['id']] = cyclecount;
+    console.log("jack shit " + cyclecount);
+    WCET[modulename][func['id']] = cyclecount;
+    computing[func['id']] = false;
+}
 function WCETanalysis(data,ctx){
     ast = data;
     paths = ctx.config['build'];
     var modules = Object.keys(data['modules']);
-    ctx.WCET = {};
     modules.forEach(function(modname){
-        var cyclecount = 0;
+        reset();
+        WCET[modname] = {};
+        modulename = modname;
         mod = data['modules'][modname];
         modvars = mod['vars'];
         uses = mod['uses'];
         mod['fdefs'].forEach(function(func){
-            funcparams = func['params'];
-            funcvars = func['vars'];
-            func['body']['stmts'].forEach(function(stat){
-                cyclecount += WCETstat(stat,1);
-            });
+            if (Object.keys(computed).indexOf(func['id']) == -1){
+                calculatefunction(func);    
+            }      
         });
-        ctx.WCET[modname] = cyclecount;
     });
-    //console.log(ctx);
+    ctx.WCET = WCET;
+    console.log(ctx);
 }
 exports.transform = WCETanalysis;

@@ -1,32 +1,3 @@
 Parsing test_pipe.vt
 Parsing ./test_mod.vt
 Parsing ./arduino.vt
-Sandesh Ghanta
-count is NaN
-count is NaN
-sending with 1
-pwer is 1 ans is 14
-count is NaN
-{ symtbl: 
-   SymbolTable {
-     name: '<root>',
-     parent: undefined,
-     symbols: {},
-     scopes: { test_mod: [Object], arduino: [Object] },
-     current_scope: [Circular] },
-  params: {},
-  resources: { 'pin(3)': [ 'test_mod' ] },
-  config: 
-   { build: 
-      { arduino: '/home/arduino/.arduino15',
-        objdump: 'arm-linux-gnueabi-objdump' } },
-  duseq: 
-   [ { mem: [Object] },
-     { use: [], def: [] },
-     { use: [], def: [Object] },
-     { use: [], def: [] } ],
-  mem: 
-   { alloc: [ [Object] ],
-     total_alloc_size: 120,
-     total_obj_size: 120 },
-  WCET: { test_mod: NaN, arduino: 0 } }
