@@ -1,0 +1,22 @@
+module arduino;
+
+@effects {	
+	pinPeripheral(n,*) :- acquire(pin) n;
+
+	Wire.begin() :- set(clock) 10000, power(i2c) IDLE;
+
+	Wire.setClock(n) :- set(clock) n;
+
+	FastWire::setup(n,) :- set(clock) n;
+
+	mpu:getFIFOBytes(buf, size), mpu:MPU :- 
+		write buf,
+		let(dur) (size*8)/clock,
+		time(cpu)  dur
+	  , power(i2c) ACTIVE(dur);
+
+	u(&sercom_name, rx_pin, tx_pin, rx_pad, tx_pad), u:Uart :- let(n) suffix(sercom_name, "sercom"), acquire(uart) n, acquire(pin) rx_pin, acquire(pin) tx_pin;
+	u.begin(b), u:Uart :- power(uart, n) idling_power;	
+	u.println(s), u:Uart :- let(dur) strlen(s)*8*baud, time(cpu) dur, power(uart, n) ACTIVE(dur);
+
+}
