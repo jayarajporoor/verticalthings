@@ -5,10 +5,13 @@ var fileEntry;
 var hasWriteAccess;
 tabTextarea = [[],[]];
 tabID=1;
+var memory;
 
 var gui = require("nw.gui");
 var fs = require("fs");
 var deb= nw.Window.get().showDevTools();
+var express= require('express');
+var app = express();
 var clipboard = gui.Clipboard.get();
 
 var modules;
@@ -20,6 +23,7 @@ xmlhttp.onreadystatechange = function() {
 };
 xmlhttp.open("GET", "moduleinfo.json", true);
 xmlhttp.send();
+var compilerObj = require('./../../compiler/src/vtcompiler.js');
 
 function handleDocumentChange(title) {
   var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
@@ -183,23 +187,138 @@ function handleNewTab()
     tabTextarea[tabID].refresh();
     var hlLine = tabTextarea[tabID].setLineClass(0, "activeline");
 }
+function createChart()
+{
+  console.log(memory);
+  var jsonRectangles = [
+      {"tag": "buf",  "x_axis": 10, "y_axis": 10, "height": 50, "width":50, "color" : "green" },
+      { "x_axis": 10, "y_axis": 70, "height": 50, "width":100, "color" : "green" },
+      { "x_axis": 160, "y_axis": 40, "height":100, "width":20, "color" : "purple" },
+      { "x_axis": 800, "y_axis": 70, "height": 20, "width":20, "color" : "red" }];
 
+  var max_x = 0;
+  var max_y = 0;
+
+  for (var i = 0; i < jsonRectangles.length; i++) {
+      var temp_x, temp_y;
+      var temp_x = jsonRectangles[i].x_axis + jsonRectangles[i].width;
+      var temp_y = jsonRectangles[i].y_axis + jsonRectangles[i].height;
+
+      if ( temp_x >= max_x ) { max_x = temp_x; }
+
+      if ( temp_y >= max_y ) { max_y = temp_y; }
+  }
+
+  var svgContainer = d3.select("body").append("svg")
+                                      .attr("width", max_x+1000)
+                                      .attr("height", max_y+1000);
+  var axisScale = d3.scaleLinear()
+                          .domain([0,max_x+20])
+                          .range([0,max_x+20])
+  var yaxisScale = d3.scaleLinear()
+                          .domain([0,max_y+20])
+                          .range([0,max_y+20]);
+
+  var xAxisGroup = svgContainer.append("g")
+                                .attr("transform","translate(200,160)")
+                                .call(d3.axisTop(axisScale));
+  //xAxisGroup.selectAll("g")
+  //console.log(d3.selectAll(".mynode").filter(_conditions_).attr("cx"));
+
+  xAxisGroup.selectAll("g").each( function(d, i){
+      console.log( d3.select(this).attr("transform") );
+  });
+
+  var yAxisGroup  =svgContainer.append("g")
+                                .attr("transform","translate(200,160)")
+                                .call(d3.axisLeft(yaxisScale));
+
+  var rectangles = xAxisGroup.selectAll("rect")
+                               .data(jsonRectangles)
+                               .enter()
+                               .append("rect");
+  /*var rectangles1 = yAxisGroup.selectAll("rect")
+                              .data(jsonRectangles)
+                              .enter()
+                              .append("rect");*/
+  var rectangleAttributes = rectangles
+                            .attr("x", function (d) { return d.x_axis; })
+                            .attr("width", function (d) { return d.width; })
+                            .style("fill", function(d) { return d.color; })
+                            .attr("y",function(d) { return (d.y_axis); })
+                            .attr("height", function (d) { return d.height; });
+
+}
+
+function handleCompileButton(){
+
+    console.log(compilerObj);
+    var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
+    console.log(tabTextarea[id]["filePath"]);
+    try{
+      var res = compilerObj.compile([tabTextarea[id]["filePath"]]);
+      //  console.log("RESULT", res.ctx.mem);
+      memory= res.ctx.mem;
+      console.log(memory);
+      var w = window.open("memory.html");
+      w.myvariable = memory;
+
+    }catch(e)
+    {
+      console.log(e, e.stack);
+      console.log(global.vtbuild);
+      var errorlen=global.vtbuild.errors.length;
+      var warnlen=global.vtbuild.warnings.length;
+      var info=global.vtbuild.info;
+      var el=document.getElementById("analysis");
+      el.style.display="none";
+      el.innerHTML="";
+      console.log(el);
+      var i;
+      if(errorlen){
+        var errordiv = document.createElement("div");
+        errordiv.id="errordiv";
+        el.append(errordiv);
+        for(i=0;i<errorlen;i++)
+        {
+          errordiv.innerHTML +="<br>"+global.vtbuild.errors[i].text;
+        }
+      }
+      if (warnlen){
+        var warningdiv =document.createElement("div");
+        warningdiv.id="warningdiv";
+        el.append(warningdiv);
+        for(i=0;i<warnlen;i++)
+        {
+          warndiv.innerHTML += "<br>"+global.vtbuild.warnings[i].text;
+        }
+      }
+      console.log(el);
+      el.style.display="block";
+      resize();
+
+      console.log("completed")
+
+    }
+
+
+}
 function initWindowMenu(){
   file = new gui.Menu({ 'type': 'menubar' });
   file.append(new gui.MenuItem({
-        label:'NewFile',
+        label:'New',
         click: function(){
           handleNewTab();
         }
   }));
   file.append(new gui.MenuItem({
-      label:'OpenFile',
+      label:'Open',
       click: function (){
         handleOpenButton();
       }
   }));
   file.append(new gui.MenuItem({
-      label :'SaveFile',
+      label :'Save',
       click:function (){
         handleSaveButton();
       }
@@ -208,6 +327,12 @@ function initWindowMenu(){
       label :'Analyse',
       click:function(){
       window.open('chart.html', '_blank');
+      }
+  }));
+  file.append(new gui.MenuItem({
+      label :'Compile',
+      click:function(){
+        handleCompileButton();
       }
   }))
   gui.Window.get().menu= file;
@@ -256,11 +381,9 @@ function initContextMenu() {
         {
           flag=1;
           console.log(modules[i].timeAnalysis);
-          el.innerHTML=modules[i].timeAnalysis+'\n'+modules[i].powerAnalysis+ modules[i].text;
-
+          el.innerHTML=" "+modules[i].timeAnalysis+"<br>"+modules[i].powerAnalysis+"<br>"+modules[i].text;
         }
         el.style.display="block";
-
       }
       if(!flag)
       {
@@ -298,8 +421,6 @@ function initContextMenu() {
     var scrollerElement = tabTextarea[id].getScrollerElement();
     scrollerElement.style.width = containerWidth + 'px';
     scrollerElement.style.height = containerHeight + 'px';
-
-
 
     tabTextarea[id].refresh();
 
@@ -363,9 +484,10 @@ function resize()
   var containerHeight = window.innerHeight-document.getElementById("analysis").offsetHeight-20;
   console.log("resized");
   console.log(id);
-  var scrollerElement = tabTextarea[id] .getScrollerElement();
+  var scrollerElement = tabTextarea[id].getScrollerElement();
   scrollerElement.style.width = containerWidth + 'px';
   scrollerElement.style.height = containerHeight + 'px';
+  tabTextarea[id].refresh();
 
 }
 onresize = function() {
