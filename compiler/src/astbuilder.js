@@ -444,6 +444,12 @@ function astInitValue(initValue){
 }
 
 const primitive_sizes = {
+	'int8_t': 1,
+	'int16_t': 2,
+	'int32_t': 3,
+	'uint8_t': 1,
+	'uint16_t': 2,
+	'uint32_t': 3,	
 	'int': 4,
 	'float': 4,
 	'char' : 1
