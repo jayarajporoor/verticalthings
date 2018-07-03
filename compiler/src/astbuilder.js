@@ -537,7 +537,13 @@ function astFormalParam(param){
 		id: getId(param),
 		src: src_info(param)		
 	};
-	addSymbol(ast.id, {type: ast.type, is_const: ast.is_const, src: ast.src, is_formal_param: true} );	
+	addSymbol(ast.id, {type: ast.type, is_const: ast.is_const, src: ast.src, is_formal_param: true, src: ast.src} );	
+
+	if(ast.type.dim && ast.type.dim.is_ring){
+		var sym_ringpos = {type: {primitive: 'int'}, is_const: ast.is_const, is_formal_param: true, src: ast.src};
+		addSymbol("__pos_" + ast.id, sym_ringpos);
+	}
+
 	return ast;
 }
 

@@ -7,14 +7,18 @@ function codepp(ast,ctx){
 	var current_indent_depth = 0;
 	for(var i=0;i<code.length;i++){
 		var line = code[i];
-		code[i] = current_indent + line;
+
 		if(line === "{"){
+			code[i] = current_indent + line;			
 			current_indent_depth++;
 			current_indent += indent;
 		}else
 		if(line === "}"){
 			current_indent = current_indent.slice(0, -indent.length);
 			current_indent_depth--;
+			code[i] = current_indent + line;			
+		}else{
+			code[i] = current_indent + line;			
 		}
 	}
 }

@@ -6,7 +6,7 @@ include model;
 
 int8_t x, y;
 
-MPU mpu;
+//MPU mpu;
 
 void init(){
 	x = 3;
@@ -15,12 +15,13 @@ void init(){
 default flow acquire(){
 	const int size = 10;
 	int ring[size] rbuf;
-	int[size] buf, ybuf, zbuf;
+	int[size] buf, ybuf;
+	int ring[size] zbuf;
 
-	pinPeripheral(3,&y);
+	pinPeripheral(3);
 
-	x = mpu.getFIFOBytes(buf, size);
-	ybuf = modelData * buf;
+	//x = mpu.getFIFOBytes(buf, size);
+	ybuf = modelData * rbuf;
 
 	zbuf = modelData * ybuf;
 
