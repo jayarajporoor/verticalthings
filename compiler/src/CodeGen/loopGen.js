@@ -133,6 +133,7 @@ function checkIfLoopNeeded(ast,ctx){
 		}
 	}
 	else if(is_varconst(ast.expr.lexpr) && is_varconst(ast.expr.rexpr)){
+		// console.log(ast);
 		var Left = astlib.resolve_matrix_expr(ast.expr.lexpr,ctx.symtbl);
 		var Right = astlib.resolve_matrix_expr(ast.expr.rexpr,ctx.symtbl);
 		var lvalue= astlib.resolve_matrix_expr(ast,ctx.symtbl);

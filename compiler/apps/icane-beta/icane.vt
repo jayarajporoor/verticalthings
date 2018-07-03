@@ -2,8 +2,7 @@ module icane;
 
 pipeline icane {
 	mpu_acq,
-	normalize_mpu_ag,
-	if_gt_any(5, 5, 5, 5, 5, 5),	
+	normalize_mpu_ag,	
 	tlc_featurizer,
 	int2float,
 	protonn,	

@@ -181,7 +181,7 @@ function transform_expr(ast, ctx){
 }
 
 function expr(ast, ctx, isRoot){
-	if(typeof ast.id != 'undefined' || typeof ast.iconst != 'undefined' || typeof ast.fcall != 'undefined'){
+	if(typeof ast.up != 'undefined' || typeof ast.id != 'undefined' || typeof ast.iconst != 'undefined' || typeof ast.fcall != 'undefined'){
 		return ast;
 	}
 	var lexpr_is_varconst = is_varconst(ast.lexpr);

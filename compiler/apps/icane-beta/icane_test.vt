@@ -1,5 +1,6 @@
 module icane_test;
 
 pipeline icane_test {
-	mpu_acq_test
+	mpu_acq_test,
+	normalize_inp_test
 };

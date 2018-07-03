@@ -113,6 +113,11 @@ function expr(ast){
 	if(typeof ast.op != 'undefined'){
 		// console.log(ast);
 		str = "("+expr(ast.lexpr) + ast.op + expr(ast.rexpr)+")";
+	}else
+	if(typeof ast.up !== 'undefined'){
+		var exprstr = expr(ast.expr);
+		var up = (ast.up === 'cast') ? ast.type.primitive : ast.up;
+		str = "(" + up + "(" + exprstr + ")" + ")";
 	}
 	else if(id){
 		if(ast.qid && ast.qid.length > 1){
