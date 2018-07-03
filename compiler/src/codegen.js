@@ -50,12 +50,20 @@ function fcall(ast){
 
 	if(qid.length > 1 || qid[0] !== "next"){
 		var name;
-		if(qid.length > 1 && sep === "."){
-			var str_amethod = array_method_call(ast);
+		if(qid.length > 1){
+			var str_amethod = (sep === ".") ? array_method_call(ast) : null;
 			if(str_amethod){
 				return str_amethod;
 			}else{
-				name = qid.join(sep);
+				var sym = symtbl.lookup(qid[0]);
+				if(sym){
+					name = ast_util.get_scoped_name(sym, "_", PVAR);
+					for(var j=1;j<qid.length;j++){
+						name += sep + qid[j];
+					}
+				}else{
+					name = qid.join(sep);
+				}
 			}
 		}else{
 			var sym = symtbl.lookup(qid[0]);
@@ -101,15 +109,22 @@ function fcall(ast){
 function expr(ast){
 	// console.log(ast);
 	var str="";
-	var id = ast.id || ast.qid;	
+	var id = ast.id || (ast.qid && ast.qid[0]);	
 	if(typeof ast.op != 'undefined'){
 		// console.log(ast);
 		str = "("+expr(ast.lexpr) + ast.op + expr(ast.rexpr)+")";
 	}
 	else if(id){
 		if(ast.qid && ast.qid.length > 1){
-			//Variables used with '.' operator must be simply expanded.
-			str = str + ast.qid.join(".");
+			var sym = symtbl.lookup(ast.qid[0]);
+			if(sym){
+				str = str + ast_util.get_scoped_name(sym, "_", PVAR);
+				for(var j=1;j<ast.qid.length;j++){
+					str += "." + ast.qid[j];
+				}
+			}else{
+				str = str + ast.qid.join(".");
+			}
 		}else{
 			var sym = symtbl.lookup(id);
 			if(sym && !sym.info.is_temp){
@@ -137,6 +152,9 @@ function expr(ast){
 	else if(typeof ast.iconst != 'undefined'){
 		str = ast.iconst;
 	}
+	else if(typeof ast.bconst != 'undefined'){
+		str = ast.bconst;
+	}	
 	else if(typeof ast.fconst != 'undefined'){
 		str = ast.fconst;
 	}else if(typeof ast.aconst !== 'undefined'){		
@@ -202,14 +220,26 @@ function stmt(ast,strbuf){
 
 function stringify_type(ast){
 	// console.log(ast);
-	var primitive=ast.primitive;
+	var base=ast.primitive;
+
+	if(!base && ast.id){
+		base = ast.id;
+	}
+	if(!base && ast.qid){
+		base = ast.qid.join(".");
+	}
+	if(!base && ast.qidCpp){
+		base = ast.qidCpp.join("::");
+	}
+
 	var dim="";
 	if(typeof ast.dim != 'undefined'){
 		for(var i in ast.dim.dim){
 			dim=dim+"["+expr(ast.dim.dim[i])+"]";
 		}
-	}
-	var astr = {primitive: primitive, dim: dim};
+	}	
+	var astr = {base: base, dim: dim};
+
 	return astr;
 }
 
@@ -235,7 +265,7 @@ function vardef(ast)
 			s=s+"const ";
 	}
 	var type = stringify_type(ast.type);
-	s=s+type.primitive+" ";
+	s=s+type.base+" ";
 	// console.log(s);
 	var temp=[];
 	for(var i in ast.defs){

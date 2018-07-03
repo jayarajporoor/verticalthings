@@ -1,6 +1,9 @@
 module test_mod;
 use arduino;
 float[30] buf;
+
+MPU mpu;
+
 default flow test_func(){
     int sum, size;
     pinPeripheral(3,4);
