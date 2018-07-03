@@ -72,7 +72,7 @@ function checkIfLoopNeeded(ast,ctx){
 		if(lvalue && rvalue){
 			if(lvalue.dim.length==1 && rvalue.dim.length==1){
 				var temp=astlib.deep_copy(ast);
-				var range={from: {iconst: 0}, to: {iconst: lvalue.dim[0]}, is_inclusive: false};
+				var range={from: {iconst: 0}, to: {iconst: lvalue.dim[0].iconst}, is_inclusive: false};
 				if(typeof temp.dim!='undefined' && temp.id.indexOf("__")!=0){
 					temp.dim.dim.push({id: '__i'});
 				}
@@ -110,7 +110,7 @@ function checkIfLoopNeeded(ast,ctx){
 		if(lvalue){
 			if(lvalue.dim.length==1){
 				var temp=astlib.deep_copy(ast);
-				var range={from: {iconst: 0}, to: {iconst: lvalue.dim[0]}, is_inclusive: false};
+				var range={from: {iconst: 0}, to: {iconst: lvalue.dim[0].iconst}, is_inclusive: false};
 				if(typeof temp.dim!='undefined' && temp.id.indexOf("__")!=0){
 					temp.dim.dim.push({id: '__i'});
 				}
@@ -276,6 +276,7 @@ function checkIfLoopNeeded(ast,ctx){
 				else if(Left.dim.length==2 && Right.dim.length==1){
 					var range1={from: {iconst: 0}, to: {iconst: Left.dim[0].iconst}, is_inclusive: false};
 					var range2={from: {iconst: 0}, to: {iconst: Right.dim[0].iconst}, is_inclusive: false};
+					// console.log(range1);
 					if(typeof temp.expr.lexpr.dim!='undefined' && temp.expr.lexpr.id.indexOf("__")!=0){
 						temp.expr.lexpr.dim.dim.push({id: '__i'});
 						temp.expr.lexpr.dim.dim.push({id: '__j'});

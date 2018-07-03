@@ -102,17 +102,9 @@ test.o: ../apps/icane-beta/test/test.cpp \
  /home/nandu6177/.arduino15/packages/arduino/hardware/samd/1.6.18/cores/arduino/USB/USB_host.h \
  /home/nandu6177/.arduino15/packages/arduino/hardware/samd/1.6.18/cores/arduino/USB/samd21_host.h \
  /home/nandu6177/.arduino15/packages/arduino/hardware/samd/1.6.18/cores/arduino/wiring_private.h \
- ../apps/icane-beta/test/src/utils.h \
- ../apps/icane-beta/test/src/../config.h \
- ../apps/icane-beta/test/src/featureextraction.h \
- ../apps/icane-beta/test/src/utils.h \
- ../apps/icane-beta/test/src/predictionfilter.h \
- ../apps/icane-beta/test/src/protoNN.h ../apps/icane-beta/test/src/data.h \
- ../apps/icane-beta/test/src/thresholdpredictor.h \
  ../apps/icane-beta/test/src/lib/I2Cdev.h \
  /home/nandu6177/.arduino15/packages/arduino/hardware/samd/1.6.18/libraries/Wire/Wire.h \
  ../apps/icane-beta/test/src/lib/MPU6050_6Axis_MotionApps20.h \
  ../apps/icane-beta/test/src/lib/I2Cdev.h \
  ../apps/icane-beta/test/src/lib/helper_3dmath.h \
- ../apps/icane-beta/test/src/lib/MPU6050.h \
- ../apps/icane-beta/test/src/vote.h
+ ../apps/icane-beta/test/src/lib/MPU6050.h
