@@ -1,3 +1,8 @@
+Parsing test_pipe.vt
+Parsing ./test_mod.vt
+Parsing ./arduino.vt
+Parsing ./test_mod1.vt
+Parsing ./test_mod2.vt
 {
     "name": "test_pipe",
     "src": {
@@ -6,10 +11,11 @@
             "col": 0
         },
         "end": {
-            "line": 5,
+            "line": 7,
             "col": 1
         }
     },
+    "includes": [],
     "uses": [],
     "vars": [],
     "pipeline": {
@@ -19,7 +25,7 @@
                 "col": 0
             },
             "end": {
-                "line": 5,
+                "line": 7,
                 "col": 1
             }
         },
@@ -29,6 +35,36 @@
                 "qname": [
                     "test_mod",
                     "test_func"
+                ],
+                "next": {
+                    "qname": [
+                        "test_mod1",
+                        "f1"
+                    ],
+                    "next": {
+                        "qname": [
+                            "test_mod2",
+                            "f2"
+                        ]
+                    }
+                }
+            },
+            {
+                "qname": [
+                    "test_mod1",
+                    "f1"
+                ],
+                "next": {
+                    "qname": [
+                        "test_mod2",
+                        "f2"
+                    ]
+                }
+            },
+            {
+                "qname": [
+                    "test_mod2",
+                    "f2"
                 ]
             }
         ],
@@ -44,10 +80,11 @@
                     "col": 0
                 },
                 "end": {
-                    "line": 14,
+                    "line": 39,
                     "col": 0
                 }
             },
+            "includes": [],
             "uses": [
                 {
                     "name": "arduino"
@@ -102,7 +139,7 @@
                             "col": 0
                         },
                         "end": {
-                            "line": 11,
+                            "line": 16,
                             "col": 0
                         }
                     },
@@ -198,6 +235,7 @@
                             {
                                 "fcall": {
                                     "qid": [
+                                        "mpu",
                                         "getFIFOBytes"
                                     ],
                                     "params": [
@@ -234,18 +272,18 @@
                             {
                                 "kind": "for",
                                 "ids": [
-                                    "__i"
+                                    "i"
                                 ],
                                 "range": {
                                     "from": {
                                         "src": {
                                             "start": {
                                                 "line": 8,
-                                                "col": 16
+                                                "col": 14
                                             },
                                             "end": {
                                                 "line": 8,
-                                                "col": 16
+                                                "col": 14
                                             }
                                         },
                                         "iconst": 0
@@ -254,11 +292,11 @@
                                         "src": {
                                             "start": {
                                                 "line": 8,
-                                                "col": 18
+                                                "col": 16
                                             },
                                             "end": {
                                                 "line": 8,
-                                                "col": 18
+                                                "col": 16
                                             }
                                         },
                                         "iconst": 20
@@ -267,51 +305,83 @@
                                     "src": {
                                         "start": {
                                             "line": 8,
-                                            "col": 15
+                                            "col": 13
                                         },
                                         "end": {
                                             "line": 8,
-                                            "col": 20
+                                            "col": 18
                                         }
                                     }
                                 },
                                 "body": {
                                     "stmts": [
                                         {
-                                            "kind": "assign",
-                                            "qid": [
-                                                "sum"
-                                            ],
+                                            "kind": "if",
                                             "expr": {
-                                                "src": {
-                                                    "start": {
-                                                        "line": 9,
-                                                        "col": 14
-                                                    },
-                                                    "end": {
-                                                        "line": 9,
-                                                        "col": 20
-                                                    }
-                                                },
-                                                "op": "+",
+                                                "op": ">",
                                                 "lexpr": {
                                                     "qid": [
-                                                        "sum"
+                                                        "i"
                                                     ],
-                                                    "id": "sum"
+                                                    "id": "i"
                                                 },
                                                 "rexpr": {
                                                     "src": {
                                                         "start": {
                                                             "line": 9,
-                                                            "col": 20
+                                                            "col": 16
                                                         },
                                                         "end": {
                                                             "line": 9,
-                                                            "col": 20
+                                                            "col": 16
                                                         }
                                                     },
                                                     "iconst": 10
+                                                },
+                                                "src": {
+                                                    "start": {
+                                                        "line": 9,
+                                                        "col": 12
+                                                    },
+                                                    "end": {
+                                                        "line": 9,
+                                                        "col": 16
+                                                    }
+                                                }
+                                            },
+                                            "if_body": {
+                                                "stmts": [
+                                                    {
+                                                        "fcall": {
+                                                            "qid": [
+                                                                "just_a_function"
+                                                            ],
+                                                            "id": "just_a_function",
+                                                            "params": []
+                                                        },
+                                                        "src": {
+                                                            "start": {
+                                                                "line": 10,
+                                                                "col": 12
+                                                            },
+                                                            "end": {
+                                                                "line": 10,
+                                                                "col": 28
+                                                            }
+                                                        },
+                                                        "kind": "fcall"
+                                                    }
+                                                ],
+                                                "kind": "block",
+                                                "src": {
+                                                    "start": {
+                                                        "line": 9,
+                                                        "col": 19
+                                                    },
+                                                    "end": {
+                                                        "line": 11,
+                                                        "col": 8
+                                                    }
                                                 }
                                             },
                                             "src": {
@@ -320,21 +390,55 @@
                                                     "col": 8
                                                 },
                                                 "end": {
-                                                    "line": 9,
-                                                    "col": 20
+                                                    "line": 14,
+                                                    "col": 8
                                                 }
                                             },
-                                            "id": "sum"
+                                            "else_body": {
+                                                "stmts": [
+                                                    {
+                                                        "fcall": {
+                                                            "qid": [
+                                                                "anothertemp"
+                                                            ],
+                                                            "id": "anothertemp",
+                                                            "params": []
+                                                        },
+                                                        "src": {
+                                                            "start": {
+                                                                "line": 13,
+                                                                "col": 12
+                                                            },
+                                                            "end": {
+                                                                "line": 13,
+                                                                "col": 24
+                                                            }
+                                                        },
+                                                        "kind": "fcall"
+                                                    }
+                                                ],
+                                                "kind": "block",
+                                                "src": {
+                                                    "start": {
+                                                        "line": 12,
+                                                        "col": 12
+                                                    },
+                                                    "end": {
+                                                        "line": 14,
+                                                        "col": 8
+                                                    }
+                                                }
+                                            }
                                         }
                                     ],
                                     "kind": "block",
                                     "src": {
                                         "start": {
                                             "line": 8,
-                                            "col": 21
+                                            "col": 19
                                         },
                                         "end": {
-                                            "line": 10,
+                                            "line": 15,
                                             "col": 4
                                         }
                                     }
@@ -345,7 +449,7 @@
                                         "col": 4
                                     },
                                     "end": {
-                                        "line": 10,
+                                        "line": 15,
                                         "col": 4
                                     }
                                 }
@@ -358,7 +462,7 @@
                                 "col": 0
                             },
                             "end": {
-                                "line": 11,
+                                "line": 16,
                                 "col": 0
                             }
                         }
@@ -367,16 +471,28 @@
                 {
                     "src": {
                         "start": {
-                            "line": 12,
+                            "line": 17,
                             "col": 0
                         },
                         "end": {
-                            "line": 14,
+                            "line": 22,
                             "col": 0
                         }
                     },
-                    "flow": "normal",
-                    "id": "temp",
+                    "type": {
+                        "primitive": "void",
+                        "src": {
+                            "start": {
+                                "line": 17,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 17,
+                                "col": 0
+                            }
+                        }
+                    },
+                    "id": "just_a_function",
                     "params": [],
                     "vars": [
                         {
@@ -384,11 +500,331 @@
                                 "primitive": "int",
                                 "src": {
                                     "start": {
-                                        "line": 13,
+                                        "line": 18,
                                         "col": 4
                                     },
                                     "end": {
-                                        "line": 13,
+                                        "line": 18,
+                                        "col": 14
+                                    }
+                                },
+                                "dim": {
+                                    "dim": [
+                                        {
+                                            "iconst": 20
+                                        },
+                                        {
+                                            "iconst": 20
+                                        }
+                                    ],
+                                    "is_ring": false
+                                },
+                                "is_const": false
+                            },
+                            "defs": [
+                                {
+                                    "id": "A"
+                                }
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 18,
+                                    "col": 4
+                                },
+                                "end": {
+                                    "line": 18,
+                                    "col": 17
+                                }
+                            }
+                        },
+                        {
+                            "type": {
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 19,
+                                        "col": 4
+                                    },
+                                    "end": {
+                                        "line": 19,
+                                        "col": 14
+                                    }
+                                },
+                                "dim": {
+                                    "dim": [
+                                        {
+                                            "iconst": 20
+                                        },
+                                        {
+                                            "iconst": 20
+                                        }
+                                    ],
+                                    "is_ring": false
+                                },
+                                "is_const": false
+                            },
+                            "defs": [
+                                {
+                                    "id": "B"
+                                }
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 19,
+                                    "col": 4
+                                },
+                                "end": {
+                                    "line": 19,
+                                    "col": 17
+                                }
+                            }
+                        },
+                        {
+                            "type": {
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 20,
+                                        "col": 4
+                                    },
+                                    "end": {
+                                        "line": 20,
+                                        "col": 14
+                                    }
+                                },
+                                "dim": {
+                                    "dim": [
+                                        {
+                                            "iconst": 20
+                                        },
+                                        {
+                                            "iconst": 20
+                                        }
+                                    ],
+                                    "is_ring": false
+                                },
+                                "is_const": false
+                            },
+                            "defs": [
+                                {
+                                    "id": "C"
+                                }
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 20,
+                                    "col": 4
+                                },
+                                "end": {
+                                    "line": 20,
+                                    "col": 17
+                                }
+                            }
+                        },
+                        {
+                            "type": {
+                                "primitive": "int",
+                                "is_const": false
+                            },
+                            "defs": [
+                                {
+                                    "id": "__t0"
+                                }
+                            ]
+                        }
+                    ],
+                    "body": {
+                        "stmts": [
+                            {
+                                "kind": "for",
+                                "ids": [
+                                    "__i"
+                                ],
+                                "range": {
+                                    "from": {
+                                        "iconst": 0
+                                    },
+                                    "to": {
+                                        "iconst": 20
+                                    },
+                                    "is_inclusive": false
+                                },
+                                "body": {
+                                    "kind": "block",
+                                    "stmts": [
+                                        {
+                                            "kind": "for",
+                                            "ids": [
+                                                "__j"
+                                            ],
+                                            "range": {
+                                                "from": {
+                                                    "iconst": 0
+                                                },
+                                                "to": {
+                                                    "iconst": 20
+                                                },
+                                                "is_inclusive": false
+                                            },
+                                            "body": {
+                                                "kind": "block",
+                                                "stmts": [
+                                                    {
+                                                        "kind": "assign",
+                                                        "id": "__t0",
+                                                        "expr": {
+                                                            "iconst": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "kind": "for",
+                                                        "ids": [
+                                                            "__k"
+                                                        ],
+                                                        "range": {
+                                                            "from": {
+                                                                "iconst": 0
+                                                            },
+                                                            "to": {
+                                                                "iconst": 20
+                                                            },
+                                                            "is_inclusive": false
+                                                        },
+                                                        "body": {
+                                                            "kind": "block",
+                                                            "stmts": [
+                                                                {
+                                                                    "kind": "assign",
+                                                                    "id": "__t0",
+                                                                    "expr": {
+                                                                        "op": "+",
+                                                                        "lexpr": {
+                                                                            "src": {
+                                                                                "start": {
+                                                                                    "line": 21,
+                                                                                    "col": 8
+                                                                                },
+                                                                                "end": {
+                                                                                    "line": 21,
+                                                                                    "col": 12
+                                                                                }
+                                                                            },
+                                                                            "op": "*",
+                                                                            "lexpr": {
+                                                                                "qid": [
+                                                                                    "A"
+                                                                                ],
+                                                                                "id": "A",
+                                                                                "dim": {
+                                                                                    "dim": [
+                                                                                        {
+                                                                                            "id": "__i"
+                                                                                        },
+                                                                                        {
+                                                                                            "id": "__k"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "rexpr": {
+                                                                                "qid": [
+                                                                                    "B"
+                                                                                ],
+                                                                                "id": "B",
+                                                                                "dim": {
+                                                                                    "dim": [
+                                                                                        {
+                                                                                            "id": "__k"
+                                                                                        },
+                                                                                        {
+                                                                                            "id": "__j"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        "rexpr": {
+                                                                            "id": "__t0"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "kind": "assign",
+                                                        "id": "C",
+                                                        "expr": {
+                                                            "id": "__t0"
+                                                        },
+                                                        "dim": {
+                                                            "dim": [
+                                                                {
+                                                                    "id": "__i"
+                                                                },
+                                                                {
+                                                                    "id": "__j"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ],
+                        "kind": "block",
+                        "src": {
+                            "start": {
+                                "line": 17,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 22,
+                                "col": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "src": {
+                        "start": {
+                            "line": 23,
+                            "col": 0
+                        },
+                        "end": {
+                            "line": 33,
+                            "col": 0
+                        }
+                    },
+                    "type": {
+                        "primitive": "void",
+                        "src": {
+                            "start": {
+                                "line": 23,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 23,
+                                "col": 0
+                            }
+                        }
+                    },
+                    "id": "anothertemp",
+                    "params": [],
+                    "vars": [
+                        {
+                            "type": {
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 24,
+                                        "col": 4
+                                    },
+                                    "end": {
+                                        "line": 24,
                                         "col": 4
                                     }
                                 },
@@ -396,31 +832,572 @@
                             },
                             "defs": [
                                 {
-                                    "id": "sum1"
+                                    "id": "sum",
+                                    "init": {
+                                        "src": {
+                                            "start": {
+                                                "line": 24,
+                                                "col": 14
+                                            },
+                                            "end": {
+                                                "line": 24,
+                                                "col": 14
+                                            }
+                                        },
+                                        "iconst": 0
+                                    }
                                 }
                             ],
                             "src": {
                                 "start": {
-                                    "line": 13,
+                                    "line": 24,
                                     "col": 4
                                 },
                                 "end": {
-                                    "line": 13,
-                                    "col": 12
+                                    "line": 24,
+                                    "col": 15
                                 }
                             }
+                        },
+                        {
+                            "type": {
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 25,
+                                        "col": 4
+                                    },
+                                    "end": {
+                                        "line": 25,
+                                        "col": 14
+                                    }
+                                },
+                                "dim": {
+                                    "dim": [
+                                        {
+                                            "iconst": 20
+                                        },
+                                        {
+                                            "iconst": 20
+                                        }
+                                    ],
+                                    "is_ring": false
+                                },
+                                "is_const": false
+                            },
+                            "defs": [
+                                {
+                                    "id": "A"
+                                }
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 25,
+                                    "col": 4
+                                },
+                                "end": {
+                                    "line": 25,
+                                    "col": 17
+                                }
+                            }
+                        },
+                        {
+                            "type": {
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 26,
+                                        "col": 4
+                                    },
+                                    "end": {
+                                        "line": 26,
+                                        "col": 14
+                                    }
+                                },
+                                "dim": {
+                                    "dim": [
+                                        {
+                                            "iconst": 20
+                                        },
+                                        {
+                                            "iconst": 20
+                                        }
+                                    ],
+                                    "is_ring": false
+                                },
+                                "is_const": false
+                            },
+                            "defs": [
+                                {
+                                    "id": "B"
+                                }
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 26,
+                                    "col": 4
+                                },
+                                "end": {
+                                    "line": 26,
+                                    "col": 17
+                                }
+                            }
+                        },
+                        {
+                            "type": {
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 27,
+                                        "col": 4
+                                    },
+                                    "end": {
+                                        "line": 27,
+                                        "col": 14
+                                    }
+                                },
+                                "dim": {
+                                    "dim": [
+                                        {
+                                            "iconst": 20
+                                        },
+                                        {
+                                            "iconst": 20
+                                        }
+                                    ],
+                                    "is_ring": false
+                                },
+                                "is_const": false
+                            },
+                            "defs": [
+                                {
+                                    "id": "C"
+                                }
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 27,
+                                    "col": 4
+                                },
+                                "end": {
+                                    "line": 27,
+                                    "col": 17
+                                }
+                            }
+                        },
+                        {
+                            "type": {
+                                "primitive": "int",
+                                "is_const": false
+                            },
+                            "defs": [
+                                {
+                                    "id": "__t0"
+                                }
+                            ]
                         }
                     ],
                     "body": {
-                        "stmts": [],
+                        "stmts": [
+                            {
+                                "kind": "for",
+                                "ids": [
+                                    "i"
+                                ],
+                                "range": {
+                                    "from": {
+                                        "src": {
+                                            "start": {
+                                                "line": 28,
+                                                "col": 14
+                                            },
+                                            "end": {
+                                                "line": 28,
+                                                "col": 14
+                                            }
+                                        },
+                                        "iconst": 0
+                                    },
+                                    "to": {
+                                        "src": {
+                                            "start": {
+                                                "line": 28,
+                                                "col": 16
+                                            },
+                                            "end": {
+                                                "line": 28,
+                                                "col": 16
+                                            }
+                                        },
+                                        "iconst": 10
+                                    },
+                                    "is_inclusive": false,
+                                    "src": {
+                                        "start": {
+                                            "line": 28,
+                                            "col": 13
+                                        },
+                                        "end": {
+                                            "line": 28,
+                                            "col": 18
+                                        }
+                                    }
+                                },
+                                "body": {
+                                    "stmts": [
+                                        {
+                                            "kind": "if",
+                                            "expr": {
+                                                "op": ">",
+                                                "lexpr": {
+                                                    "qid": [
+                                                        "i"
+                                                    ],
+                                                    "id": "i"
+                                                },
+                                                "rexpr": {
+                                                    "src": {
+                                                        "start": {
+                                                            "line": 29,
+                                                            "col": 16
+                                                        },
+                                                        "end": {
+                                                            "line": 29,
+                                                            "col": 16
+                                                        }
+                                                    },
+                                                    "iconst": 5
+                                                },
+                                                "src": {
+                                                    "start": {
+                                                        "line": 29,
+                                                        "col": 12
+                                                    },
+                                                    "end": {
+                                                        "line": 29,
+                                                        "col": 16
+                                                    }
+                                                }
+                                            },
+                                            "if_body": {
+                                                "stmts": [
+                                                    {
+                                                        "kind": "for",
+                                                        "ids": [
+                                                            "__i"
+                                                        ],
+                                                        "range": {
+                                                            "from": {
+                                                                "iconst": 0
+                                                            },
+                                                            "to": {
+                                                                "iconst": 20
+                                                            },
+                                                            "is_inclusive": false
+                                                        },
+                                                        "body": {
+                                                            "kind": "block",
+                                                            "stmts": [
+                                                                {
+                                                                    "kind": "for",
+                                                                    "ids": [
+                                                                        "__j"
+                                                                    ],
+                                                                    "range": {
+                                                                        "from": {
+                                                                            "iconst": 0
+                                                                        },
+                                                                        "to": {
+                                                                            "iconst": 20
+                                                                        },
+                                                                        "is_inclusive": false
+                                                                    },
+                                                                    "body": {
+                                                                        "kind": "block",
+                                                                        "stmts": [
+                                                                            {
+                                                                                "kind": "assign",
+                                                                                "id": "__t0",
+                                                                                "expr": {
+                                                                                    "iconst": 0
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "kind": "for",
+                                                                                "ids": [
+                                                                                    "__k"
+                                                                                ],
+                                                                                "range": {
+                                                                                    "from": {
+                                                                                        "iconst": 0
+                                                                                    },
+                                                                                    "to": {
+                                                                                        "iconst": 20
+                                                                                    },
+                                                                                    "is_inclusive": false
+                                                                                },
+                                                                                "body": {
+                                                                                    "kind": "block",
+                                                                                    "stmts": [
+                                                                                        {
+                                                                                            "kind": "assign",
+                                                                                            "id": "__t0",
+                                                                                            "expr": {
+                                                                                                "op": "+",
+                                                                                                "lexpr": {
+                                                                                                    "src": {
+                                                                                                        "start": {
+                                                                                                            "line": 30,
+                                                                                                            "col": 16
+                                                                                                        },
+                                                                                                        "end": {
+                                                                                                            "line": 30,
+                                                                                                            "col": 20
+                                                                                                        }
+                                                                                                    },
+                                                                                                    "op": "*",
+                                                                                                    "lexpr": {
+                                                                                                        "qid": [
+                                                                                                            "A"
+                                                                                                        ],
+                                                                                                        "id": "A",
+                                                                                                        "dim": {
+                                                                                                            "dim": [
+                                                                                                                {
+                                                                                                                    "id": "__i"
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "id": "__k"
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    },
+                                                                                                    "rexpr": {
+                                                                                                        "qid": [
+                                                                                                            "B"
+                                                                                                        ],
+                                                                                                        "id": "B",
+                                                                                                        "dim": {
+                                                                                                            "dim": [
+                                                                                                                {
+                                                                                                                    "id": "__k"
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "id": "__j"
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    }
+                                                                                                },
+                                                                                                "rexpr": {
+                                                                                                    "id": "__t0"
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "kind": "assign",
+                                                                                "id": "C",
+                                                                                "expr": {
+                                                                                    "id": "__t0"
+                                                                                },
+                                                                                "dim": {
+                                                                                    "dim": [
+                                                                                        {
+                                                                                            "id": "__i"
+                                                                                        },
+                                                                                        {
+                                                                                            "id": "__j"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "kind": "block",
+                                                "src": {
+                                                    "start": {
+                                                        "line": 29,
+                                                        "col": 18
+                                                    },
+                                                    "end": {
+                                                        "line": 31,
+                                                        "col": 8
+                                                    }
+                                                }
+                                            },
+                                            "src": {
+                                                "start": {
+                                                    "line": 29,
+                                                    "col": 8
+                                                },
+                                                "end": {
+                                                    "line": 31,
+                                                    "col": 8
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "kind": "block",
+                                    "src": {
+                                        "start": {
+                                            "line": 28,
+                                            "col": 19
+                                        },
+                                        "end": {
+                                            "line": 32,
+                                            "col": 4
+                                        }
+                                    }
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 28,
+                                        "col": 4
+                                    },
+                                    "end": {
+                                        "line": 32,
+                                        "col": 4
+                                    }
+                                }
+                            }
+                        ],
                         "kind": "block",
                         "src": {
                             "start": {
-                                "line": 12,
+                                "line": 23,
                                 "col": 0
                             },
                             "end": {
-                                "line": 14,
+                                "line": 33,
+                                "col": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "src": {
+                        "start": {
+                            "line": 35,
+                            "col": 0
+                        },
+                        "end": {
+                            "line": 39,
+                            "col": 0
+                        }
+                    },
+                    "flow": "normal",
+                    "id": "temp",
+                    "params": [],
+                    "vars": [],
+                    "body": {
+                        "stmts": [
+                            {
+                                "kind": "for",
+                                "ids": [
+                                    "i"
+                                ],
+                                "range": {
+                                    "from": {
+                                        "src": {
+                                            "start": {
+                                                "line": 36,
+                                                "col": 14
+                                            },
+                                            "end": {
+                                                "line": 36,
+                                                "col": 14
+                                            }
+                                        },
+                                        "iconst": 0
+                                    },
+                                    "to": {
+                                        "src": {
+                                            "start": {
+                                                "line": 36,
+                                                "col": 16
+                                            },
+                                            "end": {
+                                                "line": 36,
+                                                "col": 16
+                                            }
+                                        },
+                                        "iconst": 10
+                                    },
+                                    "is_inclusive": false,
+                                    "src": {
+                                        "start": {
+                                            "line": 36,
+                                            "col": 13
+                                        },
+                                        "end": {
+                                            "line": 36,
+                                            "col": 18
+                                        }
+                                    }
+                                },
+                                "body": {
+                                    "stmts": [
+                                        {
+                                            "fcall": {
+                                                "qid": [
+                                                    "anothertemp"
+                                                ],
+                                                "id": "anothertemp",
+                                                "params": []
+                                            },
+                                            "src": {
+                                                "start": {
+                                                    "line": 37,
+                                                    "col": 8
+                                                },
+                                                "end": {
+                                                    "line": 37,
+                                                    "col": 20
+                                                }
+                                            },
+                                            "kind": "fcall"
+                                        }
+                                    ],
+                                    "kind": "block",
+                                    "src": {
+                                        "start": {
+                                            "line": 36,
+                                            "col": 19
+                                        },
+                                        "end": {
+                                            "line": 38,
+                                            "col": 4
+                                        }
+                                    }
+                                },
+                                "src": {
+                                    "start": {
+                                        "line": 36,
+                                        "col": 4
+                                    },
+                                    "end": {
+                                        "line": 38,
+                                        "col": 4
+                                    }
+                                }
+                            }
+                        ],
+                        "kind": "block",
+                        "src": {
+                            "start": {
+                                "line": 35,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 39,
                                 "col": 0
                             }
                         }
@@ -441,6 +1418,7 @@
                     "col": 0
                 }
             },
+            "includes": [],
             "uses": [],
             "vars": [],
             "fdefs": [],
@@ -451,7 +1429,9 @@
                         "expr": {
                             "id": "pin",
                             "params": [
-                                0
+                                {
+                                    "param": 0
+                                }
                             ]
                         }
                     }
@@ -482,6 +1462,168 @@
                 ]
             },
             "srcpath": "./arduino.vt"
+        },
+        "test_mod1": {
+            "name": "test_mod1",
+            "src": {
+                "start": {
+                    "line": 1,
+                    "col": 0
+                },
+                "end": {
+                    "line": 5,
+                    "col": 0
+                }
+            },
+            "includes": [],
+            "uses": [],
+            "vars": [],
+            "fdefs": [
+                {
+                    "src": {
+                        "start": {
+                            "line": 3,
+                            "col": 0
+                        },
+                        "end": {
+                            "line": 5,
+                            "col": 0
+                        }
+                    },
+                    "flow": "default",
+                    "id": "f1",
+                    "params": [],
+                    "vars": [
+                        {
+                            "type": {
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 4,
+                                        "col": 4
+                                    },
+                                    "end": {
+                                        "line": 4,
+                                        "col": 4
+                                    }
+                                },
+                                "is_const": false
+                            },
+                            "defs": [
+                                {
+                                    "id": "sum1"
+                                }
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 4,
+                                    "col": 4
+                                },
+                                "end": {
+                                    "line": 4,
+                                    "col": 12
+                                }
+                            }
+                        }
+                    ],
+                    "body": {
+                        "stmts": [],
+                        "kind": "block",
+                        "src": {
+                            "start": {
+                                "line": 3,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 5,
+                                "col": 0
+                            }
+                        }
+                    }
+                }
+            ],
+            "srcpath": "./test_mod1.vt"
+        },
+        "test_mod2": {
+            "name": "test_mod2",
+            "src": {
+                "start": {
+                    "line": 1,
+                    "col": 0
+                },
+                "end": {
+                    "line": 5,
+                    "col": 0
+                }
+            },
+            "includes": [],
+            "uses": [],
+            "vars": [],
+            "fdefs": [
+                {
+                    "src": {
+                        "start": {
+                            "line": 3,
+                            "col": 0
+                        },
+                        "end": {
+                            "line": 5,
+                            "col": 0
+                        }
+                    },
+                    "flow": "default",
+                    "id": "f2",
+                    "params": [],
+                    "vars": [
+                        {
+                            "type": {
+                                "primitive": "int",
+                                "src": {
+                                    "start": {
+                                        "line": 4,
+                                        "col": 4
+                                    },
+                                    "end": {
+                                        "line": 4,
+                                        "col": 4
+                                    }
+                                },
+                                "is_const": false
+                            },
+                            "defs": [
+                                {
+                                    "id": "sum2"
+                                }
+                            ],
+                            "src": {
+                                "start": {
+                                    "line": 4,
+                                    "col": 4
+                                },
+                                "end": {
+                                    "line": 4,
+                                    "col": 12
+                                }
+                            }
+                        }
+                    ],
+                    "body": {
+                        "stmts": [],
+                        "kind": "block",
+                        "src": {
+                            "start": {
+                                "line": 3,
+                                "col": 0
+                            },
+                            "end": {
+                                "line": 5,
+                                "col": 0
+                            }
+                        }
+                    }
+                }
+            ],
+            "srcpath": "./test_mod2.vt"
         }
     }
 }
@@ -489,5 +1631,47 @@ Warnings:
 [
     {
         "text": "Symbol  size  not found"
+    },
+    {
+        "text": "Symbol  i  not found"
+    },
+    {
+        "text": "Symbol  __i  not found"
+    },
+    {
+        "text": "Symbol  __k  not found"
+    },
+    {
+        "text": "Symbol  __k  not found"
+    },
+    {
+        "text": "Symbol  __j  not found"
+    },
+    {
+        "text": "Symbol  __i  not found"
+    },
+    {
+        "text": "Symbol  __j  not found"
+    },
+    {
+        "text": "Symbol  i  not found"
+    },
+    {
+        "text": "Symbol  __i  not found"
+    },
+    {
+        "text": "Symbol  __k  not found"
+    },
+    {
+        "text": "Symbol  __k  not found"
+    },
+    {
+        "text": "Symbol  __j  not found"
+    },
+    {
+        "text": "Symbol  __i  not found"
+    },
+    {
+        "text": "Symbol  __j  not found"
     }
 ]
