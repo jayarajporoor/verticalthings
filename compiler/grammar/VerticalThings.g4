@@ -19,7 +19,9 @@ effectParam: ADDRESSOF? Identifier;
 
 effectCtx: Identifier COLON Identifier;
 
-effectSpec: Identifier effectExpr;
+effectSpec: Identifier opsList? effectExpr;
+
+opsList: LS Identifier (COMMA Identifier)* RS;
 
 effectExpr: Identifier | exprConstant | StringLiteral | effectTerm ;
 

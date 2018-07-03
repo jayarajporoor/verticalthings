@@ -74,6 +74,15 @@ VerticalThingsListener.prototype.exitEffectSpec = function(ctx) {
 };
 
 
+// Enter a parse tree produced by VerticalThings#opsList.
+VerticalThingsListener.prototype.enterOpsList = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#opsList.
+VerticalThingsListener.prototype.exitOpsList = function(ctx) {
+};
+
+
 // Enter a parse tree produced by VerticalThings#effectExpr.
 VerticalThingsListener.prototype.enterEffectExpr = function(ctx) {
 };

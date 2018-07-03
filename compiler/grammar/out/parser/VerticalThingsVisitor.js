@@ -47,6 +47,11 @@ VerticalThingsVisitor.prototype.visitEffectSpec = function(ctx) {
 };
 
 
+// Visit a parse tree produced by VerticalThings#opsList.
+VerticalThingsVisitor.prototype.visitOpsList = function(ctx) {
+};
+
+
 // Visit a parse tree produced by VerticalThings#effectExpr.
 VerticalThingsVisitor.prototype.visitEffectExpr = function(ctx) {
 };

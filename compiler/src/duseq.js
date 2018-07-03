@@ -147,13 +147,13 @@ class DUSeq{
                 }
                 write_params.push(effect.expr.param);
               break;
-              case 'exclusive':
+              case 'acquire':
                 if(effect.expr.params){
                   var effect_param_values = [];
                   for(var k=0;k<effect.expr.params.length;k++){
                     var eparam = effect.expr.params[k];
-                    var param = ast.params[eparam].expr;
-                    var val = param.iconst || param.fconst;
+                    var param = typeof eparam.param !== 'undefined' ? ast.params[eparam.param].expr : eparam;
+                    var val = param.iconst || param.fconst;//currently only considering params/constant values.
                     if(typeof val === 'undefined'){
                       val = this.dynscope.lookup_sym(param);
                       if(val){
@@ -389,10 +389,10 @@ exports.transform = function(ast, ctx){
     for(var res in ctx.resources){
       var usage = ctx.resources[res];
       if(usage.length === 1){
-        console.log("Resource ", res, " exclusively used by module: ", usage[0]);
+        console.log("Resource capability ", res, " acquired by module: ", usage[0]);
       }else{
-        console.log("Resource conflict! The resource ", res
-                    , " is used by multiple modules in exclusive mode. Modules: ", usage.join(","));
+        console.log("Resource conflict! The resource capability ", res
+                    , " is acquired by multiple modules. Modules: ", usage.join(","));
       }
     }
   }

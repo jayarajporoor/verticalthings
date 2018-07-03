@@ -11,7 +11,7 @@ function getSymbol(name){
 }
 
 function getId(node) {
-	return node.Identifier().getText();
+	return node.Identifier() ? node.Identifier().getText() : null;
 }
 
 function getIConst(node) {
@@ -700,9 +700,15 @@ function astEffectTerm(term, params){
 			var paramid = getId(expr[i]);
 			paramidx = params[paramid];
 			if(typeof paramidx !== 'undefined'){
-				res.params.push(paramidx);
+				res.params.push({param: paramidx});
+			}else
+			if(paramid)
+			{
+				res.params.push({id: paramid});
 			}else{
-				res.params.push(null);
+				var exprConstant = expr[i].exprConstant();
+				var c = getExprConstAst(exprConstant);
+				res.params.push(c);
 			}
 		}
 	}
@@ -719,6 +725,8 @@ function astEffectExpr(expr, params){
 		var idx = params[id];
 		if(typeof idx !== 'undefined'){
 			ast = {param: idx};
+		}else{
+			ast = {id: id};
 		}
 	}else
 	if(exprConstant){
@@ -731,10 +739,11 @@ function astEffectExpr(expr, params){
 }
 
 function astEffectSpec(espec, params){
-/*effectSpec: Identifier effectExpr;
-effectExpr: Identifier | exprConstant | StringLiteral | effectTerm ;
-effectTerm: Identifier LP (effectExpr (COMMA effectExpr)*)? RP;*/
 	var effect = {kind: getId(espec), expr: astEffectExpr(espec.effectExpr(), params)};	
+	var opsList = espec.opsList();
+	if(opsList){
+		effect.ops = getIdList(opsList);
+	}	
 	return effect;
 }
 
