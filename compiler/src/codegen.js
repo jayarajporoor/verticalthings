@@ -12,10 +12,14 @@ const SPTR = "_p";
 
 
 function array_method_call(ast){
-	var id = ast.qid[0];	
+	var id = ast.qid[0];
 	var fn = ast.qid[1];
+
 	var sym = symtbl.lookup(id);	
 
+	if(!sym){
+		return null;
+	}
 	if(!sym.info.type.dim){
 		return null;
 	}
@@ -40,21 +44,25 @@ function array_method_call(ast){
 
 function fcall(ast){
 	var str="";
-	if(ast.qid.length > 1 || ast.qid[0] !== "next"){
+	var qid = ast.qid || ast.qidCpp;
+
+	var sep = ast.qidCpp ? "::" : ".";
+
+	if(qid.length > 1 || qid[0] !== "next"){
 		var name;
-		if(ast.qid.length > 1){
+		if(qid.length > 1 && sep === "."){
 			var str_amethod = array_method_call(ast);
 			if(str_amethod){
 				return str_amethod;
 			}else{
-				name = ast.qid.join(".");
+				name = qid.join(sep);
 			}
 		}else{
-			var sym = symtbl.lookup(ast.qid[0]);
+			var sym = symtbl.lookup(qid[0]);
 			if(sym){
 				name =  ast_util.get_scoped_name(sym, "_", PFUNC);
 			}else{
-				name = ast.qid[0];
+				name = qid[0];
 			}
 		}
 		str = str + name +"(";
@@ -176,7 +184,7 @@ function stmt(ast,strbuf){
 			break;
 		case "while":
 			strbuf.push("while(" + expr(ast.expr) + ")");
-			stmt(ast.body,str);
+			stmt(ast.body,strbuf);
 			break;
 		case "return":
 			strbuf.push("return " + expr(ast.expr) + ";");
