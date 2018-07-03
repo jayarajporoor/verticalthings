@@ -58,6 +58,8 @@ function assign(ast, ctx){
 }
 
 function is_varconst(ast){
+	if(typeof ast==='undefined')
+		return false;
 	if(typeof ast.id != 'undefined' || typeof ast.qid != 'undefined' || typeof ast.iconst != 'undefined')
 		return true;
 	return false;
@@ -103,6 +105,7 @@ function checkIfLoopNeeded(ast,ctx){
 		}
 	}
 	else if(typeof ast.expr.iconst!='undefined'){
+		// console.log(ast);
 		var lvalue=astlib.resolve_matrix_expr(ast,ctx.symtbl);
 		if(lvalue){
 			if(lvalue.dim.length==1){

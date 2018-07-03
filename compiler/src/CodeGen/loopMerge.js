@@ -40,8 +40,12 @@ function check_inner(stmts){
 			}
 			else if(stmts[i].kind == "if"){
 				changed = (changed || check_inner(stmts[i].if_body.stmts));
-				if(typeof stmts[i].else_body != 'undefined')
-					changed = (changed || check_inner(stmts[i].else_body.stmts));
+				if(typeof stmts[i].else_body != 'undefined'){
+					if(stmts[i].else_body.kind != "block")
+						changed = (changed || merge_loops([stmts[i].else_body]));
+					else
+						changed = (changed || merge_loops(stmts[i].else_body.stmts));
+				}
 				if(changed){
 					anychange=true;
 					break;
@@ -67,6 +71,7 @@ function check_inner(stmts){
 }
 
 function merge_loops(stmts){
+	// console.log(stmts);
 	var changed=true;
 	var anychange=false;
 	while(changed){
@@ -91,8 +96,14 @@ function merge_loops(stmts){
 			}
 			else if(stmts[i].kind == "if"){
 				changed = (changed || merge_loops(stmts[i].if_body.stmts));
-				if(typeof stmts[i].else_body != 'undefined')
-					changed = (changed || merge_loops(stmts[i].else_body.stmts));
+				if(typeof stmts[i].else_body != 'undefined'){
+					// console.log(stmts[i]);
+					if(stmts[i].else_body.kind != "block")
+						changed = (changed || merge_loops([stmts[i].else_body]));
+					else
+						changed = (changed || merge_loops(stmts[i].else_body.stmts));
+				}
+					console.log("***************************");
 				if(changed){
 					anychange=true;
 					break;

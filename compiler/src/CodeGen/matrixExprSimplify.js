@@ -33,6 +33,7 @@ function stmts(ast, ctx){
 		if(typeof ast[i].kind != 'undefined'){
 			switch(ast[i].kind){
 				case "assign":
+					// console.log(ast[i]);
 					var orig=assign(ast[i], ctx);
 					if(block_stmts.length>0){
 						ast[i]={kind: "block", stmts: block_stmts, orig: orig};
@@ -88,6 +89,8 @@ function assign(ast, ctx){
 
 function is_varconst(ast){
 	// console.log(ast);
+	if(typeof ast === 'undefined')
+		return false;
 	if(typeof ast.id != 'undefined' || typeof ast.qid != 'undefined' || typeof ast.is_const != 'undefined')
 		return true;
 	return false;
@@ -172,7 +175,7 @@ function transform_expr(ast, ctx){
 
 function expr(ast, ctx, isRoot){
 	// console.log(ast);
-	if(typeof ast.id != 'undefined' || typeof ast.iconst != 'undefined'){
+	if(typeof ast.id != 'undefined' || typeof ast.iconst != 'undefined' || typeof ast.fcall != 'undefined'){
 		return ast;
 	}
 	var lexpr_is_varconst = is_varconst(ast.lexpr);
