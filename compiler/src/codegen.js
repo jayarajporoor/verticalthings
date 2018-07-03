@@ -357,7 +357,7 @@ function fdef(ast,strbuf){
 			def = "#define " + scoped_name + " (*" + scoped_name_p +")";
 			strglobals.push(def);
 			if(param.type.dim.is_ring){
-				var def_ringpos = "int " + get_current_scoped_name("__pos_" + param.id, PVAR);		
+				var def_ringpos = "int " + get_current_scoped_name("__pos_" + param.id, PVAR) + ";" ;		
 				strglobals.push(def_ringpos);
 			}			
 		}
