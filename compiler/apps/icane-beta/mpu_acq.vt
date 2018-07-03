@@ -7,18 +7,19 @@ const int N = 64;
 MPU6050 mpu1;
 int[N] fifoBuffer;
 //0..N fifoPacketSize;
+int fifoCount;
 int samplesAfterReset;  // Unsigned Long
 int numNewReadings; // uint16_t
 int mpuIntStatus; // uint8_t
 void init(const boolean i2c_arduino) {
-	if(i2c_arduino) {
+	//if(i2c_arduino) {
 	   Wire.begin();
 	   Wire.setClock(400000);
-	}else{
-	   FastWire::setup(400, true);
-	}
+	//}else{
+	   //FastWire::setup(400, true);
+	//}
 
-	mpu1.init();
+	//mpu1.init();
 
 	mpu1.dmpInitialize(); //assert == 0, panic != 0
 
@@ -29,7 +30,6 @@ void init(const boolean i2c_arduino) {
 
 default flow acq() {
 	mpuIntStatus = mpu1.getIntStatus();
-
 	if ((mpuIntStatus & 0x10) || fifoCount == 1024){
 		// Buffer time 
 		// 350ms @66hz  (empirical) i.e. 13ms between samples

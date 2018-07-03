@@ -103,7 +103,7 @@ function merge_loops(stmts){
 					else
 						changed = (changed || merge_loops(stmts[i].else_body.stmts));
 				}
-					console.log("***************************");
+					// console.log("***************************");
 				if(changed){
 					anychange=true;
 					break;
