@@ -1,0 +1,6 @@
+{
+	"codegen":{
+		"stdincludes" :["arduino.h"],
+		"pathincludes" :["arduino.h"]
+	}
+}

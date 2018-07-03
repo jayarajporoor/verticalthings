@@ -88,8 +88,8 @@ function fcall(ast){
 		var flow_params = next_state.flowdef.params;
 		for(var i=0;i<ast.params.length;i++){
 			var flow_param = flow_params[i];
-			var scoped_param_name = PVAR + next_state.qname + "_" + flow_param.id;
 			if(flow_param){
+				var scoped_param_name = PVAR + next_state.qname + "_" + flow_param.id;				
 				var expr_str = expr(ast.params[i].expr);
 				if(flow_param.type.dim){//array param
 					expr_str = "&(" + expr_str + ")";//assign address.
@@ -291,7 +291,7 @@ function fparam(ast){
 	var type=stringify_type(ast.type);
 	var name = get_current_scoped_name(ast.id, PVAR);
 
-	s = s + type.primitive + " " + name + type.dim;	
+	s = s + type.base + " " + name + type.dim;	
 
 	if(typeof ast.init != 'undefined'){
 		s = s + "=" + expr(ast.init);	
@@ -317,7 +317,7 @@ function fdef(ast,strbuf){
 			var stype = stringify_type(param.type);
 			var scoped_name = get_current_scoped_name(param.id, PVAR);
 			var scoped_name_p = scoped_name + SPTR;
-			var def =  str_parray(stype.primitive, scoped_name_p, stype.dim) + ";" ;
+			var def =  str_parray(stype.base, scoped_name_p, stype.dim) + ";" ;
 			strglobals.push(def);
 			def = "#define " + scoped_name + " (*" + scoped_name_p +")";
 			strglobals.push(def);
@@ -360,9 +360,9 @@ function memdefs(mem){
 		var scoped_name = ast_util.get_scoped_name(alloc.sym, "_", PVAR);
 		var scoped_name_p =  scoped_name + SPTR;
 		var stype = stringify_type(alloc.sym.info.type);
-		var def = 	  str_parray(stype.primitive, scoped_name_p, stype.dim) 
+		var def = 	  str_parray(stype.base, scoped_name_p, stype.dim) 
 					+ "= (" 
-					+ str_parray(stype.primitive, "", stype.dim) 
+					+ str_parray(stype.base, "", stype.dim) 
 					+ ") "
 					+ "&__vtmem[" + alloc.loc + "];"
 					;
@@ -399,10 +399,26 @@ function boiler_plate(){
 	strglobals.push("********************************************************************************/");
 }
 
+function includes(cfg){
+	if(cfg.stdincludes){
+		for(var i=0;i<cfg.stdincludes.length;i++){
+			strglobals.push("#include <" + cfg.stdincludes[i] + ">");
+		}
+	}
+	if(cfg.pathincludes){
+		for(var i=0;i<cfg.pathincludes.length;i++){
+			strglobals.push("#include \"" + cfg.stdincludes[i] + "\"");
+		}
+	}
+}
+
 function code_gen(ast,ctx){
 	// console.log("asdasd");
 
 	boiler_plate();
+	if(ctx.config && ctx.config.codegen){
+		includes(ctx.config.codegen);
+	}
 
 	if(!ctx.code){
 		ctx.code = [];
@@ -474,7 +490,7 @@ function code_gen(ast,ctx){
     	var curr_state_name = pipeline_state_names[i];
         code.push("case __" + curr_state_name + ":");
         code.push("__state = "+ "__" + pipeline_state_names[0] +";");
-        code.push("___" + pipeline_state_names[i] + "();");
+        code.push(PFUNC + pipeline_state_names[i] + "();");
         code.push("break;");
     }
     code.push("default :");
@@ -487,7 +503,7 @@ function code_gen(ast,ctx){
     // Calling all inits
     for(var i =0; i< ast.modules.length;i++){
     	var mod_ast= ast.modules[i];
-    	var ast_init = ast_util.find_fdef(mod_ast, "init")
+    	var ast_init = ast_util.find_fdef(mod_ast, "init");
        if(ast_init){
             code.push(PFUNC + mod_ast.name +"_init();");
        }
