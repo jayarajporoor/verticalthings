@@ -6,7 +6,7 @@ int16_t[10] factors;
 
 int ring[10] rdata;
 
-int compute(int[10] val, int scale){
+int compute(int ring[10] val, int scale){
 	int result;
 	float fresult;
 	fresult = float(result);

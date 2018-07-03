@@ -20,6 +20,8 @@ default flow acquire(){
 
 	pinPeripheral(3);
 
+	rbuf = 0;
+
 	//x = mpu.getFIFOBytes(buf, size);
 	ybuf = modelData * rbuf;
 

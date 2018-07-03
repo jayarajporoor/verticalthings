@@ -136,7 +136,7 @@ function expr(ast){
 	if(typeof ast.up !== 'undefined'){
 		var exprstr = expr(ast.expr);
 		var up = (ast.up === 'cast') ? ast.type.primitive : ast.up;
-		str = "(" + up + "(" + exprstr + ")" + ")";
+		str = "( (" + up + ") (" + exprstr + ")" + ")";
 	}
 	else if(id){
 		if(ast.qid && ast.qid.length > 1){
@@ -329,7 +329,7 @@ function fparam(ast){
 
 	if(type.is_ring){
 		var str_ringpos = "int " + get_current_scoped_name("__pos_" + ast.id, PVAR);		
-		s = s + ", " + str_ringpos;
+		s = s + ", " + str_ringpos;		
 	}
 
 	return s;
@@ -357,7 +357,7 @@ function fdef(ast,strbuf){
 			def = "#define " + scoped_name + " (*" + scoped_name_p +")";
 			strglobals.push(def);
 			if(param.type.dim.is_ring){
-				var def_ringpos = "int " + get_current_scoped_name("__pos_" + param.id, PVAR) + ";" ;		
+				var def_ringpos = "int " + get_current_scoped_name("__pos_" + param.id, PVAR) + ";";		
 				strglobals.push(def_ringpos);
 			}			
 		}

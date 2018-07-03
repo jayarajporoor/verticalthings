@@ -35,6 +35,9 @@ function compute_ltmap(duseq){
 				var scoped_name = ast_util.get_scoped_name(m);				
 				var lt = ltmap[scoped_name];
 				if(lt){
+					if(lt.undef){
+						vtbuild.error("Local variable used before initialization.", m.name, " in scope: ", m.scope_names);
+					}else
 					if(lt.mem){
 						full_ltmap[scoped_name] = lt.sym;
 						delete ltmap[scoped_name];
