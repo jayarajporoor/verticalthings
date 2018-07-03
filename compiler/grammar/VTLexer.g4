@@ -102,6 +102,13 @@ INT: 'int';
 FLOAT: 'float';
 BOOLEAN: 'boolean';
 
+I8: 'int8_t';
+U8: 'uint8_t';
+I16: 'int16_t';
+U16: 'uint16_t';
+I32: 'int32_t';
+U32: 'uint32_t';
+
 RETURN: 'return';
 
 Identifier

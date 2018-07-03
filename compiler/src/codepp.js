@@ -13,7 +13,8 @@ function codepp(ast,ctx){
 			current_indent += indent;
 		}else
 		if(line === "}"){
-			current_indent.slice(0, -indent.length);
+			current_indent = current_indent.slice(0, -indent.length);
+			current_indent_depth--;
 		}
 	}
 }

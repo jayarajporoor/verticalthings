@@ -4,7 +4,13 @@ use arduino;
 
 include model;
 
-int x, y;
+int8_t x, y;
+
+MPU mpu;
+
+void init(){
+	x = 3;
+}
 
 default flow acquire(){
 	const int size = 10;
@@ -13,7 +19,7 @@ default flow acquire(){
 
 	pinPeripheral(3,&y);
 
-	mpu.getFIFOBytes(buf, size);
+	x = mpu.getFIFOBytes(buf, size);
 	ybuf = modelData * buf;
 
 	zbuf = modelData * ybuf;

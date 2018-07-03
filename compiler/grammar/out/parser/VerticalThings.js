@@ -7,7 +7,7 @@ var VerticalThingsVisitor = require('./VerticalThingsVisitor').VerticalThingsVis
 var grammarFileName = "VerticalThings.g4";
 
 var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
-    "\u0003G\u025a\u0004\u0002\t\u0002\u0004\u0003\t\u0003\u0004\u0004\t",
+    "\u0003M\u025a\u0004\u0002\t\u0002\u0004\u0003\t\u0003\u0004\u0004\t",
     "\u0004\u0004\u0005\t\u0005\u0004\u0006\t\u0006\u0004\u0007\t\u0007\u0004",
     "\b\t\b\u0004\t\t\t\u0004\n\t\n\u0004\u000b\t\u000b\u0004\f\t\f\u0004",
     "\r\t\r\u0004\u000e\t\u000e\u0004\u000f\t\u000f\u0004\u0010\t\u0010\u0004",
@@ -88,10 +88,10 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "9\u0253\n9\u0003:\u0003:\u0003:\u0005:\u0258\n:\u0003:\u0002\u0004h",
     "l;\u0002\u0004\u0006\b\n\f\u000e\u0010\u0012\u0014\u0016\u0018\u001a",
     "\u001c\u001e \"$&(*,.02468:<>@BDFHJLNPRTVXZ\\^`bdfhjlnpr\u0002\u0010",
-    "\u0003\u0002\u0011\u0012\u0004\u0002\u001f\u001f!!\u0003\u0002=>\u0004",
-    "\u0002\u001b\u001b\u001d\u001d\u0003\u00029;\u0004\u0002\u000f\u000f",
-    "9;\u0004\u0002  55\u0004\u00023466\u0003\u000212\u0004\u0002!#%%\u0003",
-    "\u0002\u001f \u0003\u0002\',\u0003\u0002./\u0003\u0002>?\u027a\u0002",
+    "\u0003\u0002\u0011\u0012\u0004\u0002\u001f\u001f!!\u0003\u0002CD\u0004",
+    "\u0002\u001b\u001b\u001d\u001d\u0003\u00029A\u0004\u0002\u000f\u000f",
+    "9A\u0004\u0002  55\u0004\u00023466\u0003\u000212\u0004\u0002!#%%\u0003",
+    "\u0002\u001f \u0003\u0002\',\u0003\u0002./\u0003\u0002DE\u027a\u0002",
     "t\u0003\u0002\u0002\u0002\u0004\u0093\u0003\u0002\u0002\u0002\u0006",
     "\u009f\u0003\u0002\u0002\u0002\b\u00b0\u0003\u0002\u0002\u0002\n\u00bf",
     "\u0003\u0002\u0002\u0002\f\u00c3\u0003\u0002\u0002\u0002\u000e\u00c7",
@@ -118,7 +118,7 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0002\u0002\u0002f\u0205\u0003\u0002\u0002\u0002h\u0217\u0003\u0002",
     "\u0002\u0002j\u0238\u0003\u0002\u0002\u0002l\u0243\u0003\u0002\u0002",
     "\u0002n\u024d\u0003\u0002\u0002\u0002p\u0252\u0003\u0002\u0002\u0002",
-    "r\u0257\u0003\u0002\u0002\u0002tu\u0007\u0003\u0002\u0002uv\u0007=\u0002",
+    "r\u0257\u0003\u0002\u0002\u0002tu\u0007\u0003\u0002\u0002uv\u0007C\u0002",
     "\u0002vz\u0007\u0014\u0002\u0002wy\u0005\u001e\u0010\u0002xw\u0003\u0002",
     "\u0002\u0002y|\u0003\u0002\u0002\u0002zx\u0003\u0002\u0002\u0002z{\u0003",
     "\u0002\u0002\u0002{\u0080\u0003\u0002\u0002\u0002|z\u0003\u0002\u0002",
@@ -159,26 +159,26 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0002\u0002\u00b9\u00b7\u0003\u0002\u0002\u0002\u00ba\u00b2\u0003\u0002",
     "\u0002\u0002\u00ba\u00bb\u0003\u0002\u0002\u0002\u00bb\u00bc\u0003\u0002",
     "\u0002\u0002\u00bc\u00bd\u0007\u0016\u0002\u0002\u00bd\t\u0003\u0002",
-    "\u0002\u0002\u00be\u00c0\u0007G\u0002\u0002\u00bf\u00be\u0003\u0002",
+    "\u0002\u0002\u00be\u00c0\u0007M\u0002\u0002\u00bf\u00be\u0003\u0002",
     "\u0002\u0002\u00bf\u00c0\u0003\u0002\u0002\u0002\u00c0\u00c1\u0003\u0002",
-    "\u0002\u0002\u00c1\u00c2\u0007=\u0002\u0002\u00c2\u000b\u0003\u0002",
-    "\u0002\u0002\u00c3\u00c4\u0007=\u0002\u0002\u00c4\u00c5\u0007\u001d",
-    "\u0002\u0002\u00c5\u00c6\u0007=\u0002\u0002\u00c6\r\u0003\u0002\u0002",
-    "\u0002\u00c7\u00c9\u0007=\u0002\u0002\u00c8\u00ca\u0005\u0010\t\u0002",
+    "\u0002\u0002\u00c1\u00c2\u0007C\u0002\u0002\u00c2\u000b\u0003\u0002",
+    "\u0002\u0002\u00c3\u00c4\u0007C\u0002\u0002\u00c4\u00c5\u0007\u001d",
+    "\u0002\u0002\u00c5\u00c6\u0007C\u0002\u0002\u00c6\r\u0003\u0002\u0002",
+    "\u0002\u00c7\u00c9\u0007C\u0002\u0002\u00c8\u00ca\u0005\u0010\t\u0002",
     "\u00c9\u00c8\u0003\u0002\u0002\u0002\u00c9\u00ca\u0003\u0002\u0002\u0002",
     "\u00ca\u00cb\u0003\u0002\u0002\u0002\u00cb\u00cc\u0005\u0012\n\u0002",
     "\u00cc\u000f\u0003\u0002\u0002\u0002\u00cd\u00ce\u0007\u0019\u0002\u0002",
-    "\u00ce\u00d3\u0007=\u0002\u0002\u00cf\u00d0\u0007\u001b\u0002\u0002",
-    "\u00d0\u00d2\u0007=\u0002\u0002\u00d1\u00cf\u0003\u0002\u0002\u0002",
+    "\u00ce\u00d3\u0007C\u0002\u0002\u00cf\u00d0\u0007\u001b\u0002\u0002",
+    "\u00d0\u00d2\u0007C\u0002\u0002\u00d1\u00cf\u0003\u0002\u0002\u0002",
     "\u00d2\u00d5\u0003\u0002\u0002\u0002\u00d3\u00d1\u0003\u0002\u0002\u0002",
     "\u00d3\u00d4\u0003\u0002\u0002\u0002\u00d4\u00d6\u0003\u0002\u0002\u0002",
     "\u00d5\u00d3\u0003\u0002\u0002\u0002\u00d6\u00d7\u0007\u001a\u0002\u0002",
-    "\u00d7\u0011\u0003\u0002\u0002\u0002\u00d8\u00dd\u0007=\u0002\u0002",
-    "\u00d9\u00dd\u0005p9\u0002\u00da\u00dd\u0007B\u0002\u0002\u00db\u00dd",
+    "\u00d7\u0011\u0003\u0002\u0002\u0002\u00d8\u00dd\u0007C\u0002\u0002",
+    "\u00d9\u00dd\u0005p9\u0002\u00da\u00dd\u0007H\u0002\u0002\u00db\u00dd",
     "\u0005\u0014\u000b\u0002\u00dc\u00d8\u0003\u0002\u0002\u0002\u00dc\u00d9",
     "\u0003\u0002\u0002\u0002\u00dc\u00da\u0003\u0002\u0002\u0002\u00dc\u00db",
     "\u0003\u0002\u0002\u0002\u00dd\u0013\u0003\u0002\u0002\u0002\u00de\u00df",
-    "\u0007=\u0002\u0002\u00df\u00e8\u0007\u0015\u0002\u0002\u00e0\u00e5",
+    "\u0007C\u0002\u0002\u00df\u00e8\u0007\u0015\u0002\u0002\u00e0\u00e5",
     "\u0005\u0012\n\u0002\u00e1\u00e2\u0007\u001b\u0002\u0002\u00e2\u00e4",
     "\u0005\u0012\n\u0002\u00e3\u00e1\u0003\u0002\u0002\u0002\u00e4\u00e7",
     "\u0003\u0002\u0002\u0002\u00e5\u00e3\u0003\u0002\u0002\u0002\u00e5\u00e6",
@@ -186,7 +186,7 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0003\u0002\u0002\u0002\u00e8\u00e0\u0003\u0002\u0002\u0002\u00e8\u00e9",
     "\u0003\u0002\u0002\u0002\u00e9\u00ea\u0003\u0002\u0002\u0002\u00ea\u00eb",
     "\u0007\u0016\u0002\u0002\u00eb\u0015\u0003\u0002\u0002\u0002\u00ec\u00ed",
-    "\u0007\u0004\u0002\u0002\u00ed\u00ee\u0007=\u0002\u0002\u00ee\u00f0",
+    "\u0007\u0004\u0002\u0002\u00ed\u00ee\u0007C\u0002\u0002\u00ee\u00f0",
     "\u0005\u0018\r\u0002\u00ef\u00f1\u0007\u0014\u0002\u0002\u00f0\u00ef",
     "\u0003\u0002\u0002\u0002\u00f0\u00f1\u0003\u0002\u0002\u0002\u00f1\u0017",
     "\u0003\u0002\u0002\u0002\u00f2\u00f3\u0007\u0017\u0002\u0002\u00f3\u00f4",
@@ -201,9 +201,9 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0002\u0101\u0104\u0003\u0002\u0002\u0002\u0102\u0100\u0003\u0002\u0002",
     "\u0002\u0103\u0105\u0007\u001b\u0002\u0002\u0104\u0103\u0003\u0002\u0002",
     "\u0002\u0104\u0105\u0003\u0002\u0002\u0002\u0105\u001d\u0003\u0002\u0002",
-    "\u0002\u0106\u0107\u0007\u0006\u0002\u0002\u0107\u0108\u0007=\u0002",
+    "\u0002\u0106\u0107\u0007\u0006\u0002\u0002\u0107\u0108\u0007C\u0002",
     "\u0002\u0108\u0109\u0007\u0014\u0002\u0002\u0109\u001f\u0003\u0002\u0002",
-    "\u0002\u010a\u010b\u0007\u000e\u0002\u0002\u010b\u010c\u0007=\u0002",
+    "\u0002\u010a\u010b\u0007\u000e\u0002\u0002\u010b\u010c\u0007C\u0002",
     "\u0002\u010c\u010d\u0007\u0014\u0002\u0002\u010d!\u0003\u0002\u0002",
     "\u0002\u010e\u010f\t\u0002\u0002\u0002\u010f#\u0003\u0002\u0002\u0002",
     "\u0110\u0119\u0007\u0017\u0002\u0002\u0111\u0116\u0005r:\u0002\u0112",
@@ -214,9 +214,9 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0003\u0002\u0002\u0002\u0119\u011a\u0003\u0002\u0002\u0002\u011a\u011b",
     "\u0003\u0002\u0002\u0002\u011b\u011c\u0007\u0018\u0002\u0002\u011c%",
     "\u0003\u0002\u0002\u0002\u011d\u0121\u0005l7\u0002\u011e\u0121\u0007",
-    "B\u0002\u0002\u011f\u0121\u0005$\u0013\u0002\u0120\u011d\u0003\u0002",
+    "H\u0002\u0002\u011f\u0121\u0005$\u0013\u0002\u0120\u011d\u0003\u0002",
     "\u0002\u0002\u0120\u011e\u0003\u0002\u0002\u0002\u0120\u011f\u0003\u0002",
-    "\u0002\u0002\u0121\'\u0003\u0002\u0002\u0002\u0122\u0125\u0007=\u0002",
+    "\u0002\u0002\u0121\'\u0003\u0002\u0002\u0002\u0122\u0125\u0007C\u0002",
     "\u0002\u0123\u0124\u0007-\u0002\u0002\u0124\u0126\u0005&\u0014\u0002",
     "\u0125\u0123\u0003\u0002\u0002\u0002\u0125\u0126\u0003\u0002\u0002\u0002",
     "\u0126)\u0003\u0002\u0002\u0002\u0127\u0129\u0007\t\u0002\u0002\u0128",
@@ -229,7 +229,7 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0130\u0003\u0002\u0002\u0002\u0133\u0134\u0007\u0014\u0002\u0002\u0134",
     "+\u0003\u0002\u0002\u0002\u0135\u0136\u00052\u001a\u0002\u0136\u0137",
     "\t\u0003\u0002\u0002\u0137\u0138\u00052\u001a\u0002\u0138-\u0003\u0002",
-    "\u0002\u0002\u0139\u013d\u0007>\u0002\u0002\u013a\u013d\u0007=\u0002",
+    "\u0002\u0002\u0139\u013d\u0007D\u0002\u0002\u013a\u013d\u0007C\u0002",
     "\u0002\u013b\u013d\u0005,\u0017\u0002\u013c\u0139\u0003\u0002\u0002",
     "\u0002\u013c\u013a\u0003\u0002\u0002\u0002\u013c\u013b\u0003\u0002\u0002",
     "\u0002\u013d/\u0003\u0002\u0002\u0002\u013e\u0140\u0007\u0013\u0002",
@@ -240,7 +240,7 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0002\u0146\u0147\u0003\u0002\u0002\u0002\u0147\u0145\u0003\u0002\u0002",
     "\u0002\u0147\u0148\u0003\u0002\u0002\u0002\u01481\u0003\u0002\u0002",
     "\u0002\u0149\u014a\t\u0004\u0002\u0002\u014a3\u0003\u0002\u0002\u0002",
-    "\u014b\u014e\u0007=\u0002\u0002\u014c\u014e\u0005n8\u0002\u014d\u014b",
+    "\u014b\u014e\u0007C\u0002\u0002\u014c\u014e\u0005n8\u0002\u014d\u014b",
     "\u0003\u0002\u0002\u0002\u014d\u014c\u0003\u0002\u0002\u0002\u014e5",
     "\u0003\u0002\u0002\u0002\u014f\u0150\u0007\u0019\u0002\u0002\u0150\u0151",
     "\u00054\u001b\u0002\u0151\u0152\t\u0005\u0002\u0002\u0152\u0153\u0005",
@@ -258,7 +258,7 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0002\u0002\u0165\u0166\u0007\u0005\u0002\u0002\u0166?\u0003\u0002",
     "\u0002\u0002\u0167\u0169\u0007\t\u0002\u0002\u0168\u0167\u0003\u0002",
     "\u0002\u0002\u0168\u0169\u0003\u0002\u0002\u0002\u0169\u016a\u0003\u0002",
-    "\u0002\u0002\u016a\u016b\u0005<\u001f\u0002\u016b\u016c\u0007=\u0002",
+    "\u0002\u0002\u016a\u016b\u0005<\u001f\u0002\u016b\u016c\u0007C\u0002",
     "\u0002\u016cA\u0003\u0002\u0002\u0002\u016d\u0172\u0005@!\u0002\u016e",
     "\u016f\u0007\u001b\u0002\u0002\u016f\u0171\u0005@!\u0002\u0170\u016e",
     "\u0003\u0002\u0002\u0002\u0171\u0174\u0003\u0002\u0002\u0002\u0172\u0170",
@@ -275,8 +275,8 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0185\u0007\u0015\u0002\u0002\u0185\u0186\u0005l7\u0002\u0186\u0187",
     "\u0007\u0016\u0002\u0002\u0187\u0189\u0005D#\u0002\u0188\u018a\u0005",
     "F$\u0002\u0189\u0188\u0003\u0002\u0002\u0002\u0189\u018a\u0003\u0002",
-    "\u0002\u0002\u018aI\u0003\u0002\u0002\u0002\u018b\u0190\u0007=\u0002",
-    "\u0002\u018c\u018d\u0007\u001b\u0002\u0002\u018d\u018f\u0007=\u0002",
+    "\u0002\u0002\u018aI\u0003\u0002\u0002\u0002\u018b\u0190\u0007C\u0002",
+    "\u0002\u018c\u018d\u0007\u001b\u0002\u0002\u018d\u018f\u0007C\u0002",
     "\u0002\u018e\u018c\u0003\u0002\u0002\u0002\u018f\u0192\u0003\u0002\u0002",
     "\u0002\u0190\u018e\u0003\u0002\u0002\u0002\u0190\u0191\u0003\u0002\u0002",
     "\u0002\u0191K\u0003\u0002\u0002\u0002\u0192\u0190\u0003\u0002\u0002",
@@ -289,7 +289,7 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u00050\u0019\u0002\u01a1\u01a0\u0003\u0002\u0002\u0002\u01a1\u01a2",
     "\u0003\u0002\u0002\u0002\u01a2\u01a3\u0003\u0002\u0002\u0002\u01a3\u01a4",
     "\u0007-\u0002\u0002\u01a4\u01a5\u0005l7\u0002\u01a5Q\u0003\u0002\u0002",
-    "\u0002\u01a6\u01a7\u0007<\u0002\u0002\u01a7\u01a8\u0005l7\u0002\u01a8",
+    "\u0002\u01a6\u01a7\u0007B\u0002\u0002\u01a7\u01a8\u0005l7\u0002\u01a8",
     "S\u0003\u0002\u0002\u0002\u01a9\u01b7\u0005D#\u0002\u01aa\u01b7\u0005",
     "H%\u0002\u01ab\u01b7\u0005L\'\u0002\u01ac\u01b7\u0005N(\u0002\u01ad",
     "\u01ae\u0005P)\u0002\u01ae\u01af\u0007\u0014\u0002\u0002\u01af\u01b7",
@@ -303,7 +303,7 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0002\u0002\u01b8\u01bb\u0005<\u001f\u0002\u01b9\u01bb\u0005> \u0002",
     "\u01ba\u01b8\u0003\u0002\u0002\u0002\u01ba\u01b9\u0003\u0002\u0002\u0002",
     "\u01ba\u01bb\u0003\u0002\u0002\u0002\u01bb\u01bc\u0003\u0002\u0002\u0002",
-    "\u01bc\u01bd\u0007=\u0002\u0002\u01bd\u01bf\u0007\u0015\u0002\u0002",
+    "\u01bc\u01bd\u0007C\u0002\u0002\u01bd\u01bf\u0007\u0015\u0002\u0002",
     "\u01be\u01c0\u0005B\"\u0002\u01bf\u01be\u0003\u0002\u0002\u0002\u01bf",
     "\u01c0\u0003\u0002\u0002\u0002\u01c0\u01c1\u0003\u0002\u0002\u0002\u01c1",
     "\u01c2\u0007\u0016\u0002\u0002\u01c2\u01c6\u0007\u0017\u0002\u0002\u01c3",
@@ -315,12 +315,12 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0003\u0002\u0002\u0002\u01cc\u01cd\u0003\u0002\u0002\u0002\u01cd\u01cf",
     "\u0003\u0002\u0002\u0002\u01ce\u01cc\u0003\u0002\u0002\u0002\u01cf\u01d0",
     "\u0007\u0018\u0002\u0002\u01d0W\u0003\u0002\u0002\u0002\u01d1\u01d6",
-    "\u0007=\u0002\u0002\u01d2\u01d3\u0007\u001e\u0002\u0002\u01d3\u01d5",
-    "\u0007=\u0002\u0002\u01d4\u01d2\u0003\u0002\u0002\u0002\u01d5\u01d8",
+    "\u0007C\u0002\u0002\u01d2\u01d3\u0007\u001e\u0002\u0002\u01d3\u01d5",
+    "\u0007C\u0002\u0002\u01d4\u01d2\u0003\u0002\u0002\u0002\u01d5\u01d8",
     "\u0003\u0002\u0002\u0002\u01d6\u01d4\u0003\u0002\u0002\u0002\u01d6\u01d7",
     "\u0003\u0002\u0002\u0002\u01d7Y\u0003\u0002\u0002\u0002\u01d8\u01d6",
-    "\u0003\u0002\u0002\u0002\u01d9\u01dc\u0007=\u0002\u0002\u01da\u01db",
-    "\u0007\u001c\u0002\u0002\u01db\u01dd\u0007=\u0002\u0002\u01dc\u01da",
+    "\u0003\u0002\u0002\u0002\u01d9\u01dc\u0007C\u0002\u0002\u01da\u01db",
+    "\u0007\u001c\u0002\u0002\u01db\u01dd\u0007C\u0002\u0002\u01dc\u01da",
     "\u0003\u0002\u0002\u0002\u01dd\u01de\u0003\u0002\u0002\u0002\u01de\u01dc",
     "\u0003\u0002\u0002\u0002\u01de\u01df\u0003\u0002\u0002\u0002\u01df[",
     "\u0003\u0002\u0002\u0002\u01e0\u01e3\u0005X-\u0002\u01e1\u01e3\u0005",
@@ -329,10 +329,10 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0002\u0002\u01e5\u01e7\u0005`1\u0002\u01e6\u01e5\u0003\u0002\u0002",
     "\u0002\u01e6\u01e7\u0003\u0002\u0002\u0002\u01e7\u01e8\u0003\u0002\u0002",
     "\u0002\u01e8\u01e9\u0007\u0016\u0002\u0002\u01e9]\u0003\u0002\u0002",
-    "\u0002\u01ea\u01eb\u0007=\u0002\u0002\u01eb\u01ed\u0007-\u0002\u0002",
+    "\u0002\u01ea\u01eb\u0007C\u0002\u0002\u01eb\u01ed\u0007-\u0002\u0002",
     "\u01ec\u01ea\u0003\u0002\u0002\u0002\u01ec\u01ed\u0003\u0002\u0002\u0002",
     "\u01ed\u01f0\u0003\u0002\u0002\u0002\u01ee\u01f1\u0005l7\u0002\u01ef",
-    "\u01f1\u0007B\u0002\u0002\u01f0\u01ee\u0003\u0002\u0002\u0002\u01f0",
+    "\u01f1\u0007H\u0002\u0002\u01f0\u01ee\u0003\u0002\u0002\u0002\u01f0",
     "\u01ef\u0003\u0002\u0002\u0002\u01f1_\u0003\u0002\u0002\u0002\u01f2",
     "\u01f7\u0005^0\u0002\u01f3\u01f4\u0007\u001b\u0002\u0002\u01f4\u01f6",
     "\u0005^0\u0002\u01f5\u01f3\u0003\u0002\u0002\u0002\u01f6\u01f9\u0003",
@@ -340,7 +340,7 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0002\u0002\u0002\u01f8\u01fb\u0003\u0002\u0002\u0002\u01f9\u01f7\u0003",
     "\u0002\u0002\u0002\u01fa\u01fc\u0007\u001b\u0002\u0002\u01fb\u01fa\u0003",
     "\u0002\u0002\u0002\u01fb\u01fc\u0003\u0002\u0002\u0002\u01fca\u0003",
-    "\u0002\u0002\u0002\u01fd\u01fe\u0007=\u0002\u0002\u01fe\u01ff\u0005",
+    "\u0002\u0002\u0002\u01fd\u01fe\u0007C\u0002\u0002\u01fe\u01ff\u0005",
     "0\u0019\u0002\u01ffc\u0003\u0002\u0002\u0002\u0200\u0203\u00073\u0002",
     "\u0002\u0201\u0204\u0005b2\u0002\u0202\u0204\u0005X-\u0002\u0203\u0201",
     "\u0003\u0002\u0002\u0002\u0203\u0202\u0003\u0002\u0002\u0002\u0204e",
@@ -386,11 +386,11 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0002\u0002\u024a\u0248\u0003\u0002\u0002\u0002\u024a\u024b\u0003\u0002",
     "\u0002\u0002\u024bm\u0003\u0002\u0002\u0002\u024c\u024a\u0003\u0002",
     "\u0002\u0002\u024d\u024e\t\u000f\u0002\u0002\u024eo\u0003\u0002\u0002",
-    "\u0002\u024f\u0253\u0005n8\u0002\u0250\u0253\u0007A\u0002\u0002\u0251",
+    "\u0002\u024f\u0253\u0005n8\u0002\u0250\u0253\u0007G\u0002\u0002\u0251",
     "\u0253\u0005\"\u0012\u0002\u0252\u024f\u0003\u0002\u0002\u0002\u0252",
     "\u0250\u0003\u0002\u0002\u0002\u0252\u0251\u0003\u0002\u0002\u0002\u0253",
     "q\u0003\u0002\u0002\u0002\u0254\u0258\u0005p9\u0002\u0255\u0258\u0005",
-    "$\u0013\u0002\u0256\u0258\u0007B\u0002\u0002\u0257\u0254\u0003\u0002",
+    "$\u0013\u0002\u0256\u0258\u0007H\u0002\u0002\u0257\u0254\u0003\u0002",
     "\u0002\u0002\u0257\u0255\u0003\u0002\u0002\u0002\u0257\u0256\u0003\u0002",
     "\u0002\u0002\u0258s\u0003\u0002\u0002\u0002@z\u0080\u0086\u008c\u0091",
     "\u009a\u00a4\u00ad\u00b7\u00ba\u00bf\u00c9\u00d3\u00dc\u00e5\u00e8\u00f0",
@@ -415,7 +415,8 @@ var literalNames = [ null, "'module'", "'pipeline'", "'flow'", "'use'",
                      "'(.)'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", 
                      "'='", "'&&'", "'||'", "'!'", "'<<'", "'>>'", "'&'", 
                      "'|'", "'~'", "'^'", "'@effects'", "':='", "'int'", 
-                     "'float'", "'boolean'", "'return'" ];
+                     "'float'", "'boolean'", "'int8_t'", "'uint8_t'", "'int16_t'", 
+                     "'uint16_t'", "'int32_t'", "'uint32_t'", "'return'" ];
 
 var symbolicNames = [ null, "MODULE", "PIPELINE", "FLOW", "USE", "CONFIG", 
                       "DEFAULT", "CONST", "IF", "ELSE", "FOR", "IN", "INCLUDE", 
@@ -425,7 +426,8 @@ var symbolicNames = [ null, "MODULE", "PIPELINE", "FLOW", "USE", "CONFIG",
                       "MOD", "POW", "HPROD", "CAT", "LT", "GT", "LTE", "GTE", 
                       "EQ", "NEQ", "ASSIGN", "LAND", "LOR", "LNOT", "LSHIFT", 
                       "RSHIFT", "BAND", "BOR", "BNOT", "BXOR", "EFFECTS", 
-                      "EASSIGN", "INT", "FLOAT", "BOOLEAN", "RETURN", "Identifier", 
+                      "EASSIGN", "INT", "FLOAT", "BOOLEAN", "I8", "U8", 
+                      "I16", "U16", "I32", "U32", "RETURN", "Identifier", 
                       "IntegerConstant", "FloatingConstant", "DigitSequence", 
                       "CharacterConstant", "StringLiteral", "Whitespace", 
                       "Newline", "BlockComment", "LineComment", "ADDRESSOF" ];
@@ -521,18 +523,24 @@ VerticalThings.EASSIGN = 54;
 VerticalThings.INT = 55;
 VerticalThings.FLOAT = 56;
 VerticalThings.BOOLEAN = 57;
-VerticalThings.RETURN = 58;
-VerticalThings.Identifier = 59;
-VerticalThings.IntegerConstant = 60;
-VerticalThings.FloatingConstant = 61;
-VerticalThings.DigitSequence = 62;
-VerticalThings.CharacterConstant = 63;
-VerticalThings.StringLiteral = 64;
-VerticalThings.Whitespace = 65;
-VerticalThings.Newline = 66;
-VerticalThings.BlockComment = 67;
-VerticalThings.LineComment = 68;
-VerticalThings.ADDRESSOF = 69;
+VerticalThings.I8 = 58;
+VerticalThings.U8 = 59;
+VerticalThings.I16 = 60;
+VerticalThings.U16 = 61;
+VerticalThings.I32 = 62;
+VerticalThings.U32 = 63;
+VerticalThings.RETURN = 64;
+VerticalThings.Identifier = 65;
+VerticalThings.IntegerConstant = 66;
+VerticalThings.FloatingConstant = 67;
+VerticalThings.DigitSequence = 68;
+VerticalThings.CharacterConstant = 69;
+VerticalThings.StringLiteral = 70;
+VerticalThings.Whitespace = 71;
+VerticalThings.Newline = 72;
+VerticalThings.BlockComment = 73;
+VerticalThings.LineComment = 74;
+VerticalThings.ADDRESSOF = 75;
 
 VerticalThings.RULE_module = 0;
 VerticalThings.RULE_effectsDef = 1;
@@ -753,11 +761,17 @@ VerticalThings.prototype.module = function() {
         case VerticalThings.INT:
         case VerticalThings.FLOAT:
         case VerticalThings.BOOLEAN:
+        case VerticalThings.I8:
+        case VerticalThings.U8:
+        case VerticalThings.I16:
+        case VerticalThings.U16:
+        case VerticalThings.I32:
+        case VerticalThings.U32:
         case VerticalThings.Identifier:
             this.state = 138;
             this._errHandler.sync(this);
             _la = this._input.LA(1);
-            while((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << VerticalThings.FLOW) | (1 << VerticalThings.DEFAULT) | (1 << VerticalThings.VOID) | (1 << VerticalThings.LS))) !== 0) || ((((_la - 55)) & ~0x1f) == 0 && ((1 << (_la - 55)) & ((1 << (VerticalThings.INT - 55)) | (1 << (VerticalThings.FLOAT - 55)) | (1 << (VerticalThings.BOOLEAN - 55)) | (1 << (VerticalThings.Identifier - 55)))) !== 0)) {
+            while((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << VerticalThings.FLOW) | (1 << VerticalThings.DEFAULT) | (1 << VerticalThings.VOID) | (1 << VerticalThings.LS))) !== 0) || ((((_la - 55)) & ~0x1f) == 0 && ((1 << (_la - 55)) & ((1 << (VerticalThings.INT - 55)) | (1 << (VerticalThings.FLOAT - 55)) | (1 << (VerticalThings.BOOLEAN - 55)) | (1 << (VerticalThings.I8 - 55)) | (1 << (VerticalThings.U8 - 55)) | (1 << (VerticalThings.I16 - 55)) | (1 << (VerticalThings.U16 - 55)) | (1 << (VerticalThings.I32 - 55)) | (1 << (VerticalThings.U32 - 55)) | (1 << (VerticalThings.Identifier - 55)))) !== 0)) {
                 this.state = 135;
                 this.funcDef();
                 this.state = 140;
@@ -1714,7 +1728,7 @@ VerticalThings.prototype.effectTerm = function() {
         this.match(VerticalThings.LP);
         this.state = 230;
         _la = this._input.LA(1);
-        if(_la===VerticalThings.TRUE || _la===VerticalThings.FALSE || ((((_la - 59)) & ~0x1f) == 0 && ((1 << (_la - 59)) & ((1 << (VerticalThings.Identifier - 59)) | (1 << (VerticalThings.IntegerConstant - 59)) | (1 << (VerticalThings.FloatingConstant - 59)) | (1 << (VerticalThings.CharacterConstant - 59)) | (1 << (VerticalThings.StringLiteral - 59)))) !== 0)) {
+        if(_la===VerticalThings.TRUE || _la===VerticalThings.FALSE || ((((_la - 65)) & ~0x1f) == 0 && ((1 << (_la - 65)) & ((1 << (VerticalThings.Identifier - 65)) | (1 << (VerticalThings.IntegerConstant - 65)) | (1 << (VerticalThings.FloatingConstant - 65)) | (1 << (VerticalThings.CharacterConstant - 65)) | (1 << (VerticalThings.StringLiteral - 65)))) !== 0)) {
             this.state = 222;
             this.effectExpr();
             this.state = 227;
@@ -2438,7 +2452,7 @@ VerticalThings.prototype.arrayLiteral = function() {
         this.match(VerticalThings.LB);
         this.state = 279;
         _la = this._input.LA(1);
-        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << VerticalThings.TRUE) | (1 << VerticalThings.FALSE) | (1 << VerticalThings.LB))) !== 0) || ((((_la - 60)) & ~0x1f) == 0 && ((1 << (_la - 60)) & ((1 << (VerticalThings.IntegerConstant - 60)) | (1 << (VerticalThings.FloatingConstant - 60)) | (1 << (VerticalThings.CharacterConstant - 60)) | (1 << (VerticalThings.StringLiteral - 60)))) !== 0)) {
+        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << VerticalThings.TRUE) | (1 << VerticalThings.FALSE) | (1 << VerticalThings.LB))) !== 0) || ((((_la - 66)) & ~0x1f) == 0 && ((1 << (_la - 66)) & ((1 << (VerticalThings.IntegerConstant - 66)) | (1 << (VerticalThings.FloatingConstant - 66)) | (1 << (VerticalThings.CharacterConstant - 66)) | (1 << (VerticalThings.StringLiteral - 66)))) !== 0)) {
             this.state = 271;
             this.literal();
             this.state = 276;
@@ -2541,6 +2555,12 @@ VerticalThings.prototype.initValue = function() {
         case VerticalThings.INT:
         case VerticalThings.FLOAT:
         case VerticalThings.BOOLEAN:
+        case VerticalThings.I8:
+        case VerticalThings.U8:
+        case VerticalThings.I16:
+        case VerticalThings.U16:
+        case VerticalThings.I32:
+        case VerticalThings.U32:
         case VerticalThings.Identifier:
         case VerticalThings.IntegerConstant:
         case VerticalThings.FloatingConstant:
@@ -3376,6 +3396,7 @@ function CastableTypeContext(parser, parent, invokingState) {
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = VerticalThings.RULE_castableType;
+    this.type = null; // Token
     return this;
 }
 
@@ -3392,6 +3413,30 @@ CastableTypeContext.prototype.FLOAT = function() {
 
 CastableTypeContext.prototype.BOOLEAN = function() {
     return this.getToken(VerticalThings.BOOLEAN, 0);
+};
+
+CastableTypeContext.prototype.I8 = function() {
+    return this.getToken(VerticalThings.I8, 0);
+};
+
+CastableTypeContext.prototype.U8 = function() {
+    return this.getToken(VerticalThings.U8, 0);
+};
+
+CastableTypeContext.prototype.I16 = function() {
+    return this.getToken(VerticalThings.I16, 0);
+};
+
+CastableTypeContext.prototype.U16 = function() {
+    return this.getToken(VerticalThings.U16, 0);
+};
+
+CastableTypeContext.prototype.I32 = function() {
+    return this.getToken(VerticalThings.I32, 0);
+};
+
+CastableTypeContext.prototype.U32 = function() {
+    return this.getToken(VerticalThings.U32, 0);
 };
 
 CastableTypeContext.prototype.enterRule = function(listener) {
@@ -3427,9 +3472,10 @@ VerticalThings.prototype.castableType = function() {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 339;
+        localctx.type = this._input.LT(1);
         _la = this._input.LA(1);
-        if(!(((((_la - 55)) & ~0x1f) == 0 && ((1 << (_la - 55)) & ((1 << (VerticalThings.INT - 55)) | (1 << (VerticalThings.FLOAT - 55)) | (1 << (VerticalThings.BOOLEAN - 55)))) !== 0))) {
-        this._errHandler.recoverInline(this);
+        if(!(((((_la - 55)) & ~0x1f) == 0 && ((1 << (_la - 55)) & ((1 << (VerticalThings.INT - 55)) | (1 << (VerticalThings.FLOAT - 55)) | (1 << (VerticalThings.BOOLEAN - 55)) | (1 << (VerticalThings.I8 - 55)) | (1 << (VerticalThings.U8 - 55)) | (1 << (VerticalThings.I16 - 55)) | (1 << (VerticalThings.U16 - 55)) | (1 << (VerticalThings.I32 - 55)) | (1 << (VerticalThings.U32 - 55)))) !== 0))) {
+            localctx.type = this._errHandler.recoverInline(this);
         }
         else {
             this.consume();
@@ -3458,6 +3504,7 @@ function PrimitiveTypeContext(parser, parent, invokingState) {
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = VerticalThings.RULE_primitiveType;
+    this.type = null; // Token
     return this;
 }
 
@@ -3478,6 +3525,30 @@ PrimitiveTypeContext.prototype.BOOLEAN = function() {
 
 PrimitiveTypeContext.prototype.VOID = function() {
     return this.getToken(VerticalThings.VOID, 0);
+};
+
+PrimitiveTypeContext.prototype.I8 = function() {
+    return this.getToken(VerticalThings.I8, 0);
+};
+
+PrimitiveTypeContext.prototype.U8 = function() {
+    return this.getToken(VerticalThings.U8, 0);
+};
+
+PrimitiveTypeContext.prototype.I16 = function() {
+    return this.getToken(VerticalThings.I16, 0);
+};
+
+PrimitiveTypeContext.prototype.U16 = function() {
+    return this.getToken(VerticalThings.U16, 0);
+};
+
+PrimitiveTypeContext.prototype.I32 = function() {
+    return this.getToken(VerticalThings.I32, 0);
+};
+
+PrimitiveTypeContext.prototype.U32 = function() {
+    return this.getToken(VerticalThings.U32, 0);
 };
 
 PrimitiveTypeContext.prototype.enterRule = function(listener) {
@@ -3513,9 +3584,10 @@ VerticalThings.prototype.primitiveType = function() {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 341;
+        localctx.type = this._input.LT(1);
         _la = this._input.LA(1);
-        if(!(_la===VerticalThings.VOID || ((((_la - 55)) & ~0x1f) == 0 && ((1 << (_la - 55)) & ((1 << (VerticalThings.INT - 55)) | (1 << (VerticalThings.FLOAT - 55)) | (1 << (VerticalThings.BOOLEAN - 55)))) !== 0))) {
-        this._errHandler.recoverInline(this);
+        if(!(_la===VerticalThings.VOID || ((((_la - 55)) & ~0x1f) == 0 && ((1 << (_la - 55)) & ((1 << (VerticalThings.INT - 55)) | (1 << (VerticalThings.FLOAT - 55)) | (1 << (VerticalThings.BOOLEAN - 55)) | (1 << (VerticalThings.I8 - 55)) | (1 << (VerticalThings.U8 - 55)) | (1 << (VerticalThings.I16 - 55)) | (1 << (VerticalThings.U16 - 55)) | (1 << (VerticalThings.I32 - 55)) | (1 << (VerticalThings.U32 - 55)))) !== 0))) {
+            localctx.type = this._errHandler.recoverInline(this);
         }
         else {
             this.consume();
@@ -4908,7 +4980,7 @@ VerticalThings.prototype.funcDef = function() {
         this.match(VerticalThings.LP);
         this.state = 445;
         _la = this._input.LA(1);
-        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << VerticalThings.CONST) | (1 << VerticalThings.VOID) | (1 << VerticalThings.LS))) !== 0) || ((((_la - 55)) & ~0x1f) == 0 && ((1 << (_la - 55)) & ((1 << (VerticalThings.INT - 55)) | (1 << (VerticalThings.FLOAT - 55)) | (1 << (VerticalThings.BOOLEAN - 55)) | (1 << (VerticalThings.Identifier - 55)))) !== 0)) {
+        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << VerticalThings.CONST) | (1 << VerticalThings.VOID) | (1 << VerticalThings.LS))) !== 0) || ((((_la - 55)) & ~0x1f) == 0 && ((1 << (_la - 55)) & ((1 << (VerticalThings.INT - 55)) | (1 << (VerticalThings.FLOAT - 55)) | (1 << (VerticalThings.BOOLEAN - 55)) | (1 << (VerticalThings.I8 - 55)) | (1 << (VerticalThings.U8 - 55)) | (1 << (VerticalThings.I16 - 55)) | (1 << (VerticalThings.U16 - 55)) | (1 << (VerticalThings.I32 - 55)) | (1 << (VerticalThings.U32 - 55)) | (1 << (VerticalThings.Identifier - 55)))) !== 0)) {
             this.state = 444;
             this.formalParams();
         }
@@ -5245,7 +5317,7 @@ VerticalThings.prototype.functionCall = function() {
         this.match(VerticalThings.LP);
         this.state = 484;
         _la = this._input.LA(1);
-        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << VerticalThings.TRUE) | (1 << VerticalThings.FALSE) | (1 << VerticalThings.LP) | (1 << VerticalThings.MINUS))) !== 0) || ((((_la - 46)) & ~0x1f) == 0 && ((1 << (_la - 46)) & ((1 << (VerticalThings.LNOT - 46)) | (1 << (VerticalThings.BAND - 46)) | (1 << (VerticalThings.BNOT - 46)) | (1 << (VerticalThings.INT - 46)) | (1 << (VerticalThings.FLOAT - 46)) | (1 << (VerticalThings.BOOLEAN - 46)) | (1 << (VerticalThings.Identifier - 46)) | (1 << (VerticalThings.IntegerConstant - 46)) | (1 << (VerticalThings.FloatingConstant - 46)) | (1 << (VerticalThings.CharacterConstant - 46)) | (1 << (VerticalThings.StringLiteral - 46)))) !== 0)) {
+        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << VerticalThings.TRUE) | (1 << VerticalThings.FALSE) | (1 << VerticalThings.LP) | (1 << VerticalThings.MINUS))) !== 0) || ((((_la - 46)) & ~0x1f) == 0 && ((1 << (_la - 46)) & ((1 << (VerticalThings.LNOT - 46)) | (1 << (VerticalThings.BAND - 46)) | (1 << (VerticalThings.BNOT - 46)) | (1 << (VerticalThings.INT - 46)) | (1 << (VerticalThings.FLOAT - 46)) | (1 << (VerticalThings.BOOLEAN - 46)) | (1 << (VerticalThings.I8 - 46)) | (1 << (VerticalThings.U8 - 46)) | (1 << (VerticalThings.I16 - 46)) | (1 << (VerticalThings.U16 - 46)) | (1 << (VerticalThings.I32 - 46)) | (1 << (VerticalThings.U32 - 46)) | (1 << (VerticalThings.Identifier - 46)) | (1 << (VerticalThings.IntegerConstant - 46)) | (1 << (VerticalThings.FloatingConstant - 46)) | (1 << (VerticalThings.CharacterConstant - 46)) | (1 << (VerticalThings.StringLiteral - 46)))) !== 0)) {
             this.state = 483;
             this.actualParams();
         }
@@ -5351,6 +5423,12 @@ VerticalThings.prototype.actualParam = function() {
         case VerticalThings.INT:
         case VerticalThings.FLOAT:
         case VerticalThings.BOOLEAN:
+        case VerticalThings.I8:
+        case VerticalThings.U8:
+        case VerticalThings.I16:
+        case VerticalThings.U16:
+        case VerticalThings.I32:
+        case VerticalThings.U32:
         case VerticalThings.Identifier:
         case VerticalThings.IntegerConstant:
         case VerticalThings.FloatingConstant:

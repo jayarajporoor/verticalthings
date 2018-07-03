@@ -82,11 +82,11 @@ rangeType
     ;
 
 castableType
-    : INT | FLOAT | BOOLEAN
+    : type=(INT | FLOAT | BOOLEAN | I8 | U8 | I16 | U16 | I32 | U32)
     ;
 
 primitiveType
-    : INT | FLOAT | BOOLEAN | VOID
+    : type=(INT | FLOAT | BOOLEAN | VOID | I8 | U8 | I16 | U16 | I32 | U32)
     ;
 
 varType

@@ -129,6 +129,7 @@ class DUSeq{
       var effects_found = false;
       var mod_name = this.symtbl.getCurrentScope().parent.name;
       var uses = this.root_ast.modules[mod_name].uses;
+      qid = qid.slice();//take a copy!
       if(qid.length > 1){
         var firstname = qid.shift();
       }

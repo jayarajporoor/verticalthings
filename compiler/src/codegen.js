@@ -504,8 +504,8 @@ function code_gen(ast,ctx){
     code.push("void setup()");
     code.push("{");
     // Calling all inits
-    for(var i =0; i< ast.modules.length;i++){
-    	var mod_ast= ast.modules[i];
+    for(var mod_name in ast.modules){
+    	var mod_ast= ast.modules[mod_name];
     	var ast_init = ast_util.find_fdef(mod_ast, "init");
        if(ast_init){
             code.push(PFUNC + mod_ast.name +"_init();");

@@ -359,8 +359,7 @@ function astRangeType(rangeType){
 }
 
 function astPrimitiveType(ptype){
-	return {primitive: ptype.INT() ? 'int' : (ptype.FLOAT() ? 'float' : (ptype.BOOLEAN() ? 'boolean' : 'void')), 
-          src: src_info(ptype)};
+	return {primitive: ptype.type.text,  src: src_info(ptype)};
 }
 
 function astVarType(varType){
