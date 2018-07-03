@@ -407,7 +407,7 @@ function includes(cfg){
 	}
 	if(cfg.pathincludes){
 		for(var i=0;i<cfg.pathincludes.length;i++){
-			strglobals.push("#include \"" + cfg.stdincludes[i] + "\"");
+			strglobals.push("#include \"" + cfg.pathincludes[i] + "\"");
 		}
 	}
 }
