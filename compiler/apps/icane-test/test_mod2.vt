@@ -6,6 +6,8 @@ int16_t[10] factors;
 
 int compute(int[10] val, int scale){
 	int result;
+	float fresult;
+	fresult = float(result);
 	result = val * factors + scale; 
 	return result;
 }

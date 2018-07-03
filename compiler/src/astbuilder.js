@@ -174,7 +174,7 @@ function astArrayExpr(expr){
 
 function getCastExprAst(expr){
 	//castExpr : castableType LP basicExpr RP;
-	return {op: 'cast', type: astPrimitiveType(expr.castableType()), expr: getBasicExprAst(expr.basicExpr()), src: src_info(expr)};
+	return {up: 'cast', type: astPrimitiveType(expr.castableType()), expr: getBasicExprAst(expr.basicExpr()), src: src_info(expr)};
 }
 
 function astAddressExpr(expr){

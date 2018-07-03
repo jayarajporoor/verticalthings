@@ -72,8 +72,10 @@ void _test_mod_acquire()
 int _test_mod2_compute(int test_mod2_compute_val[10], int test_mod2_compute_scale)
 {
     int test_mod2_compute_result;
+    float test_mod2_compute_fresult;
     int __t0;
     {
+        test_mod2_compute_fresult=(float(test_mod2_compute_result));
         __t0=0;
         for(int __i=0; __i<10; __i++)
         {
