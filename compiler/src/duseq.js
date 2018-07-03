@@ -14,21 +14,25 @@ function branch_merge(seq1, seq2){
 }
 
 function seq_merge(seq_entry, use_syms, def_syms, use_found, def_found){
-  for(var i=0;i<seq_entry.use.length;i++){
-      var m = seq_entry.use[i];
-      var scoped_name = ast_util.get_scoped_name(m);
-      if(!use_found[scoped_name]){
-        use_found[scoped_name] = true;
-        use_syms.push(m);
-      }
+  if(seq_entry.use){
+    for(var i=0;i<seq_entry.use.length;i++){
+        var m = seq_entry.use[i];
+        var scoped_name = ast_util.get_scoped_name(m);
+        if(!use_found[scoped_name]){
+          use_found[scoped_name] = true;
+          use_syms.push(m);
+        }
+    }
   }
-  for(var i=0;i<seq_entry.def.length;i++){
-      var m = seq_entry.def[i];
-      var scoped_name = ast_util.get_scoped_name(m);
-      if(!def_found[scoped_name]){
-        def_found[scoped_name] = true;
-        def_syms.push(m);
-      }
+  if(seq_entry.def){
+    for(var i=0;i<seq_entry.def.length;i++){
+        var m = seq_entry.def[i];
+        var scoped_name = ast_util.get_scoped_name(m);
+        if(!def_found[scoped_name]){
+          def_found[scoped_name] = true;
+          def_syms.push(m);
+        }
+    }
   }
 }
 
