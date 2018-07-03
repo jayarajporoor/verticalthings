@@ -168,6 +168,9 @@ function expr(ast){
 	else if(typeof ast.fcall != 'undefined'){
 		str = fcall(ast.fcall);
 	}
+	if(ast.address_of){
+		str = "&(" + str + ")";
+	}
 	return str;
 }
 

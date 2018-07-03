@@ -169,7 +169,7 @@ actualParams
 arrayExpr: Identifier dimensionSpec;
 
 
-addressExpr: ADDRESSOF (arrayExpr | qualIdentifier);
+addressExpr: BAND (arrayExpr | qualIdentifier);
 
 castExpr : castableType LP basicExpr RP;
 

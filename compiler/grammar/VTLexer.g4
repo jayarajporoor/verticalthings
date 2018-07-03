@@ -94,8 +94,6 @@ BOR: '|';
 BNOT: '~';
 BXOR: '^';
 
-ADDRESSOF: '&';
-
 EFFECTS: '@effects';
 
 EASSIGN: ':=';

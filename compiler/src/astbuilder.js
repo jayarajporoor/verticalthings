@@ -177,6 +177,24 @@ function getCastExprAst(expr){
 	return {op: 'cast', type: astPrimitiveType(expr.castableType()), expr: getBasicExprAst(expr.basicExpr()), src: src_info(expr)};
 }
 
+function astAddressExpr(expr){
+	//addressExpr: ADDRESSOF (arrayExpr | qualIdentifier);	
+	var arrayExpr = expr.arrayExpr();
+	var qualIdentifier = expr.qualIdentifier();
+	var ast = null;
+	if(arrayExpr){
+		ast = astArrayExpr(arrayExpr);
+	}else
+	if(qualIdentifier){
+		ast = {qid: getIdList(qualIdentifier)};
+		if(ast.qid.length === 1){
+			ast.id = ast.qid[0];
+		}
+	}
+
+	ast.address_of = true;
+	return ast;
+}
 
 function getBasicExprAst(expr){
     var ast = {src: src_info(expr)};
@@ -186,10 +204,14 @@ function getBasicExprAst(expr){
 	var constant = expr.exprConstant();
 	var basicSubExpr = expr.basicExpr();
 	var castExpr = expr.castExpr();
+	var addrExpr = expr.addressExpr();
 
 	var op = expr.op ? expr.op.text : null;
 	var up = expr.up ? expr.up.text : null;//unary op
 
+	if(addrExpr){
+		return astAddressExpr(addrExpr);
+	}else
 	if(castExpr){
 		return getCastExprAst(castExpr);
 	}else

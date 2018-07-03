@@ -15,6 +15,7 @@ int (*test_mod_acquire_ybuf_p)[10]= (int (*)[10]) &__vtmem[80];
 #define test_mod_acquire_ybuf (*test_mod_acquire_ybuf_p)
 /*End of managed memory variables*/
 /*Module vars for test_mod*/
+int test_mod_x, test_mod_y;
 const int test_mod_modelData[10][10]={ { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10} , { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10} , { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10} , { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10} , { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10} , { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10} , { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10} , { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10} , { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10} , { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10} } ;
 /*End of module vars for test_mod*/
 int test_mod_acquire___pos_rbuf = 0;
@@ -28,76 +29,76 @@ typedef enum { __test_mod_acquire, __test_mod2_process}  __icane_test;
  __icane_test __state = __test_mod_acquire;
 void _test_mod_acquire()
 {
-const int test_mod_acquire_size=10;
-int __t0;
-int __t1;
-{
-pinPeripheral(3, 4);
-getFIFOBytes(test_mod_acquire_buf, test_mod_acquire_size);
-for(int __i=0; __i<10; __i++)
-{
-__t0=0;
-for(int __j=0; __j<10; __j++)
-{
-__t0=((test_mod_modelData[__i][__j]*test_mod_acquire_buf[__j])+__t0);
-}
-}
-for(int __i=0; __i<[object Object]; __i++)
-{
-test_mod_acquire_ybuf[__i]=__t0;
-}
-for(int __i=0; __i<10; __i++)
-{
-__t1=0;
-for(int __j=0; __j<10; __j++)
-{
-__t1=((test_mod_modelData[__i][__j]*test_mod_acquire_ybuf[__j])+__t1);
-}
-}
-for(int __i=0; __i<[object Object]; __i++)
-{
-test_mod_acquire_zbuf[__i]=__t1;
-}
-test_mod2_process_data_p = &(test_mod_acquire_zbuf); __state = __test_mod2_process;
-}
-}
-int _test_mod2_compute(int test_mod2_compute_val[10], int test_mod2_compute_scale)
-{
-int test_mod2_compute_result;
-int __t0;
-{
-__t0=0;
-for(int __i=0; __i<10; __i++)
-{
-__t0=((test_mod2_compute_val[__i]*test_mod2_factors[__i])+__t0);
-}
-test_mod2_compute_result=(__t0+test_mod2_compute_scale);
-return test_mod2_compute_result;
-}
-}
-void _test_mod2_process()
-{
-const int test_mod2_process_x=3;
-{
-_test_mod2_compute(test_mod2_process_data, test_mod2_process_x);
-}
-}
-void loop()
-{
-switch(__state)
-{
-case __test_mod_acquire:
-__state = __test_mod_acquire;
-_test_mod_acquire();
-break;
-case __test_mod2_process:
-__state = __test_mod_acquire;
-_test_mod2_process();
-break;
-default :
-__state = __test_mod_acquire;
-}
-}
-void setup()
-{
-}
+    const int test_mod_acquire_size=10;
+    int __t0;
+    int __t1;
+    {
+        pinPeripheral(3, &(test_mod_y));
+        getFIFOBytes(test_mod_acquire_buf, test_mod_acquire_size);
+        for(int __i=0; __i<10; __i++)
+        {
+            __t0=0;
+            for(int __j=0; __j<10; __j++)
+            {
+                __t0=((test_mod_modelData[__i][__j]*test_mod_acquire_buf[__j])+__t0);
+                }
+                }
+                for(int __i=0; __i<[object Object]; __i++)
+                {
+                    test_mod_acquire_ybuf[__i]=__t0;
+                    }
+                    for(int __i=0; __i<10; __i++)
+                    {
+                        __t1=0;
+                        for(int __j=0; __j<10; __j++)
+                        {
+                            __t1=((test_mod_modelData[__i][__j]*test_mod_acquire_ybuf[__j])+__t1);
+                            }
+                            }
+                            for(int __i=0; __i<[object Object]; __i++)
+                            {
+                                test_mod_acquire_zbuf[__i]=__t1;
+                                }
+                                test_mod2_process_data_p = &(test_mod_acquire_zbuf); __state = __test_mod2_process;
+                                }
+                                }
+                                int _test_mod2_compute(int test_mod2_compute_val[10], int test_mod2_compute_scale)
+                                {
+                                    int test_mod2_compute_result;
+                                    int __t0;
+                                    {
+                                        __t0=0;
+                                        for(int __i=0; __i<10; __i++)
+                                        {
+                                            __t0=((test_mod2_compute_val[__i]*test_mod2_factors[__i])+__t0);
+                                            }
+                                            test_mod2_compute_result=(__t0+test_mod2_compute_scale);
+                                            return test_mod2_compute_result;
+                                            }
+                                            }
+                                            void _test_mod2_process()
+                                            {
+                                                const int test_mod2_process_x=3;
+                                                {
+                                                    _test_mod2_compute(test_mod2_process_data, test_mod2_process_x);
+                                                    }
+                                                    }
+                                                    void loop()
+                                                    {
+                                                        switch(__state)
+                                                        {
+                                                            case __test_mod_acquire:
+                                                            __state = __test_mod_acquire;
+                                                            _test_mod_acquire();
+                                                            break;
+                                                            case __test_mod2_process:
+                                                            __state = __test_mod_acquire;
+                                                            _test_mod2_process();
+                                                            break;
+                                                            default :
+                                                            __state = __test_mod_acquire;
+                                                            }
+                                                            }
+                                                            void setup()
+                                                            {
+                                                                }
