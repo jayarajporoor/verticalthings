@@ -48,8 +48,8 @@ default flow mpu_acq(){
 			mpu1.dmpGetGyro(&gyr__,fifoBuffer);
 			acc[x]=acc__.x; acc[y]=acc__.y; acc[z]=acc__.z;
 			gyr[x]=gyr__.x; gyr[y]=gyr__.y; gyr[z]=gyr__.z;
-			numNewReadings = numNewReadings+1;			// Pass to next;
-			samplesAfterReset = samplesAfterReset+1;	// Pass to next;
+			numNewReadings = numNewReadings+1;
+			samplesAfterReset = samplesAfterReset+1;
 			// Pass acc, gry to next
 		}
 	}

@@ -16,8 +16,30 @@ default flow normalize(){
 	float[3] normAcc, normGyr;
 	minMaxNormalize(acc,minAcc,maxAcc,normAcc);
 	minMaxNormalize(gyr,minGyr,maxGyr,normGyr);
+	normAX.push(normAcc[x]);
+	normAY.push(normAcc[y]);
+	normAZ.push(normAcc[z]);
+	normGX.push(normGyr[x]);
+	normGX.push(normGyr[y]);
+	normGZ.push(normGyr[z]);
+	numNewReadings = numNewReadings + 1;
+	samplesAfterReset = samplesAfterReset + 1;
+	if(samplesAfterReset < 250){
+		if(numNewReadings == STRIDE){
+			numNewReadings = 0;
+		}
+	}
+	else if(numNewReadings == STRIDE){
+		samplesAfterReset = 401;
+		next(normAX, normAY, normAZ)
+	}
 }
 
-void minMaxNormalize(){
-	
+void minMaxNormalize(const int16_t[3] v, const int16_t[3] vmin, const int16_t[3] vmax, float[3] dst){
+	dst[x] = float(v[x]) - float(vmin[x]);
+	dst[x] = dst[x]/(float(vmax[x]) - float(vmin[x]));
+	dst[y] = float(v[y]) - float(vmin[y]);
+	dst[y] = dst[y]/(float(vmax[y]) - float(vmin[y]));
+	dst[z] = float(v[z]) - float(vmin[z]);
+	dst[z] = dst[z]/(float(vmax[z]) - float(vmin[z]));		
 }
