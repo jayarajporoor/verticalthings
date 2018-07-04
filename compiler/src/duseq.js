@@ -242,6 +242,7 @@ class DUSeq{
           this.symtbl.enterNestedScope(fdef_ast.id);//of the calleee
 
           this.fdef(fdef_ast, seq);
+          console.log(JSON.stringify(seq, null, 2));
           this.symtbl.exitNestedScope();//of the callee          
 
           if(is_flow){

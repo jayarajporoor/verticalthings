@@ -1,9 +1,9 @@
 var fs = require('fs');
 
 
-var srcpath = argv[2];
-var outpath = argv[3];
-var cols = parseInt(argv[3]);
+var srcpath = process.argv[2];
+var outpath = process.argv[3];
+var cols = parseInt(process.argv[3]);
 
 var text = fs.readFileSync(srcpath);
 
