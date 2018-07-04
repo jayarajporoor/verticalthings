@@ -113,6 +113,7 @@ class DUSeq{
 
     if(id){
       var sym = this.dynscope.lookup_sym(id);
+      //if(sym) console.log(id, " alias to ", sym.name, sym.scope_names); else console.log(id, " not found");
       if(sym){
         if(sym.info.type.dim){
           use_syms.push(sym);
@@ -246,7 +247,7 @@ class DUSeq{
             this.pipeline_stack.unshift(this.pipeline_stack[0].next);
             //console.log("Save and exit scope ", saved_mod_scope_name, " and enter ", mod_name);
           }          
-
+          //console.log("ENtering ", fdef_ast.id, " from dyn scope ", this.dynscope.current_scope.symtbl.name);
           this.dynscope.enterFunctionCall(fdef_ast.id, ast.params);
 
           this.symtbl.enterNestedScope(fdef_ast.id);//of the calleee

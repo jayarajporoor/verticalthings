@@ -19,7 +19,9 @@ int (*test_modx_just_a_function_C_p)[20][20]= (int (*)[20][20]) &__vtmem[8000];
 #define test_modx_just_a_function_C (*test_modx_just_a_function_C_p)
 /*End of managed memory variables*/
 /*Module vars for test_modx*/
-const float test_modx_bufxxx[3]={ (-1.3), 4.5, 3.3} ;
+const int test_modx_FFF=3;
+const float test_modx_YYYY=5;
+const float test_modx_bufxxx[3][2]={ { (-1.3), 2} , { 4.5, 5} , { 3.3, 6} } ;
 /*End of module vars for test_modx*/
 /*Module vars for arduino*/
 /*End of module vars for arduino*/

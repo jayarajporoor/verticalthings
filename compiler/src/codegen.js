@@ -145,8 +145,9 @@ function expr(ast){
 		}
 	}
 	else if(id){
+		var sym = null;
 		if(ast.qid && ast.qid.length > 1){
-			var sym = symtbl.lookup(ast.qid[0]);
+			sym = symtbl.lookup(ast.qid[0]);
 			if(sym){
 				str = str + ast_util.get_scoped_name(sym, "_", PVAR);
 				for(var j=1;j<ast.qid.length;j++){
@@ -156,7 +157,7 @@ function expr(ast){
 				str = str + ast.qid.join(".");
 			}
 		}else{
-			var sym = symtbl.lookup(id);
+			sym = symtbl.lookup(id);
 			if(sym && !sym.info.is_temp){
 				str = str + ast_util.get_scoped_name(sym, "_", PVAR);
 			}else{

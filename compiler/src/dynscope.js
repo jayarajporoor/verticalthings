@@ -21,7 +21,9 @@ class DynScope{
   		console.log("DynScope: Cannot find function symbol ", name, " in symtbl scope ", this.symtbl.current_scope.name);
   		return;
   	}
-  	var child = new DynScope(this.symtbl.getNestedScope(name), this.current_scope, "Function call " + name);
+    var dynscope_symtbl = this.symtbl.getNestedScope(name);
+
+  	var child = new DynScope(dynscope_symtbl, this.current_scope, "Function call " + name);
   	var formal_params = fsym.info.type.formal_params;
   	for(var i=0;i<actualParams.length && i < formal_params.length;i++){
   		var formal_param = formal_params[i];
@@ -38,6 +40,7 @@ class DynScope{
         alias_entry.value = actual_param.iconst || actual_param.fconst;
       }      
   		child.aliases[formal_param.id] = alias_entry;
+      //console.log("ADD alias for ", formal_param.id, " to ", alias_entry.id);
   	}
   	this.current_scope = child;
   }
@@ -61,13 +64,13 @@ class DynScope{
         {
   				return {name: name, info: {value: alias.value, type:{primitive: 'num'}}};//return a pseudo symbol with the value.
   			}
-        break;
   		}else{
   			break;
   		}
 		  curr_scope = curr_scope.parent;
   	}
-  	return dyn_scope.symtbl.lookup(name,null,true);
+    var sym = dyn_scope.symtbl.lookup(name,null,true);
+  	return sym;
   }
 
 }

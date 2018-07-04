@@ -45,7 +45,9 @@ function compute_ltmap(duseq){
 						lt.end = idx;
 						idx_used = true;
 					}
-				}else{
+				}else
+				if(!full_ltmap[scoped_name])
+				{
 					vtbuild.error("LT entry for variable definition not found before use ", m.name, " in scope: ", m.scope_names);
 				}
 			}
@@ -67,7 +69,9 @@ function compute_ltmap(duseq){
 					//memory allocator won't ignore unused definitions.
 					lt.end = idx;
 					idx_used = true;				
-				}else{
+				}else 
+				if(!full_ltmap[scoped_name])				
+				{
 					vtbuild.error("LT entry for variable definition not found before def ", m.name, " in scope: ", m.scope_names);
 				}
 			}
