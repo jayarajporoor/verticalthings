@@ -1,6 +1,5 @@
 module test_mod;
 use arduino;
-float[30] buf;
 
 MPU mpu;
 
@@ -15,7 +14,7 @@ default flow test_func(){
 
 void temp(){
     int sum1;
-    int[20] A;
+    uint8_t[10] A;
     int[20] B;
     int C;
     B = 0;

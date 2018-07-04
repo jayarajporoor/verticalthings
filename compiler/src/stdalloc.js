@@ -94,7 +94,7 @@ function init_regions(){
 			if(!block.size){
 				console.log("LT entry with unknown size ", id, " cannot be automatically allocated.");
 			}else{
-				block.size = (block.size / alignment + 1)*alignment;
+				block.size = Math.ceil(block.size / alignment)*alignment;
 				regions.push({blocks: [block], size: block.size});
 				if(block.lt_end > max_lifetime){
 					max_lifetime = block.lt_end;
@@ -268,7 +268,7 @@ function allocate_addresses(max_lifetime){
 				if(!address_assigned[scoped_name]){
 					address_assigned[scoped_name] = true;
 					var ltmap_entry = ltmap[scoped_name];
-					var sym_alloc = {sym: sym, loc: next_loc, lifetime: {start: ltmap_entry.start, end: ltmap_entry.end}};
+					var sym_alloc = {sym: sym, loc: next_loc/alignment, lifetime: {start: ltmap_entry.start, end: ltmap_entry.end}};
 					alloc.push(sym_alloc);
 					total_obj_size += sym_alloc.sym.info.size;
 				}

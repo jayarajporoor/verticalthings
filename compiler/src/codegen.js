@@ -404,7 +404,7 @@ function str_parray(elemtype, name, dimstr){
 
 function memdefs(mem){
 	strglobals.push("/*Managed memory variables*/");
-	var dword_size = (mem.total_alloc_size/4 + 1);
+	var dword_size = Math.ceil(mem.total_alloc_size);
 	strglobals.push("uint32_t __vtmem[" +  dword_size + "];");
 	for(var i=0;i<mem.alloc.length;i++){
 		var alloc = mem.alloc[i];
