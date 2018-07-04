@@ -1,5 +1,7 @@
 module normalize_inp_test;
 
+include Config;
+
 float ring[400] normAX, normAY, normAZ, normGX, normGY, normGZ;
 const int x=0, y=1, z=2;
 
@@ -29,7 +31,7 @@ default flow normalize(int16_t[3] acc, int16_t[3] gyr, int16_t numNewReadings, i
 	normAY.push(normAcc[y]);
 	normAZ.push(normAcc[z]);
 	normGX.push(normGyr[x]);
-	normGX.push(normGyr[y]);
+	normGY.push(normGyr[y]);
 	normGZ.push(normGyr[z]);
 	numNewReadings = numNewReadings + 1;
 	samplesAfterReset = samplesAfterReset + 1;
@@ -40,6 +42,6 @@ default flow normalize(int16_t[3] acc, int16_t[3] gyr, int16_t numNewReadings, i
 	}
 	else if(numNewReadings == STRIDE){
 		samplesAfterReset = 401;
-		// next(normAX, normAY, normAZ, normGX, normGY, normGZ);
+		next(normAX, normAY, normAZ, normGX, normGY, normGZ);
 	}
 }
