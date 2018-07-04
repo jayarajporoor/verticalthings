@@ -1,6 +1,6 @@
 {
 	"codegen":{
-		"stdincludes" :["Arduino.h","wiring_private.h"],
-		"pathincludes" :["src/utils.h","src/featureextraction.h","src/predictionfilter.h","src/lib/I2Cdev.h","src/lib/MPU6050_6Axis_MotionApps20.h","src/vote.h"]
+		"stdincludes" :["Arduino.h","Wire.h"],
+		"pathincludes" :[]
 	}
 }

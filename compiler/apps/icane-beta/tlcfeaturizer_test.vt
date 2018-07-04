@@ -18,7 +18,7 @@ void getBucket(float ring[400] sensorValue1D,boolean isGY){
 	int imax=0,imin=0,maxval=0,minval=0,maxcount=0,mincount=0,postemp=0,negtemp=0,bucketCount,val,index,thresholdCount;
 
 	boolean flagPos=false, flagNeg=false;
-	float j,k;
+
 	for i in [0,400]{
 		val=int(100)*sensorValue1D[i];
 		if(val<0){
