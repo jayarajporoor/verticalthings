@@ -196,6 +196,6 @@ function WCETanalysis(data,ctx){
         }
         start = start.next;
     }
-    console.log(ctx.WCET);
+    console.log(ctx);
 }
 exports.transform = WCETanalysis;

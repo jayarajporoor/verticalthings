@@ -1,5 +1,7 @@
 module test_mod1;
 
 default flow f1(){
-    int sum1;
+    int[10][10] a;
+    int[10][10] b;
+    a = b;
 }

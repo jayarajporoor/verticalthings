@@ -4,7 +4,7 @@ include Config;
 
 int bucketIndex;
 
-default flow featurizer(float ring[400] normAX,float ring[400] normAY,float ring[400] normAZ, float ring[400] normGX, float ring[400] normGY, float ring[400] GZ){
+default flow featurizer(float ring[400] normAX,float ring[400] normAY,float ring[400] normAZ, float ring[400] normGX, float ring[400] normGY, float ring[400] normGZ){
 	int[FEATURE_LENGTH] featureVector;
 	float[FEATURE_LENGTH] featureVectorF;
 	int result;
