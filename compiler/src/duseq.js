@@ -13,7 +13,17 @@ function branch_merge(seq1, seq2){
   return seq1.concat(seq2);
 }
 
-function seq_merge(seq_entry, use_syms, def_syms, use_found, def_found){
+function seq_merge(seq_entry, use_syms, def_syms, undef_syms, use_found, def_found, undef_found){
+  if(seq_entry.undef){
+    for(var i=0;i<seq_entry.undef.length;i++){
+        var m = seq_entry.undef[i];
+        var scoped_name = ast_util.get_scoped_name(m);
+        if(!undef_found[scoped_name]){
+          undef_found[scoped_name] = true;
+          undef_syms.push(m);
+        }
+    }
+  }
   if(seq_entry.use){
     for(var i=0;i<seq_entry.use.length;i++){
         var m = seq_entry.use[i];
@@ -37,15 +47,15 @@ function seq_merge(seq_entry, use_syms, def_syms, use_found, def_found){
 }
 
 function loop_merge(expr_seq, stmt_seq){
-  var use_syms = [], def_syms = [];
-  var use_found ={}, def_found = {};
+  var use_syms = [], def_syms = [], undef_syms = [];
+  var use_found ={}, def_found = {}, undef_found = {};
   for(var i=0;i<expr_seq.length;i++){
-    seq_merge(expr_seq[i], use_syms, def_syms, use_found, def_found);
+    seq_merge(expr_seq[i], use_syms, def_syms, undef_syms, use_found, def_found, undef_found);
   }
   for(var i=0;i<stmt_seq.length;i++){
-    seq_merge(stmt_seq[i], use_syms, def_syms, use_found, def_found);
+    seq_merge(stmt_seq[i], use_syms, def_syms, undef_syms, use_found, def_found, undef_found);
   }
-  return [{use: use_syms, def: def_syms}];
+  return [{use: use_syms, def: def_syms, undef: undef_syms}];
 }
 
 class DUSeq{
@@ -242,7 +252,6 @@ class DUSeq{
           this.symtbl.enterNestedScope(fdef_ast.id);//of the calleee
 
           this.fdef(fdef_ast, seq);
-          console.log(JSON.stringify(seq, null, 2));
           this.symtbl.exitNestedScope();//of the callee          
 
           if(is_flow){

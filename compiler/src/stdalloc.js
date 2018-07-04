@@ -23,7 +23,7 @@ function compute_ltmap(duseq){
 			for(var j=0;j< du.undef.length;j++){
 				var m = du.undef[j];
 				var scoped_name = ast_util.get_scoped_name(m);				
-				ltmap[scoped_name] = {undef: true, sym: m};
+				ltmap[scoped_name] = {undef: true, sym: m, du_idx : i};
 			}
 		}
 
@@ -35,7 +35,7 @@ function compute_ltmap(duseq){
 				var scoped_name = ast_util.get_scoped_name(m);				
 				var lt = ltmap[scoped_name];
 				if(lt){
-					if(lt.undef){
+					if(lt.undef && lt.du_idx !== i){
 						vtbuild.error("Local variable used before initialization.", m.name, " in scope: ", m.scope_names);
 					}else
 					if(lt.mem){
@@ -45,6 +45,8 @@ function compute_ltmap(duseq){
 						lt.end = idx;
 						idx_used = true;
 					}
+				}else{
+					vtbuild.error("LT entry for variable definition not found before use ", m.name, " in scope: ", m.scope_names);
 				}
 			}
 		}
@@ -65,6 +67,8 @@ function compute_ltmap(duseq){
 					//memory allocator won't ignore unused definitions.
 					lt.end = idx;
 					idx_used = true;				
+				}else{
+					vtbuild.error("LT entry for variable definition not found before def ", m.name, " in scope: ", m.scope_names);
 				}
 			}
 		}
@@ -170,6 +174,9 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 		}
 		assert(!(tblock && cblock));//both not pending together.
 		if(merged_blocks){
+			if(tblock){
+				merged_blocks.push(tblock);
+			}			
 			if(!cblock){
 				cblock = candidate[cidx++];
 			}
@@ -275,8 +282,12 @@ exports.transform = function(ast, ctx){
 	var max_lifetime = init_regions();
 
 	optimize_regions(max_lifetime, default_merge_policy);
+
+	ctx.stdalloc.regions = regions;
+	//console.log(JSON.stringify(regions));
+
 	var mem = allocate_addresses(max_lifetime);
-//	console.log(regions);
+
 	ctx.mem = mem;
 	if(ctx.params['-printalloc']){
 		console.log("Total alloc size ", mem.total_alloc_size, ", total size of objects ", mem.total_obj_size);

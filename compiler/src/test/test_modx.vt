@@ -29,7 +29,7 @@ void anothertemp(){
             C = A * B;
         }
         else{
-            just_a_function();
+           // just_a_function();
         }
     }
 }
