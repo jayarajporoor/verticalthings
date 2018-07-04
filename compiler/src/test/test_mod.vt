@@ -6,7 +6,7 @@ MPU mpu;
 
 default flow test_func(){
     int sum, size;
-    pinPeripheral(3,4);
+    pinPeripheral(3,false);
 	mpu.getFIFOBytes(buf, size);
     for i in [0,20]{
         temp();

@@ -2300,6 +2300,7 @@ function BooleanLiteralContext(parser, parent, invokingState) {
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = VerticalThings.RULE_booleanLiteral;
+    this.value = null; // Token
     return this;
 }
 
@@ -2347,9 +2348,10 @@ VerticalThings.prototype.booleanLiteral = function() {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 268;
+        localctx.value = this._input.LT(1);
         _la = this._input.LA(1);
         if(!(_la===VerticalThings.TRUE || _la===VerticalThings.FALSE)) {
-        this._errHandler.recoverInline(this);
+            localctx.value = this._errHandler.recoverInline(this);
         }
         else {
             this.consume();

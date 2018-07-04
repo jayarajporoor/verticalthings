@@ -51,7 +51,7 @@ includeSpec
     ;
 
 
-booleanLiteral: TRUE | FALSE;
+booleanLiteral: value=(TRUE | FALSE);
 
 arrayLiteral
     : LB (expr (COMMA expr)*)? RB

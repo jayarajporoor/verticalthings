@@ -1,0 +1,7 @@
+module data;
+
+const int FFF = 3;
+const float YYYY = 5.0;
+const float[N][M] bufxxx = {{-1.3,2}, 
+{4.5,5}, 
+{3.3,6}};

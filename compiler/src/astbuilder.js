@@ -27,7 +27,7 @@ function getCConst(node) {
 }
 
 function getBConst(node) {
-	return (node.TRUE ? true : false);
+	return (node.value.text === 'true') ? true : false;
 }
 
 function getNumConstAst(node){
