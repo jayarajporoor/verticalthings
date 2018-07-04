@@ -457,7 +457,7 @@ function primitive_size(t){
 	return primitive_sizes[t];
 }
 
-function computeDimensions(ast, val){
+function computeDimensions(ast, val, varid){//varid is only for debug purpose.
 	var dim = ast.type.dim.dim;
 	var nested_val = val && val.aconst;
 	var i;
@@ -512,11 +512,11 @@ function astVarDef(def){
 	  }
 	  var syminfo = {type: ast.type, is_const: ast.is_const, src: ast.src, value: def.init};
 	  if(ast.type.dim){
-	  	var size = computeDimensions(ast, def.init);
+	  	var size = computeDimensions(ast, def.init, def.id);
 	  	if(size){
 	  		syminfo.size = size;
 	  	}
-	  }
+	  }  
 	  addSymbol(def.id, syminfo);
 	  if(ast.type.dim && ast.type.dim.is_ring){
 	  	var sym_ringpos = {type: {primitive: 'int'}, is_const: false, src: ast.src, value: {iconst: 0}};
@@ -833,12 +833,7 @@ function astModule(moduleDef, ast) {
 	ast.name = getId(moduleDef);
 	ast.src = src_info(moduleDef);
 	var useSpec = moduleDef.useSpec();
-	var incSpec = moduleDef.includeSpec();
-	if(incSpec){
-		ast.includes = astIncludeSpec(incSpec);
-	}else{
-		ast.includes = [];
-	}
+
 	if(useSpec){
 		ast.uses = astUseSpec(useSpec);
 	}else{
@@ -846,7 +841,9 @@ function astModule(moduleDef, ast) {
 	}
 	var varDef = moduleDef.varDef();
 	if(varDef){
-		ast.vars = [];
+		if(!ast.vars){
+			ast.vars = [];
+		}
 		for(var i=0;i<varDef.length;i++){
 			ast.vars.push(astVarDef(varDef[i]));
 		}
@@ -858,7 +855,9 @@ function astModule(moduleDef, ast) {
 	}
 	var funcDef = moduleDef.funcDef();
 	if(funcDef){
-		ast.fdefs = [];
+		if(!ast.fdefs){
+			ast.fdefs = [];
+		}
 		for(var i=0;i<funcDef.length;i++){
 			ast.fdefs.push(astFuncDef(funcDef[i]));
 		}
@@ -870,14 +869,24 @@ function astModule(moduleDef, ast) {
 	return ast;
 }
 
-function buildAst(tree, symtbl) {
+function buildAst(tree, mod_ast, symtbl) {
 	ctx.symtbl = symtbl;
-	var ast ={};
-	astModule(tree, ast);
-	return ast;
+	astModule(tree, mod_ast);
+	return mod_ast;
+}
+
+function getIncludes(moduleDef, symtbl) {
+	ctx.symtbl = symtbl;	
+	var incSpec = moduleDef.includeSpec();
+	if(incSpec){
+		return astIncludeSpec(incSpec);
+	}
+
+	return null;
 }
 
 
 exports.buildAst = buildAst;
+exports.getIncludes = getIncludes;
 
 
