@@ -96,6 +96,12 @@ function getDimensionSpec(dimSpec){
 		}else
 		if(dimValue[i].Identifier()){
 			dimval.id = getId(dimValue[i]);
+			var sym = getSymbol(dimval.id);//try to replace the ID with constant defined if available.
+			if(sym && sym.info.value && sym.info.value.iconst){
+				var dimlen = sym.info.value.iconst;
+		  		delete dimval.id;
+		  		dimval.iconst = dimlen;				
+			}
 		}
 		dim.push(dimval);
 	}

@@ -15,7 +15,7 @@ default flow predict(float[FEATURE_LENGTH] x){
 	int maxIndex;
 	y_cap=0.0;
 	// Project x onto ldDim dimension
-	x_cap=x*ldProjectionMatrix;
+	x_cap= ldProjectionMatrix*x;
 	for i in [0,numPrototypes]{
 		weight=0.0;
 		weight=(x_cap-prototypeMatrix[i]) * (x_cap-prototypeMatrix[i]);
