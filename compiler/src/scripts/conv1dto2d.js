@@ -3,7 +3,7 @@ var fs = require('fs');
 
 var srcpath = process.argv[2];
 var outpath = process.argv[3];
-var cols = parseInt(process.argv[3]);
+var cols = parseInt(process.argv[4]);
 
 var text = fs.readFileSync(srcpath, 'utf8');
 
