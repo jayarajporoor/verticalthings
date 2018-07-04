@@ -121,7 +121,7 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 	var cblock = null;
 	var done = false;
 	var size_saving = 0;
-	if(commit) console.log("MERGE regions");
+
 	while(!done){
 		if(!tblock){
 			if(tidx < target.length){

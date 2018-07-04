@@ -54,7 +54,7 @@ includeSpec
 booleanLiteral: TRUE | FALSE;
 
 arrayLiteral
-    : LB (literal (COMMA literal)*)? RB
+    : LB (expr (COMMA expr)*)? RB
     ;
 
 initValue: expr | StringLiteral | arrayLiteral;
@@ -182,7 +182,7 @@ basicExpr
         arrayExpr |
         addressExpr |
         functionCall |
-        exprConstant |
+        literal |
         up=(BNOT|MINUS) basicExpr |
         basicExpr op=(BAND|BOR|BXOR) basicExpr |
         basicExpr op=(LSHIFT|RSHIFT) basicExpr |

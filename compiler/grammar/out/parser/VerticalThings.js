@@ -206,8 +206,8 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0002\u0002\u010b\u010c\u0007C\u0002\u0002\u010c\u010d\u0007\u0014",
     "\u0002\u0002\u010d!\u0003\u0002\u0002\u0002\u010e\u010f\t\u0002\u0002",
     "\u0002\u010f#\u0003\u0002\u0002\u0002\u0110\u0119\u0007\u0017\u0002",
-    "\u0002\u0111\u0116\u0005r:\u0002\u0112\u0113\u0007\u001b\u0002\u0002",
-    "\u0113\u0115\u0005r:\u0002\u0114\u0112\u0003\u0002\u0002\u0002\u0115",
+    "\u0002\u0111\u0116\u0005l7\u0002\u0112\u0113\u0007\u001b\u0002\u0002",
+    "\u0113\u0115\u0005l7\u0002\u0114\u0112\u0003\u0002\u0002\u0002\u0115",
     "\u0118\u0003\u0002\u0002\u0002\u0116\u0114\u0003\u0002\u0002\u0002\u0116",
     "\u0117\u0003\u0002\u0002\u0002\u0117\u011a\u0003\u0002\u0002\u0002\u0118",
     "\u0116\u0003\u0002\u0002\u0002\u0119\u0111\u0003\u0002\u0002\u0002\u0119",
@@ -349,7 +349,7 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "g\u0003\u0002\u0002\u0002\u020b\u020c\b5\u0001\u0002\u020c\u020d\t\u0007",
     "\u0002\u0002\u020d\u0219\u0005h5\t\u020e\u0219\u0005f4\u0002\u020f\u0219",
     "\u0005V,\u0002\u0210\u0219\u0005b2\u0002\u0211\u0219\u0005d3\u0002\u0212",
-    "\u0219\u0005Z.\u0002\u0213\u0219\u0005p9\u0002\u0214\u0215\u0007\u0015",
+    "\u0219\u0005Z.\u0002\u0213\u0219\u0005r:\u0002\u0214\u0215\u0007\u0015",
     "\u0002\u0002\u0215\u0216\u0005h5\u0002\u0216\u0217\u0007\u0016\u0002",
     "\u0002\u0217\u0219\u0003\u0002\u0002\u0002\u0218\u020b\u0003\u0002\u0002",
     "\u0002\u0218\u020e\u0003\u0002\u0002\u0002\u0218\u020f\u0003\u0002\u0002",
@@ -2392,14 +2392,14 @@ ArrayLiteralContext.prototype.RB = function() {
     return this.getToken(VerticalThings.RB, 0);
 };
 
-ArrayLiteralContext.prototype.literal = function(i) {
+ArrayLiteralContext.prototype.expr = function(i) {
     if(i===undefined) {
         i = null;
     }
     if(i===null) {
-        return this.getTypedRuleContexts(LiteralContext);
+        return this.getTypedRuleContexts(ExprContext);
     } else {
-        return this.getTypedRuleContext(LiteralContext,i);
+        return this.getTypedRuleContext(ExprContext,i);
     }
 };
 
@@ -2451,9 +2451,9 @@ VerticalThings.prototype.arrayLiteral = function() {
         this.match(VerticalThings.LB);
         this.state = 279;
         _la = this._input.LA(1);
-        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << VerticalThings.TRUE) | (1 << VerticalThings.FALSE) | (1 << VerticalThings.LB))) !== 0) || ((((_la - 66)) & ~0x1f) == 0 && ((1 << (_la - 66)) & ((1 << (VerticalThings.IntegerConstant - 66)) | (1 << (VerticalThings.FloatingConstant - 66)) | (1 << (VerticalThings.CharacterConstant - 66)) | (1 << (VerticalThings.StringLiteral - 66)))) !== 0)) {
+        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << VerticalThings.TRUE) | (1 << VerticalThings.FALSE) | (1 << VerticalThings.LP) | (1 << VerticalThings.LB) | (1 << VerticalThings.MINUS))) !== 0) || ((((_la - 46)) & ~0x1f) == 0 && ((1 << (_la - 46)) & ((1 << (VerticalThings.LNOT - 46)) | (1 << (VerticalThings.BAND - 46)) | (1 << (VerticalThings.BNOT - 46)) | (1 << (VerticalThings.INT - 46)) | (1 << (VerticalThings.FLOAT - 46)) | (1 << (VerticalThings.BOOLEAN - 46)) | (1 << (VerticalThings.I8 - 46)) | (1 << (VerticalThings.U8 - 46)) | (1 << (VerticalThings.I16 - 46)) | (1 << (VerticalThings.U16 - 46)) | (1 << (VerticalThings.I32 - 46)) | (1 << (VerticalThings.U32 - 46)) | (1 << (VerticalThings.Identifier - 46)) | (1 << (VerticalThings.IntegerConstant - 46)) | (1 << (VerticalThings.FloatingConstant - 46)) | (1 << (VerticalThings.CharacterConstant - 46)) | (1 << (VerticalThings.StringLiteral - 46)))) !== 0)) {
             this.state = 271;
-            this.literal();
+            this.expr(0);
             this.state = 276;
             this._errHandler.sync(this);
             _la = this._input.LA(1);
@@ -2461,7 +2461,7 @@ VerticalThings.prototype.arrayLiteral = function() {
                 this.state = 272;
                 this.match(VerticalThings.COMMA);
                 this.state = 273;
-                this.literal();
+                this.expr(0);
                 this.state = 278;
                 this._errHandler.sync(this);
                 _la = this._input.LA(1);
@@ -2543,43 +2543,27 @@ VerticalThings.prototype.initValue = function() {
     this.enterRule(localctx, 36, VerticalThings.RULE_initValue);
     try {
         this.state = 286;
-        switch(this._input.LA(1)) {
-        case VerticalThings.TRUE:
-        case VerticalThings.FALSE:
-        case VerticalThings.LP:
-        case VerticalThings.MINUS:
-        case VerticalThings.LNOT:
-        case VerticalThings.BAND:
-        case VerticalThings.BNOT:
-        case VerticalThings.INT:
-        case VerticalThings.FLOAT:
-        case VerticalThings.BOOLEAN:
-        case VerticalThings.I8:
-        case VerticalThings.U8:
-        case VerticalThings.I16:
-        case VerticalThings.U16:
-        case VerticalThings.I32:
-        case VerticalThings.U32:
-        case VerticalThings.Identifier:
-        case VerticalThings.IntegerConstant:
-        case VerticalThings.FloatingConstant:
-        case VerticalThings.CharacterConstant:
+        this._errHandler.sync(this);
+        var la_ = this._interp.adaptivePredict(this._input,22,this._ctx);
+        switch(la_) {
+        case 1:
             this.enterOuterAlt(localctx, 1);
             this.state = 283;
             this.expr(0);
             break;
-        case VerticalThings.StringLiteral:
+
+        case 2:
             this.enterOuterAlt(localctx, 2);
             this.state = 284;
             this.match(VerticalThings.StringLiteral);
             break;
-        case VerticalThings.LB:
+
+        case 3:
             this.enterOuterAlt(localctx, 3);
             this.state = 285;
             this.arrayLiteral();
             break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+
         }
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
@@ -5200,7 +5184,7 @@ VerticalThings.prototype.functionCall = function() {
         this.match(VerticalThings.LP);
         this.state = 477;
         _la = this._input.LA(1);
-        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << VerticalThings.TRUE) | (1 << VerticalThings.FALSE) | (1 << VerticalThings.LP) | (1 << VerticalThings.MINUS))) !== 0) || ((((_la - 46)) & ~0x1f) == 0 && ((1 << (_la - 46)) & ((1 << (VerticalThings.LNOT - 46)) | (1 << (VerticalThings.BAND - 46)) | (1 << (VerticalThings.BNOT - 46)) | (1 << (VerticalThings.INT - 46)) | (1 << (VerticalThings.FLOAT - 46)) | (1 << (VerticalThings.BOOLEAN - 46)) | (1 << (VerticalThings.I8 - 46)) | (1 << (VerticalThings.U8 - 46)) | (1 << (VerticalThings.I16 - 46)) | (1 << (VerticalThings.U16 - 46)) | (1 << (VerticalThings.I32 - 46)) | (1 << (VerticalThings.U32 - 46)) | (1 << (VerticalThings.Identifier - 46)) | (1 << (VerticalThings.IntegerConstant - 46)) | (1 << (VerticalThings.FloatingConstant - 46)) | (1 << (VerticalThings.CharacterConstant - 46)) | (1 << (VerticalThings.StringLiteral - 46)))) !== 0)) {
+        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << VerticalThings.TRUE) | (1 << VerticalThings.FALSE) | (1 << VerticalThings.LP) | (1 << VerticalThings.LB) | (1 << VerticalThings.MINUS))) !== 0) || ((((_la - 46)) & ~0x1f) == 0 && ((1 << (_la - 46)) & ((1 << (VerticalThings.LNOT - 46)) | (1 << (VerticalThings.BAND - 46)) | (1 << (VerticalThings.BNOT - 46)) | (1 << (VerticalThings.INT - 46)) | (1 << (VerticalThings.FLOAT - 46)) | (1 << (VerticalThings.BOOLEAN - 46)) | (1 << (VerticalThings.I8 - 46)) | (1 << (VerticalThings.U8 - 46)) | (1 << (VerticalThings.I16 - 46)) | (1 << (VerticalThings.U16 - 46)) | (1 << (VerticalThings.I32 - 46)) | (1 << (VerticalThings.U32 - 46)) | (1 << (VerticalThings.Identifier - 46)) | (1 << (VerticalThings.IntegerConstant - 46)) | (1 << (VerticalThings.FloatingConstant - 46)) | (1 << (VerticalThings.CharacterConstant - 46)) | (1 << (VerticalThings.StringLiteral - 46)))) !== 0)) {
             this.state = 476;
             this.actualParams();
         }
@@ -5295,36 +5279,19 @@ VerticalThings.prototype.actualParam = function() {
 
         }
         this.state = 487;
-        switch(this._input.LA(1)) {
-        case VerticalThings.TRUE:
-        case VerticalThings.FALSE:
-        case VerticalThings.LP:
-        case VerticalThings.MINUS:
-        case VerticalThings.LNOT:
-        case VerticalThings.BAND:
-        case VerticalThings.BNOT:
-        case VerticalThings.INT:
-        case VerticalThings.FLOAT:
-        case VerticalThings.BOOLEAN:
-        case VerticalThings.I8:
-        case VerticalThings.U8:
-        case VerticalThings.I16:
-        case VerticalThings.U16:
-        case VerticalThings.I32:
-        case VerticalThings.U32:
-        case VerticalThings.Identifier:
-        case VerticalThings.IntegerConstant:
-        case VerticalThings.FloatingConstant:
-        case VerticalThings.CharacterConstant:
+        this._errHandler.sync(this);
+        var la_ = this._interp.adaptivePredict(this._input,49,this._ctx);
+        switch(la_) {
+        case 1:
             this.state = 485;
             this.expr(0);
             break;
-        case VerticalThings.StringLiteral:
+
+        case 2:
             this.state = 486;
             this.match(VerticalThings.StringLiteral);
             break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+
         }
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
@@ -5870,8 +5837,8 @@ BasicExprContext.prototype.functionCall = function() {
     return this.getTypedRuleContext(FunctionCallContext,0);
 };
 
-BasicExprContext.prototype.exprConstant = function() {
-    return this.getTypedRuleContext(ExprConstantContext,0);
+BasicExprContext.prototype.literal = function() {
+    return this.getTypedRuleContext(LiteralContext,0);
 };
 
 BasicExprContext.prototype.LP = function() {
@@ -6010,7 +5977,7 @@ VerticalThings.prototype.basicExpr = function(_p) {
 
         case 7:
             this.state = 529;
-            this.exprConstant();
+            this.literal();
             break;
 
         case 8:

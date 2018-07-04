@@ -199,7 +199,7 @@ function getBasicExprAst(expr){
 	var qualIdentifier = expr.qualIdentifier();
 	var arrayExpr = expr.arrayExpr();
 	var functionCall = expr.functionCall();
-	var constant = expr.exprConstant();
+	var literal = expr.literal();
 	var basicSubExpr = expr.basicExpr();
 	var castExpr = expr.castExpr();
 	var addrExpr = expr.addressExpr();
@@ -225,8 +225,8 @@ function getBasicExprAst(expr){
 	if(functionCall){
 		ast = getFunctionCallAst(functionCall);
 	}else
-	if(constant){
-		ast = getExprConstAst(constant);
+	if(literal){
+		ast = astLiteral(literal);
 	}else
 	if(op){
 		ast.op = op;
@@ -397,11 +397,11 @@ function astVarType(varType){
 
 
 function astArrayLiteral(alit){
-    var entries = alit.literal();
+    var entries = alit.expr();
     var ast = [];
 
     for(var i=0;i<entries.length;i++){
-    	ast.push(astLiteral(entries[i]));
+    	ast.push(getExprAst(entries[i]));
     }
     return ast;
 }

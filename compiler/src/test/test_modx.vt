@@ -2,6 +2,8 @@ module test_modx;
 use arduino;
 float[30] buf;
 
+const float[N] bufxxx = {-1.3, 4.5, 3.3};
+
 default flow test_func(){
     int sum;
     pinPeripheral(3,4);
