@@ -90,7 +90,7 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u001a\u001c\u001e \"$&(*,.02468:<>@BDFHJLNPRTVXZ\\^`bdfhjlnpr\u0002",
     "\u000f\u0003\u0002\u0011\u0012\u0003\u0002CD\u0004\u0002\u001b\u001b",
     "\u001d\u001d\u0003\u00029A\u0004\u0002\u000f\u000f9A\u0004\u0002  5",
-    "5\u0004\u00023466\u0003\u000212\u0004\u0002!#%%\u0003\u0002\u001f \u0003",
+    "5\u0003\u000212\u0004\u00023466\u0004\u0002!#%%\u0003\u0002\u001f \u0003",
     "\u0002\',\u0003\u0002./\u0003\u0002DE\u027a\u0002t\u0003\u0002\u0002",
     "\u0002\u0004\u0093\u0003\u0002\u0002\u0002\u0006\u009f\u0003\u0002\u0002",
     "\u0002\b\u00b0\u0003\u0002\u0002\u0002\n\u00bf\u0003\u0002\u0002\u0002",
@@ -5853,6 +5853,14 @@ BasicExprContext.prototype.POW = function() {
     return this.getToken(VerticalThings.POW, 0);
 };
 
+BasicExprContext.prototype.LSHIFT = function() {
+    return this.getToken(VerticalThings.LSHIFT, 0);
+};
+
+BasicExprContext.prototype.RSHIFT = function() {
+    return this.getToken(VerticalThings.RSHIFT, 0);
+};
+
 BasicExprContext.prototype.BAND = function() {
     return this.getToken(VerticalThings.BAND, 0);
 };
@@ -5863,14 +5871,6 @@ BasicExprContext.prototype.BOR = function() {
 
 BasicExprContext.prototype.BXOR = function() {
     return this.getToken(VerticalThings.BXOR, 0);
-};
-
-BasicExprContext.prototype.LSHIFT = function() {
-    return this.getToken(VerticalThings.LSHIFT, 0);
-};
-
-BasicExprContext.prototype.RSHIFT = function() {
-    return this.getToken(VerticalThings.RSHIFT, 0);
 };
 
 BasicExprContext.prototype.CAT = function() {
@@ -6027,7 +6027,7 @@ VerticalThings.prototype.basicExpr = function(_p) {
                     this.state = 540;
                     localctx.op = this._input.LT(1);
                     _la = this._input.LA(1);
-                    if(!(((((_la - 49)) & ~0x1f) == 0 && ((1 << (_la - 49)) & ((1 << (VerticalThings.BAND - 49)) | (1 << (VerticalThings.BOR - 49)) | (1 << (VerticalThings.BXOR - 49)))) !== 0))) {
+                    if(!(_la===VerticalThings.LSHIFT || _la===VerticalThings.RSHIFT)) {
                         localctx.op = this._errHandler.recoverInline(this);
                     }
                     else {
@@ -6047,7 +6047,7 @@ VerticalThings.prototype.basicExpr = function(_p) {
                     this.state = 543;
                     localctx.op = this._input.LT(1);
                     _la = this._input.LA(1);
-                    if(!(_la===VerticalThings.LSHIFT || _la===VerticalThings.RSHIFT)) {
+                    if(!(((((_la - 49)) & ~0x1f) == 0 && ((1 << (_la - 49)) & ((1 << (VerticalThings.BAND - 49)) | (1 << (VerticalThings.BOR - 49)) | (1 << (VerticalThings.BXOR - 49)))) !== 0))) {
                         localctx.op = this._errHandler.recoverInline(this);
                     }
                     else {
