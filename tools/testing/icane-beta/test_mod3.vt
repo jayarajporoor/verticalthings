@@ -1,0 +1,8 @@
+module test_mod3;
+
+int x;
+int[10] ggg;
+default flow process(int[10] val){
+	ggg = 5 * val;
+	x = val * ggg;
+}

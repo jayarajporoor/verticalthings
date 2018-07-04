@@ -1,0 +1,5 @@
+module pipe;
+
+pipeline pipe{
+    mpu_acq_test
+}

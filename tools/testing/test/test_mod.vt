@@ -1,0 +1,11 @@
+module test_mod;
+use arduino;
+float[30] buf;
+default flow test_func(){
+    int[10] A,B;
+    int C;
+    A=0;
+    B=0;
+    C=0;
+    C=(A+B);
+}

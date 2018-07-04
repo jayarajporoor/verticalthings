@@ -1,5 +1,0 @@
-module test_pipe;
-
-pipeline test_pipe{
-    acq_test
-}

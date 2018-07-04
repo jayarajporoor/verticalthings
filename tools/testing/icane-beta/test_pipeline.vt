@@ -1,0 +1,8 @@
+module test_pipeline;
+
+pipeline icane_test {
+	/*acq_test,
+	protonn_test*/
+	test_mod,
+	test_mod2
+};

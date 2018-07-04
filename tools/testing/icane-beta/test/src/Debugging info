@@ -1,0 +1,7 @@
+ERROR1: Normalisation Error
+	DEBUG.println("ERROR:1");
+ERROR2: Featurizing Error
+	DEBUG.println("ERROR:2");
+ERROR3: Mismatch in Bucket length
+	Serial.println("ERROR3: BucketWidth not 20, 
+		not compatible with current ProtoNN Model"); 	
