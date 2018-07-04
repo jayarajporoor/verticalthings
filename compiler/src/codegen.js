@@ -168,16 +168,20 @@ function expr(ast){
 			}
 		}
         if(typeof ast.dim != 'undefined'){
-			if(sym.info.type.dim.is_ring){
-				var sym_pos = symtbl.lookup("__pos_" + id);
-				var size = sym.info.type.dim.dim[0].iconst;	
-				var pos_str = ast_util.get_scoped_name(sym_pos, "_", PVAR);
-				str=str + "[ ( (" + expr(ast.dim.dim[0]) + ") + " + pos_str + ") % " + size + "]";
-			}else{
-	            for(var i in ast.dim.dim){
-	                str=str + "[" + expr(ast.dim.dim[i]) + "]";
-	            }
-        	}
+        	if(!sym){
+        		vtbuild.error("The array symbol ", id, " not found in symbol table.");
+        	}else{
+				if(sym.info.type.dim.is_ring){
+					var sym_pos = symtbl.lookup("__pos_" + id);
+					var size = sym.info.type.dim.dim[0].iconst;	
+					var pos_str = ast_util.get_scoped_name(sym_pos, "_", PVAR);
+					str=str + "[ ( (" + expr(ast.dim.dim[0]) + ") + " + pos_str + ") % " + size + "]";
+				}else{
+		            for(var i in ast.dim.dim){
+		                str=str + "[" + expr(ast.dim.dim[i]) + "]";
+		            }
+	        	}
+        	}	
         }
 	}
 	else if(ast.expr){

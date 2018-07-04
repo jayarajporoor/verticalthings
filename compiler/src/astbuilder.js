@@ -467,18 +467,21 @@ function computeDimensions(ast, val, varid){//varid is only for debug purpose.
 		var dimsize = 0;
 		if(dimval.id){
 			var dimlen = nested_val && nested_val.length;
+			var sym = null;
 			if(!dimlen){
-				var sym = getSymbol(dimval.id);
+				sym = getSymbol(dimval.id);
 				if(sym && sym.info.value && sym.info.value.iconst){
 					dimlen = sym.info.value.iconst;
 				}
 			}
 			//console.log(dimval.id, nested_val.length);
-	  		addSymbol(dimval.id, { type: {primitive: 'int', is_const: true}
-	  			                 , src: ast.src
-	  			                 , value: {iconst: dimlen}
-	  			                 , is_dim: true
-	  			                 } );
+			if(!sym){
+		  		addSymbol(dimval.id, { type: {primitive: 'int', is_const: true}
+		  			                 , src: ast.src
+		  			                 , value: {iconst: dimlen}
+		  			                 , is_dim: true
+		  			                 } );
+	  		}
 	  		delete dimval.id;
 	  		dimval.iconst = dimlen;
 		}
