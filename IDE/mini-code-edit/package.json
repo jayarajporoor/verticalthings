@@ -7,7 +7,6 @@
     "start": "nw"
   },
   "devDependencies": {
-    "nw": "^0.18.2",
     "nw-builder": "^3.1.2"
   },
   "window": {
@@ -21,7 +20,7 @@
     "bootstrap": "^4.1.1",
     "chart.js": "^2.7.2",
     "jquery": "^3.3.1",
-    "nw": "^0.30.2",
+    "nw": "^0.31.4",
     "popper": "^1.0.1",
     "popper.js": "^1.14.3"
   }
