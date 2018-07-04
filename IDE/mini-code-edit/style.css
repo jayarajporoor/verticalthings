@@ -35,8 +35,13 @@ button {
   right: 0;
   background: #262626;
 }
+.errordiv{
+  color:'red';
+}
 #analysis{
   overflow :auto;
+  overflow-x: auto;
+  overflow-y: auto;
   height :200px;
   bottom:0;
   background: #ffffff;

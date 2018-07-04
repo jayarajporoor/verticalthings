@@ -13,7 +13,7 @@ var fs = require("fs");
 var deb= nw.Window.get().showDevTools();
 
 var clipboard = gui.Clipboard.get();
-var compilerObj = require('./../../compiler/src/vtcompiler.js');
+
 //var analyse = require('./../../tools/testing/analyse.js');
 //var config = require('./../../tools/testing/paths.json');
 var modules;
@@ -273,15 +273,16 @@ function createChart()
 function handleCompileButton(){
     var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
     try{
+      console.log(compilerObj);
+      var compilerObj = require('./../../compiler/src/vtcompiler.js');
       var srcPath = tabTextarea[id]["filePath"];
       var configPath = './../../tools/testing/paths.json';
       var analysePath = './../../tools/testing/analyse.js';
-      //res = compilerObj.compile([srcPath,"-config",configPath,"-xast",analysePath]);
-      res = compilerObj.compile([srcPath,"-printalloc"]);
+      res = compilerObj.compile([srcPath,"-config",configPath,"-xast",analysePath]);
+      //res = compilerObj.compile([srcPath,"-printalloc"]);
+      var i=0;
       console.log(res);
-      memory= res.ctx.mem;
-      var w = window.open("memory.html");
-      w.myvariable = memory;
+
 
     }catch(e)
     {
@@ -298,11 +299,14 @@ function handleCompileButton(){
       if(errorlen){
         var errordiv = document.createElement("div");
         errordiv.id="errordiv";
+        errordiv.className="errordiv";
         el.append(errordiv);
+        errordiv.innerHTML+="<text color="+"'red'>Errors:<br>";
         for(i=0;i<errorlen;i++)
         {
-          errordiv.innerHTML +="<br>"+global.vtbuild.errors[i].text;
+          errordiv.innerHTML +=""+global.vtbuild.errors[i].text;
         }
+        errordiv.innerHTML+="</text>";
       }
       if (warnlen){
         var warningdiv =document.createElement("div");
@@ -348,6 +352,14 @@ function initWindowMenu(){
       click:function(){
       var w=window.open('../Charts/timing.html', '_blank');
       w.info=res.ctx.WCET;
+      }
+  }));
+  file.append(new gui.MenuItem({
+      label :'Memory  ',
+      click:function(){
+        memory= res.ctx.mem;
+        var w = window.open("memory.html");
+        w.myvariable = memory;
       }
   }));
   file.append(new gui.MenuItem({
