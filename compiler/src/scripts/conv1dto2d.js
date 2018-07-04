@@ -40,6 +40,8 @@ for(i =0;i<fields.length;i++){
 	}
 }
 
+out += "}";
+
 if(c !== 0){
 	console.log("Matrix ill-formed. The last row has only ", c, "columns.");
 }else{
