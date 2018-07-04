@@ -177,15 +177,15 @@ void _mpu_acq_test_mpu_acq()
 void _normalize_inp_test_init()
 {
     {
-        normalize_inp_test_minAcc[normalize_inp_test_x]=( (-) (16384));
-        normalize_inp_test_minAcc[normalize_inp_test_y]=( (-) (16384));
-        normalize_inp_test_minAcc[normalize_inp_test_z]=( (-) (16384));
+        normalize_inp_test_minAcc[normalize_inp_test_x]=(-16384);
+        normalize_inp_test_minAcc[normalize_inp_test_y]=(-16384);
+        normalize_inp_test_minAcc[normalize_inp_test_z]=(-16384);
         normalize_inp_test_maxAcc[normalize_inp_test_x]=16384;
         normalize_inp_test_maxAcc[normalize_inp_test_y]=16384;
         normalize_inp_test_maxAcc[normalize_inp_test_z]=16384;
-        normalize_inp_test_minGyr[normalize_inp_test_x]=( (-) (512));
-        normalize_inp_test_minGyr[normalize_inp_test_y]=( (-) (2048));
-        normalize_inp_test_minGyr[normalize_inp_test_z]=( (-) (512));
+        normalize_inp_test_minGyr[normalize_inp_test_x]=(-512);
+        normalize_inp_test_minGyr[normalize_inp_test_y]=(-2048);
+        normalize_inp_test_minGyr[normalize_inp_test_z]=(-512);
         normalize_inp_test_maxGyr[normalize_inp_test_x]=512;
         normalize_inp_test_maxGyr[normalize_inp_test_y]=2048;
         normalize_inp_test_maxGyr[normalize_inp_test_z]=512;
@@ -239,8 +239,8 @@ void _tlcfeaturizer_test_featurizer()
             tlcfeaturizer_test_featurizer_featureVector[__i]=0;
             tlcfeaturizer_test_featurizer_featureVectorF[__i]=0;
         }
-        tlcfeaturizer_test_featurizer_featureVector[0]=( (-) (1));
-        tlcfeaturizer_test_featurizer_featureVector[3]=( (-) (1));
+        tlcfeaturizer_test_featurizer_featureVector[0]=(-1);
+        tlcfeaturizer_test_featurizer_featureVector[3]=(-1);
         tlcfeaturizer_test_bucketIndex=4;
         _tlcfeaturizer_test_getBucket(tlcfeaturizer_test_featurizer_normAX, tlcfeaturizer_test_featurizer___pos_normAX, tlcfeaturizer_test_featurizer_featureVector, true);
         _tlcfeaturizer_test_getBucket(tlcfeaturizer_test_featurizer_normAY, tlcfeaturizer_test_featurizer___pos_normAY, tlcfeaturizer_test_featurizer_featureVector, true);

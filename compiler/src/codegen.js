@@ -135,8 +135,14 @@ function expr(ast){
 	}else
 	if(typeof ast.up !== 'undefined'){
 		var exprstr = expr(ast.expr);
-		var up = (ast.up === 'cast') ? ast.type.primitive : ast.up;
-		str = "( (" + up + ") (" + exprstr + ")" + ")";
+		switch(ast.up){
+			case 'cast':
+				str = "( (" + ast.type.primitive + ") (" + exprstr + ")" + ")";			
+			break;
+			default:
+				str = "(" + ast.up + exprstr + ")" ;
+			break;
+		}
 	}
 	else if(id){
 		if(ast.qid && ast.qid.length > 1){
