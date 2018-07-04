@@ -3,74 +3,36 @@ module protonn_test;
 use arduino;
 
 include model;
+include Config;
 
-int scores[6];
+//int scores[10];
 
-default flow predict(float[FEATURE_LENGTH] x, int length){
-	float[ldDim] x_cap,prototype;
-	float[numLabels] y_cap,prototypeLabel;
-	float weight = 0.0; 
-	if(length != featDim)
-		return -1.0;
+
+default flow predict(float[FEATURE_LENGTH] x){
+	float[ldDim] x_cap;
+	float[numLabels] y_cap;
+	float weight = 0.0, maxScore;
+	int maxIndex;
 	y_cap=0.0;
 	// Project x onto ldDim dimension
 	x_cap=x*ldProjectionMatrix;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const float[5][5] ldProjectionMatrix;
-const int N = 20;
-float[N] buf;
-
-
-float gaussian(float[n] x, float[n] y, float gamma){
-	float sumSq;
-	sumSq =  reduce(map(x - y, _ ** 2), sum);
-	sumSq = -1*gamma*gamma*sumSq;
-	sumSq = exp(sumSq);
-	return sumSq;
-}
-
-float rho(float[n] labelScores){
-	return reduce(labelScores, maxIndex); 
-}
-
-
-default flow predict(float[30] x){
-
-	float[10] x_cap;
-	float[10] y_cap;
-	float[10] scores;
-	float[10] weight;
-	
-	pinPeripheral(3,4);
-
-
- 	x_cap = ldProjectionMatrix * x; //denseLDProjection(buf, x_cap);
-
-	y_cap = 0;
-
-	for i in [0,M] { 
-		weight = gaussian(x_cap, prototypeMatrix[i], 1.0);
-		y_cap = y_cap + prototypeLabelMatrix[i] * weight;
+	for i in [0,numPrototypes]{
+		weight=0.0;
+		weight=(x_cap-prototypeMatrix[i]) * (x_cap-prototypeMatrix[i]);
+		weight=-1*gamma*gamma*weight;
+		weight=exp(weight);
+		prototypeLabelMatrix[i]=prototypeLabelMatrix[i]*weight;
+		y_cap=y_cap+prototypeLabelMatrix[i];
 	}
-
-    scores = y_cap * 100000;
-
-//	next(scores, rho(y_cap));
+	//scores=100000*y_cap;
+	maxScore= -FLT_MAX;
+	maxIndex=0;
+	for i in [0,numLabels]{
+		if(y_cap[i] > maxScore){
+			maxIndex=i;
+			maxScore=labelScores[i];
+		}
+	}
+	//next(maxIndex);
 }
+

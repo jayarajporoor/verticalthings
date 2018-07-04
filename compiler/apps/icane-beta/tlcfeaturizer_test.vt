@@ -121,5 +121,5 @@ default flow featurizer(float ring[400] normAX,float ring[400] normAY,float ring
 	getBucket(normGY,true);
 	getBucket(normGZ,false);
 	featureVectorF = featureVector;
-	// next(featureVectorF);
+	next(featureVectorF);
 }
