@@ -121,10 +121,14 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 	var cblock = null;
 	var done = false;
 	var size_saving = 0;
+	if(commit) console.log("MERGE regions");
 	while(!done){
 		if(!tblock){
 			if(tidx < target.length){
 				tblock = target[tidx++];
+				if(!commit){
+					tblock = ast_util.deep_copy(tblock);
+				}				
 			}else{
 				done = true;
 				break;
@@ -133,6 +137,9 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 		if(!cblock){
 			if(cidx < candidate.length){
 				cblock = candidate[cidx++];
+				if(!commit){
+					cblock = ast_util.deep_copy(cblock);
+				}				
 			}else{
 				done = true;
 				break;
@@ -151,7 +158,7 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 				size_saving += cblock.size;
 				cblock = null;
             }else if(cblock.size > tblock.size){
-				cblock.size = cblock.size - tblock.size;
+				cblock.size = cblock.size - tblock.size;	
 				merged_block.size = tblock.size;
 				size_saving += tblock.size;
 				tblock = null;
@@ -280,7 +287,7 @@ exports.transform = function(ast, ctx){
 //	console.log(ltmap);
 	
 	var max_lifetime = init_regions();
-
+	
 	optimize_regions(max_lifetime, default_merge_policy);
 
 	ctx.stdalloc.regions = regions;

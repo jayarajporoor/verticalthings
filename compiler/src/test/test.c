@@ -39,15 +39,15 @@ void _test_mod_temp()
     {
         for(int __i=0; __i<20; __i++)
         {
-            B[__i]=0;
+            test_mod_temp_B[__i]=0;
         }
         test_mod_temp_C=0;
         __t2=0;
         for(int __i=0; __i<20; __i++)
         {
             test_mod_temp_A[__i]=0;
-            __t0=(B[__i]+test_mod_temp_A[__i]);
-            __t1=(B[__i]+test_mod_temp_A[__i]);
+            __t0=(test_mod_temp_B[__i]+test_mod_temp_A[__i]);
+            __t1=(test_mod_temp_B[__i]+test_mod_temp_A[__i]);
             __t2=((__t0*__t1)+__t2);
         }
         test_mod_temp_C=__t2;
