@@ -6,7 +6,7 @@ var currentx=0,currenty=0;
 
 var jsonRectangles = [
     ];
-var colors = ["#ccffcc","#ccccff","#00ffcc","#ffccff","#ffcccc","#99ccff"];
+var colors=["rgb(100,100,100,0.15)","rgb(20,20,20,0.1)","rgb(100,200,50,0.15)","rgb(200,100,250,0.2)","rgb(100,100,23,0.1)","rgb(200,100,30,0.1)","rgb(200,200,200,0.15)","rgb(150,150,100,0.1)","rgb(10,20,100,0.2)"];
 
 for(i=0;i<size;i++)
 {
@@ -55,6 +55,19 @@ for (var i = 0; i < jsonRectangles.length; i++) {
     if ( temp_y >= max_y ) { max_y = temp_y; }
 }
 
+var digits=max_x.toString().length;
+console.log(digits);
+
+var xscale;
+console.log(digits);
+if(digits==4)
+{
+  xscale=10000;
+}else if(digits ==7) {
+  xscale=1;
+}
+xscale=parseInt(xscale);
+
 var svgContainer = d3.select("body").append("svg")
                                     .attr("width", max_x+1000)
                                     .attr("height", max_y+1000);
@@ -87,6 +100,7 @@ var rectangles = xAxisGroup.selectAll("rect")
                            .style("fill", function(d) { return d.color; })
                            .attr("y",function(d) { return (d.y_axis); })
                            .attr("height", function (d) { return d.height; });
+                           //.attr("transform","scale("+1/xscale+")");
 
  var rectangleText =xAxisGroup.selectAll("textRect")
                                .data(jsonRectangles)
