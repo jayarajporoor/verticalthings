@@ -356,7 +356,7 @@ function fdef(ast,strbuf){
 			strglobals.push(def);
 			def = "#define " + scoped_name + " (*" + scoped_name_p +")";
 			strglobals.push(def);
-			if(param.type.dim.is_ring){
+			if(param.type.dim && param.type.dim.is_ring){
 				var def_ringpos = "int " + get_current_scoped_name("__pos_" + param.id, PVAR) + ";";		
 				strglobals.push(def_ringpos);
 			}			
