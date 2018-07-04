@@ -1,6 +1,6 @@
 {
     "build":{
-        "arduino":"/home/arduino/.arduino15",
+        "arduino":"/home/pvsuryachaitanya/.arduino15",
         "objdump":"arm-linux-gnueabi-objdump"
     }
 }
