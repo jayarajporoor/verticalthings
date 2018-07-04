@@ -266,6 +266,8 @@ exports.transform = function(ast, ctx){
 	}
 
 	compute_ltmap(ctx.duseq);
+
+	ctx.stdalloc = {full_ltmap: full_ltmap, ltmap: ltmap};
 	
 //	console.log(full_ltmap);
 //	console.log(ltmap);

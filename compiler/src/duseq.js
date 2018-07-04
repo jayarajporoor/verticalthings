@@ -332,7 +332,6 @@ class DUSeq{
   }
 
   fdef(ast, seq){
-
     if(ast.vars){
       this.vardefs(ast.vars, seq);
     }
