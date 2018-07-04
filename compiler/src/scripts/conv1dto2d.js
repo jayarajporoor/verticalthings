@@ -5,7 +5,7 @@ var srcpath = process.argv[2];
 var outpath = process.argv[3];
 var cols = parseInt(process.argv[3]);
 
-var text = fs.readFileSync(srcpath);
+var text = fs.readFileSync(srcpath, 'utf8');
 
 var lines = text.split('\n');
 
