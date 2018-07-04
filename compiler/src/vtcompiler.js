@@ -79,7 +79,9 @@ function loadInclude(name, basepath, symtbl){
 		return vtbuild.error("Cannot load module ", name, ". File cannot be accessed: ", filepath);
 	}
 	var tree = parse(filepath, src);
-	return astBuilder.buildAst(tree, symtbl);
+	var mod_ast = {};
+	astBuilder.buildAst(tree, mod_ast, symtbl);
+	return mod_ast;
 }
 
 function loadModule(ast, name, basepath, symtbl){
@@ -97,10 +99,13 @@ function loadModule(ast, name, basepath, symtbl){
 	}
 	var tree = parse(filepath, src);
 	symtbl.createNestedScope(name);
-	var mod_ast = astBuilder.buildAst(tree, symtbl);
+	
+	var mod_ast = {fdefs:[], vars:[]};
 
-	for(var j=0;j<mod_ast.includes.length;j++){
-		var inc_ast = loadInclude(mod_ast.includes[j].name, basepath, symtbl);
+	var includes = astBuilder.getIncludes(tree, symtbl);
+
+	for(var j=0;j<includes.length;j++){
+		var inc_ast = loadInclude(includes[j].name, basepath, symtbl);
 		for(k=0;k<inc_ast.fdefs.length;k++){
 			mod_ast.fdefs.push(inc_ast.fdefs[k]);
 		}
@@ -108,6 +113,9 @@ function loadModule(ast, name, basepath, symtbl){
 			mod_ast.vars.push(inc_ast.vars[k]);
 		}		
 	}
+
+	astBuilder.buildAst(tree, mod_ast, symtbl);
+
 	symtbl.exitNestedScope();
 	mod_ast.srcpath = filepath;
 	if(mod_ast.name !== name){
