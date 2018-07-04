@@ -1,0 +1,45 @@
+module protonn_test;
+
+use arduino;
+
+const float[5][5] ldProjectionMatrix;
+const int N = 20;
+float[N] buf;
+
+
+float gaussian(float[n] x, float[n] y, float gamma){
+	float sumSq;
+	sumSq =  reduce(map(x - y, _ ** 2), sum);
+	sumSq = -1*gamma*gamma*sumSq;
+	sumSq = exp(sumSq);
+	return sumSq;
+}
+
+float rho(float[n] labelScores){
+	return reduce(labelScores, maxIndex); 
+}
+
+
+default flow predict(float[30] x){
+
+	float[10] x_cap;
+	float[10] y_cap;
+	float[10] scores;
+	float[10] weight;
+	
+	pinPeripheral(3,4);
+
+
+ 	x_cap = ldProjectionMatrix * x; //denseLDProjection(buf, x_cap);
+
+	y_cap = 0;
+
+	for i in [0,M] { 
+		weight = gaussian(x_cap, prototypeMatrix[i], 1.0);
+		y_cap = y_cap + prototypeLabelMatrix[i] * weight;
+	}
+
+    scores = y_cap * 100000;
+
+//	next(scores, rho(y_cap));
+}

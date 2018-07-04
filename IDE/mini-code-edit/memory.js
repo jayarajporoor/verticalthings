@@ -15,7 +15,7 @@ for(i=0;i<size;i++)
     obj.x_axis=array[i].lifetime.start*100;
     obj.y_axis=array[i].loc;
     obj.height=array[i].sym.info.size;
-    obj.width=(array[i].lifetime.end-array[i].lifetime.start)*100 + 20 ;
+    obj.width=(array[i].lifetime.end-array[i].lifetime.start)*100+ 20 ;
     obj.color=colors[(i+1)%6];
     obj.name=array[i].sym.name;
     console.log(obj);
@@ -41,6 +41,16 @@ for (var i = 0; i < jsonRectangles.length; i++) {
 var svgContainer = d3.select("body").append("svg")
                                     .attr("width", max_x+1000)
                                     .attr("height", max_y+1000);
+svgContainer.append('text')
+              .attr("transform","translate(130,400) rotate(-90) ")
+              .attr("dy","1em")
+              .style("text-anchor","middle")
+              .text("memory-address");
+svgContainer.append('text')
+              .attr("transform","translate(400,110)")
+              .attr("dy","1em")
+              .style("text-anchor","middle")
+              .text("pipeline-execution");
 
 var axisScale = d3.scaleLinear()
                         .domain([0,max_x])
@@ -49,12 +59,12 @@ var yaxisScale = d3.scaleLinear()
                         .domain([0,max_y])
                         .range([0,(max_y)]);
 var xAxisGroup = svgContainer.append("g")
-                              .style("font","8px times")
-                              .attr("transform","translate(200,160) scale(2,3)")
+                              .style("font","14px times")
+                              .attr("transform","translate(200,160) ")
                               .attr("id","x-group")
                               .call(d3.axisTop(axisScale));
 var yAxisGroup  =svgContainer.append("g")
-                              .attr("transform","translate(200,160) scale(2,3)")
+                              .attr("transform","translate(200,160) ")
                               .call(d3.axisLeft(yaxisScale));
 
 

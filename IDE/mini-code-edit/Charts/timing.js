@@ -10,19 +10,35 @@ var colors = ["#ccffcc","#ccccff","#00ffcc","#ffccff","#ffcccc","#99ccff"];
 
 for(i=0;i<size;i++)
 {
-    var obj={};
-    obj.x_axis=currentx;
-    currentx=currentx+parseInt(modules[i].time)/10000;
-    obj.y_axis=currenty;
-    currenty+=30;
-    obj.height=30;
-    obj.width=parseInt(modules[i].time)/100000;
-    obj.color=colors[(i+1)%6];
-    obj.name=modules[i].name[0];
+    var obj = {};
+    obj.x_axis = currentx;
+    currentx = currentx+parseInt(modules[i].time)/100000;
+    obj.y_axis = currenty;
+    currenty += 30;
+    obj.height = 30;
+    obj.width = parseInt(modules[i].time)/100000;
+    obj.color = colors[(i+1)%6];
+    obj.name = modules[i].name[0];
     console.log(obj);
     jsonRectangles.push(obj);
 }
 console.log(jsonRectangles);
+if(jsonRectangles.length<5)
+{
+    for(i=0;i<5-jsonRectangles.length;i++)
+    {
+        var obj ={};
+        obj.x_axis= currentx;
+        currentx += 50;
+        obj.y_axis = currenty;
+        currenty += 30;
+        obj.height  =30;
+        obj.width = 50;
+        obj.color = "#ffffff";
+        obj.name = "";
+        jsonRectangles.push(obj);
+    }
+}
 
 
 

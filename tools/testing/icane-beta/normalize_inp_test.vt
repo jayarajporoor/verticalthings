@@ -1,0 +1,47 @@
+module normalize_inp_test;
+
+include Config;
+
+float ring[400] normAX, normAY, normAZ, normGX, normGY, normGZ;
+const int x=0, y=1, z=2;
+
+int16_t[3] minAcc, maxAcc, minGyr, maxGyr;
+
+void init(){
+	minAcc[x]= -16384; minAcc[y]= -16384; minAcc[z]= -16384;
+	maxAcc[x]=16384; maxAcc[y]=16384; maxAcc[z]=16384;
+	minGyr[x]= -512; minGyr[y]= -2048; minGyr[z]= -512;
+	maxGyr[x]=512; maxGyr[y]=2048; maxGyr[z]=512;
+}
+
+void minMaxNormalize(const int16_t[3] v, const int16_t[3] vmin, const int16_t[3] vmax, float[3] dst){
+	dst[x] = float(v[x]) - float(vmin[x]);
+	dst[x] = dst[x]/(float(vmax[x]) - float(vmin[x]));
+	dst[y] = float(v[y]) - float(vmin[y]);
+	dst[y] = dst[y]/(float(vmax[y]) - float(vmin[y]));
+	dst[z] = float(v[z]) - float(vmin[z]);
+	dst[z] = dst[z]/(float(vmax[z]) - float(vmin[z]));		
+}
+
+default flow normalize(int16_t[3] acc, int16_t[3] gyr, int16_t numNewReadings, int32_t samplesAfterReset){
+	float[3] normAcc, normGyr;
+	minMaxNormalize(acc,minAcc,maxAcc,normAcc);
+	minMaxNormalize(gyr,minGyr,maxGyr,normGyr);
+	normAX.push(normAcc[x]);
+	normAY.push(normAcc[y]);
+	normAZ.push(normAcc[z]);
+	normGX.push(normGyr[x]);
+	normGY.push(normGyr[y]);
+	normGZ.push(normGyr[z]);
+	numNewReadings = numNewReadings + 1;
+	samplesAfterReset = samplesAfterReset + 1;
+	if(samplesAfterReset < 250){
+		if(numNewReadings == STRIDE){
+			numNewReadings = 0;
+		}
+	}
+	else if(numNewReadings == STRIDE){
+		samplesAfterReset = 401;
+		next(normAX, normAY, normAZ, normGX, normGY, normGZ);
+	}
+}

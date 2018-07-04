@@ -1,0 +1,16 @@
+module test_mod2;
+
+use arduino;
+
+int[10] factors;
+
+int compute(int[10] val, int scale){
+	int result;
+	result = val * factors + scale; 
+	return result;
+}
+
+default flow process(int[10] data){
+    const int x = 3;
+    compute(data, x);
+}

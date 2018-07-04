@@ -187,6 +187,7 @@ function handleNewTab()
         "'{'": function(cm) { cm.bracketComplete(cm, '{'); },
         "'('": function(cm) { cm.bracketComplete(cm, '('); },
         "'['": function(cm) { cm.bracketComplete(cm, '['); },
+        "Ctrl-O":function(instance) {handleOpenButton()},
         "Ctrl-N": function(instance) {handleNewTab()},
         "Ctrl-Space": "autocomplete"
       }
@@ -275,7 +276,8 @@ function handleCompileButton(){
       var srcPath = tabTextarea[id]["filePath"];
       var configPath = './../../tools/testing/paths.json';
       var analysePath = './../../tools/testing/analyse.js';
-      res = compilerObj.compile([srcPath,"-config",configPath,"-xast",analysePath]);
+      //res = compilerObj.compile([srcPath,"-config",configPath,"-xast",analysePath]);
+      res = compilerObj.compile([srcPath,"-printalloc"]);
       console.log(res);
       memory= res.ctx.mem;
       var w = window.open("memory.html");
@@ -480,6 +482,7 @@ onload = function() {
 				"'('": function(cm) { cm.bracketComplete(cm, '('); },
         "'['": function(cm) { cm.bracketComplete(cm, '['); },
         "Ctrl-N": function(instance) {handleNewTab()},
+        "Ctrl-O": function(instance) {handleOpenButton()},
         "Ctrl-Space": "autocomplete"
 
       }
