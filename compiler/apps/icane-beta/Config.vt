@@ -1,0 +1,16 @@
+module Config;
+const int16_t BAUD_RATE=115200;
+const int16_t NUM_BUCKETS=20;
+const int16_t STRIDE=20;
+const int16_t BUCKET_WIDTH=20;
+const int16_t BUCKET_BUFF_WIDTH=(2 * BUCKET_WIDTH);
+const int16_t FEATURE_LENGTH=(6 * BUCKET_WIDTH + 4);
+const int16_t FEAT_VEC_DIM=((6 * NUM_BUCKETS) + 4);
+const int16_t GEST_NOTA=0;
+const int16_t GEST_SILENCE=1;
+const int16_t GEST_TAP=2;
+const int16_t GEST_DTAP=3;
+const int16_t GEST_LTWIST=4;
+const int16_t GEST_RTWIST=5;
+const int16_t GEST_Slow_LTWIST=7;
+const int16_t GEST_Slow_RTWIST=8;

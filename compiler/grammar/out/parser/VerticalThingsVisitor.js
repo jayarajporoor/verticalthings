@@ -117,11 +117,6 @@ VerticalThingsVisitor.prototype.visitVarDef = function(ctx) {
 };
 
 
-// Visit a parse tree produced by VerticalThings#dimExpr.
-VerticalThingsVisitor.prototype.visitDimExpr = function(ctx) {
-};
-
-
 // Visit a parse tree produced by VerticalThings#dimValue.
 VerticalThingsVisitor.prototype.visitDimValue = function(ctx) {
 };
@@ -249,6 +244,11 @@ VerticalThingsVisitor.prototype.visitActualParam = function(ctx) {
 
 // Visit a parse tree produced by VerticalThings#actualParams.
 VerticalThingsVisitor.prototype.visitActualParams = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#dimensionExpr.
+VerticalThingsVisitor.prototype.visitDimensionExpr = function(ctx) {
 };
 
 

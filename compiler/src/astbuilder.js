@@ -85,14 +85,6 @@ function astIntVal(val){
 	return ast;
 }
 
-function getDimExpr(dexpr){
-	//dimExpr : intVal op=(PLUS|MUL) intVal;
-	var ast = {src: src_info(dexpr)};
-	ast.op = dexpr.op.text;
-	var intVal = dexpr.intVal();
-	ast.vals = [astIntVal(intVal[0]), astIntVal(intVal[1])];
-	return ast;
-}
 
 function getDimensionSpec(dimSpec){
 	var dim = [];
@@ -104,9 +96,6 @@ function getDimensionSpec(dimSpec){
 		}else
 		if(dimValue[i].Identifier()){
 			dimval.id = getId(dimValue[i]);
-		}else
-		if(dimValue[i].dimExpr()){
-			dimval.expr = getDimExpr(dimValue[i].dimExpr());
 		}
 		dim.push(dimval);
 	}
@@ -163,10 +152,19 @@ function getFunctionCallAst(fcall){
 	return {fcall: ast, src: src_info(fcall)};
 }
 
+function astDimensionExpr(dimexpr){
+	var dim = [];
+	var exprs = dimexpr.expr();
+	for(var i=0;i<exprs.length;i++){
+		dim.push(getExprAst(exprs[i]));
+	}
+	return {dim: dim};
+}
+
 function astArrayExpr(expr){
 	var ast = {
 		id: getId(expr),
-		dim: getDimensionSpec(expr.dimensionSpec()),
+		dim: astDimensionExpr(expr.dimensionExpr()),
 		src: src_info(expr)
 	};
 	return ast;
@@ -537,7 +535,13 @@ function astFormalParam(param){
 		id: getId(param),
 		src: src_info(param)		
 	};
-	addSymbol(ast.id, {type: ast.type, is_const: ast.is_const, src: ast.src, is_formal_param: true} );	
+	addSymbol(ast.id, {type: ast.type, is_const: ast.is_const, src: ast.src, is_formal_param: true, src: ast.src} );	
+
+	if(ast.type.dim && ast.type.dim.is_ring){
+		var sym_ringpos = {type: {primitive: 'int'}, is_const: ast.is_const, is_formal_param: true, src: ast.src};
+		addSymbol("__pos_" + ast.id, sym_ringpos);
+	}
+
 	return ast;
 }
 
@@ -552,9 +556,9 @@ function astAssignStmt(stmt){
 	if(ast.qid.length === 1){
 		ast.id = ast.qid[0];
 	}
-	var dimSpec = stmt.dimensionSpec();
-	if(dimSpec){
-		ast.dim = getDimensionSpec(dimSpec);
+	var dimExpr = stmt.dimensionExpr();
+	if(dimExpr){
+		ast.dim = astDimensionExpr(dimExpr);
 	}	
 	return ast;
 }

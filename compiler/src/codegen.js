@@ -75,8 +75,18 @@ function fcall(ast){
 		}
 		str = str + name +"(";
 		for(var i=0;i<ast.params.length;i++){
+			var param = ast.params[i];
 			if(i > 0) str += ", ";
-			str = str + expr(ast.params[i].expr);
+			var param_str = expr(param);
+			str = str + param_str;
+			var paramid = param.expr.id || (param.expr.qid && param.expr.qid[0]);
+			var param_sym = paramid && symtbl.lookup(paramid);
+			if(param_sym && param_sym.info.type.dim && param_sym.info.type.dim.is_ring){
+				var sym = symtbl.lookup("__pos_" + paramid);
+				if(sym){
+					str = str + ", " + ast_util.get_scoped_name(sym, "_", PVAR);
+				}
+			}
 		}
 		str += ")";
 	}
@@ -87,16 +97,25 @@ function fcall(ast){
 		next_state = pipeline_states[next_state];
 		var flow_params = next_state.flowdef.params;
 		for(var i=0;i<ast.params.length;i++){
+			var param = ast.params[i];
 			var flow_param = flow_params[i];
 			if(flow_param){
 				var scoped_param_name = PVAR + next_state.qname + "_" + flow_param.id;				
-				var expr_str = expr(ast.params[i].expr);
+				var expr_str = expr(param);
 				if(flow_param.type.dim){//array param
 					expr_str = "&(" + expr_str + ")";//assign address.
 					scoped_param_name = scoped_param_name + SPTR;
 				}
 				var param_assign = scoped_param_name + " = " + expr_str + "; ";
 				str += param_assign;
+				if(flow_param.type.dim && flow_param.type.dim.is_ring){
+					var scoped_pos_param_name = PVAR + next_state.qname + "_" + "__pos_" + flow_param.id;
+					var param_id = param.expr.id || (param.expr.qid && param.expr.qid[0]);
+					var sym = symtbl.lookup("__pos_" + param_id);
+					if(sym){
+						str = str + scoped_pos_param_name + " = " + ast_util.get_scoped_name(sym, "_", PVAR) + ";";
+					}					
+				}				
 			}else{
 				vtbuild.error("Flow param mismatch for ", next_state.name, ". flow from ", scoped_name);
 			}
@@ -117,7 +136,7 @@ function expr(ast){
 	if(typeof ast.up !== 'undefined'){
 		var exprstr = expr(ast.expr);
 		var up = (ast.up === 'cast') ? ast.type.primitive : ast.up;
-		str = "(" + up + "(" + exprstr + ")" + ")";
+		str = "( (" + up + ") (" + exprstr + ")" + ")";
 	}
 	else if(id){
 		if(ast.qid && ast.qid.length > 1){
@@ -154,6 +173,9 @@ function expr(ast){
         	}
         }
 	}
+	else if(ast.expr){
+		str = expr(ast.expr);
+	}	
 	else if(typeof ast.iconst != 'undefined'){
 		str = ast.iconst;
 	}
@@ -200,7 +222,7 @@ function stmt(ast,strbuf){
 			stmt(ast.if_body,strbuf);
 			if(typeof ast.else_body !='undefined'){
 				strbuf.push("else");
-				stmt(ast.else_body,strbuf)
+				stmt(ast.else_body, strbuf);
 			}
 			break;
 		case "for":
@@ -246,7 +268,7 @@ function stringify_type(ast){
 			dim=dim+"["+expr(ast.dim.dim[i])+"]";
 		}
 	}	
-	var astr = {base: base, dim: dim};
+	var astr = {base: base, dim: dim, is_ring: ast.dim && ast.dim.is_ring};
 
 	return astr;
 }
@@ -305,6 +327,11 @@ function fparam(ast){
 		s = s + "=" + expr(ast.init);	
 	}
 
+	if(type.is_ring){
+		var str_ringpos = "int " + get_current_scoped_name("__pos_" + ast.id, PVAR);		
+		s = s + ", " + str_ringpos;		
+	}
+
 	return s;
 }
 
@@ -329,6 +356,10 @@ function fdef(ast,strbuf){
 			strglobals.push(def);
 			def = "#define " + scoped_name + " (*" + scoped_name_p +")";
 			strglobals.push(def);
+			if(param.type.dim.is_ring){
+				var def_ringpos = "int " + get_current_scoped_name("__pos_" + param.id, PVAR) + ";";		
+				strglobals.push(def_ringpos);
+			}			
 		}
 
 	}else{

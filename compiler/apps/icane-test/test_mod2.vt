@@ -4,7 +4,9 @@ use arduino;
 
 int16_t[10] factors;
 
-int compute(int[10] val, int scale){
+int ring[10] rdata;
+
+int compute(int ring[10] val, int scale){
 	int result;
 	float fresult;
 	fresult = float(result);
@@ -12,7 +14,13 @@ int compute(int[10] val, int scale){
 	return result;
 }
 
-default flow process(int[10] data){
+int compute2(int ring[10] value){
+	value.push(10);
+	value[0] = 1;	
+}
+
+default flow process(int ring[10] data){
     const int x = 3;
     compute(data, x);
+    compute2(rdata);
 }

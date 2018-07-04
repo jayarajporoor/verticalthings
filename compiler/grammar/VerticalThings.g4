@@ -15,7 +15,7 @@ effectStmt: effectTarget (COMMA effectCtx)* EASSIGN effectSpec (COMMA effectSpec
 
 effectTarget: qualIdentifier LP (effectParam (COMMA effectParam)*)? RP;
 
-effectParam: ADDRESSOF? Identifier;
+effectParam: BAND? Identifier;
 
 effectCtx: Identifier COLON Identifier;
 
@@ -65,9 +65,7 @@ varDef
     :  CONST? varType varIdDef (COMMA varIdDef)* SEMI
     ;
 
-dimExpr : intVal op=(PLUS|MUL) intVal;
-
-dimValue: (IntegerConstant|Identifier|dimExpr);
+dimValue: (IntegerConstant|Identifier);
 
 dimensionSpec
     : RING? (LS dimValue RS)+
@@ -131,7 +129,7 @@ whileStmt
     ;
 
 assignStmt  
-    : qualIdentifier dimensionSpec? ASSIGN expr
+    : qualIdentifier dimensionExpr? ASSIGN expr
     ;
 
 returnStmt: RETURN expr;
@@ -166,8 +164,11 @@ actualParams
 	;
 
 
-arrayExpr: Identifier dimensionSpec;
+dimensionExpr
+    : (LS expr RS)+
+    ;
 
+arrayExpr: Identifier dimensionExpr;
 
 addressExpr: BAND (arrayExpr | qualIdentifier);
 

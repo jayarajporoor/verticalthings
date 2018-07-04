@@ -50,6 +50,9 @@ function resolve_matrix_expr(ast, symtbl){
 		return null;
 	}
 	var sym = symtbl.lookup(id);
+	if(!sym){
+		return null;
+	}
 	var sym_dim = sym.info.type.dim;
 	if(!sym_dim){
 		return null;
