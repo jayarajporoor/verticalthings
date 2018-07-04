@@ -93,8 +93,12 @@ function init_regions(){
 			var block = {lt_start: ltentry.start, lt_end: ltentry.end, size: ltentry.sym.info.size, lt_available: false,
 									owners: [{sym: ltentry.sym}] };
 			if(!block.size){
-				console.log("LT entry with unknown size ", id, " cannot be automatically allocated.");
-			}else{
+				vtbuild.error("LT entry with unknown size ", id, " cannot be automatically allocated.");
+			}else
+			if(isNaN(block.size)){
+				vtbuild.error("LT entry with malformed size ", id, " cannot be automatically allocated.");
+			}
+			else{
 				regions.push({blocks: [block], size: block.size});
 				if(block.lt_end > max_lifetime){
 					max_lifetime = block.lt_end;
@@ -248,6 +252,9 @@ function allocate_addresses(max_lifetime){
 
 		if(sym.info.type.is_const){
 			continue;//ignore constants.
+		}
+		if(isNaN(sym.info.size)){
+			vtbuild.error("LT entry (full LT) with malformed size ", sym.name, " cannot be automatically allocated.");
 		}
 
 		var sym_alloc = {sym: sym, loc: next_loc, lifetime: {full: true, start: 0, end: max_lifetime}};
