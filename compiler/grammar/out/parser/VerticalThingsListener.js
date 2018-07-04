@@ -200,15 +200,6 @@ VerticalThingsListener.prototype.exitVarDef = function(ctx) {
 };
 
 
-// Enter a parse tree produced by VerticalThings#dimExpr.
-VerticalThingsListener.prototype.enterDimExpr = function(ctx) {
-};
-
-// Exit a parse tree produced by VerticalThings#dimExpr.
-VerticalThingsListener.prototype.exitDimExpr = function(ctx) {
-};
-
-
 // Enter a parse tree produced by VerticalThings#dimValue.
 VerticalThingsListener.prototype.enterDimValue = function(ctx) {
 };
@@ -440,6 +431,15 @@ VerticalThingsListener.prototype.enterActualParams = function(ctx) {
 
 // Exit a parse tree produced by VerticalThings#actualParams.
 VerticalThingsListener.prototype.exitActualParams = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#dimensionExpr.
+VerticalThingsListener.prototype.enterDimensionExpr = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#dimensionExpr.
+VerticalThingsListener.prototype.exitDimensionExpr = function(ctx) {
 };
 
 

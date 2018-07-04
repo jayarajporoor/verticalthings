@@ -72,7 +72,6 @@ Whitespace=71
 Newline=72
 BlockComment=73
 LineComment=74
-ADDRESSOF=75
 'module'=1
 'pipeline'=2
 'flow'=3
