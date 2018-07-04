@@ -177,14 +177,11 @@ function expr(ast){
         	if(!sym){
         		vtbuild.error("The array symbol ", id, " not found in symbol table.");
         	}else{
-				if(sym.info.type.dim.is_ring){
-					var resolv = ast_util.resolve_matrix_expr_by_sym(ast, sym);
-					if(resolv.dim.length > 0){
-						var sym_pos = symtbl.lookup("__pos_" + id);
-						var size = sym.info.type.dim.dim[0].iconst;	
-						var pos_str = ast_util.get_scoped_name(sym_pos, "_", PVAR);
-						str=str + "[ ( (" + expr(ast.dim.dim[0]) + ") + " + pos_str + ") % " + size + "]";
-					}
+				if(sym.info.type.dim.is_ring){//we only support 1D ring buffer for now.
+					var sym_pos = symtbl.lookup("__pos_" + id);
+					var size = sym.info.type.dim.dim[0].iconst;	
+					var pos_str = ast_util.get_scoped_name(sym_pos, "_", PVAR);
+					str=str + "[ ( (" + expr(ast.dim.dim[0]) + ") + " + pos_str + ") % " + size + "]";
 				}else{
 		            for(var i in ast.dim.dim){
 		                str=str + "[" + expr(ast.dim.dim[i]) + "]";
