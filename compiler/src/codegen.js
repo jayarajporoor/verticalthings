@@ -116,7 +116,7 @@ function fcall(ast){
 					var param_id = param.expr.id || (param.expr.qid && param.expr.qid[0]);
 					var sym = symtbl.lookup("__pos_" + param_id);
 					if(sym){
-						var resolv = ast_util.resolve_matrix_expr_by_sym(param.expr, sym);
+						var resolv = ast_util.resolve_matrix_expr(param.expr, symtbl);
 						if(resolv.dim.length > 0){					
 							str = str + scoped_pos_param_name + " = " + ast_util.get_scoped_name(sym, "_", PVAR) + ";";
 						}
