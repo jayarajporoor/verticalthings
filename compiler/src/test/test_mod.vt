@@ -15,10 +15,11 @@ default flow test_func(){
 
 void temp(){
     int sum1;
-    int[20][20] A;
-    int[20][20] B;
-    int[20][20] C;
+    int[20] A;
+    int[20] B;
+    int C;
     B = 0;
     C= 0;
-    C = A*B;
+    A = 0;
+    C = (B + A)*(B+A);
 }

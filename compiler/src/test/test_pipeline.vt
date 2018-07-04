@@ -2,5 +2,5 @@
 module test_pipeline;
 
 pipeline test_pipeline{
-	test_modx
+	test_mod
 }
