@@ -1,6 +1,8 @@
 const assert = require('assert');
 const ast_util = require("./ast_util.js");
 
+const alignment = 4;
+
 var ltmap ={};
 var full_ltmap = {};
 var regions = [];
@@ -92,6 +94,7 @@ function init_regions(){
 			if(!block.size){
 				console.log("LT entry with unknown size ", id, " cannot be automatically allocated.");
 			}else{
+				block.size = (block.size / alignment + 1)*alignment;
 				regions.push({blocks: [block], size: block.size});
 				if(block.lt_end > max_lifetime){
 					max_lifetime = block.lt_end;
