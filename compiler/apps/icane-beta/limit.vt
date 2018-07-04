@@ -1,0 +1,3 @@
+module limit;
+
+const float FLT_MAX=3.402823e+38;
