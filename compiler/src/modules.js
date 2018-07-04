@@ -1,7 +1,7 @@
 module.exports = [
 	__dirname + "/vtcompiler.js"
 ,	__dirname + "/astbuilder.js"
-, 	__dirname + "/ast_utils.js"
+, 	__dirname + "/ast_util.js"
 , 	__dirname + "/stdalloc.js"
 , 	__dirname + "/pseq.js"
 , 	__dirname + "/duseq.js"
