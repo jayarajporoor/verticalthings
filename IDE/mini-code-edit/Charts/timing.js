@@ -1,9 +1,8 @@
 var deb= nw.Window.get().showDevTools();
-var memory = window.myvariable;
-var size= memory.alloc.length;
-var array=memory.alloc;
+var modules = window.info;
+var size = modules.length;
 var i,j;
-
+var currentx=0,currenty=0;
 
 var jsonRectangles = [
     ];
@@ -12,12 +11,14 @@ var colors = ["#ccffcc","#ccccff","#00ffcc","#ffccff","#ffcccc","#99ccff"];
 for(i=0;i<size;i++)
 {
     var obj={};
-    obj.x_axis=array[i].lifetime.start*100;
-    obj.y_axis=array[i].loc;
-    obj.height=array[i].sym.info.size;
-    obj.width=(array[i].lifetime.end-array[i].lifetime.start)*100 + 20 ;
+    obj.x_axis=currentx;
+    currentx=currentx+parseInt(modules[i].time)/10000;
+    obj.y_axis=currenty;
+    currenty+=30;
+    obj.height=30;
+    obj.width=parseInt(modules[i].time)/100000;
     obj.color=colors[(i+1)%6];
-    obj.name=array[i].sym.name;
+    obj.name=modules[i].name[0];
     console.log(obj);
     jsonRectangles.push(obj);
 }

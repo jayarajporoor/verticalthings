@@ -155,7 +155,8 @@
         $(this).html(name+'<button class="close" type="button" title="Remove this page">×</button>');
 				document.getElementById("title").innerHTML = name;
 				$('#tab-list').removeClass("active");
-				$(this).parents('li').tab('show');
+				console.log(this);
+				console.log($(this).parents('li').tab('show'));
 		});
 		$('.nav-tabs').on('shown.bs.tab', function (e) {
 			e.target;
