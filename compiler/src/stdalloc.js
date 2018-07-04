@@ -89,12 +89,12 @@ function init_regions(){
 		//initially create separate region for each object.
 		var ltentry = ltmap[id];
 		if(typeof ltentry.start !== 'undefined'){
+			ltentry.sym.info.size = Math.ceil(ltentry.sym.info.size/alignment);//allocate in words.
 			var block = {lt_start: ltentry.start, lt_end: ltentry.end, size: ltentry.sym.info.size, lt_available: false,
 									owners: [{sym: ltentry.sym}] };
 			if(!block.size){
 				console.log("LT entry with unknown size ", id, " cannot be automatically allocated.");
 			}else{
-				block.size = Math.ceil(block.size / alignment)*alignment;
 				regions.push({blocks: [block], size: block.size});
 				if(block.lt_end > max_lifetime){
 					max_lifetime = block.lt_end;
@@ -250,9 +250,9 @@ function allocate_addresses(max_lifetime){
 			continue;//ignore constants.
 		}
 
-		var sym_alloc = {sym: sym, loc: next_loc/alignment, lifetime: {full: true, start: 0, end: max_lifetime}};
+		var sym_alloc = {sym: sym, loc: next_loc, lifetime: {full: true, start: 0, end: max_lifetime}};
 		alloc.push(sym_alloc);
-		var aligned_size = Math.ceil(sym.info.size / alignment)*alignment;
+		var aligned_size = sym.info.size;
 		next_loc += aligned_size;
 		total_alloc_size += aligned_size;
 		total_obj_size += aligned_size;
@@ -269,7 +269,7 @@ function allocate_addresses(max_lifetime){
 				if(!address_assigned[scoped_name]){
 					address_assigned[scoped_name] = true;
 					var ltmap_entry = ltmap[scoped_name];
-					var sym_alloc = {sym: sym, loc: next_loc/alignment, lifetime: {start: ltmap_entry.start, end: ltmap_entry.end}};
+					var sym_alloc = {sym: sym, loc: next_loc, lifetime: {start: ltmap_entry.start, end: ltmap_entry.end}};
 					alloc.push(sym_alloc);
 					total_obj_size += sym_alloc.sym.info.size;
 				}
