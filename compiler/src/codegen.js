@@ -404,7 +404,8 @@ function str_parray(elemtype, name, dimstr){
 
 function memdefs(mem){
 	strglobals.push("/*Managed memory variables*/");
-	strglobals.push("unsigned char __vtmem[" +  mem.total_alloc_size + "];");
+	var dword_size = (mem.total_alloc_size/4 + 1);
+	strglobals.push("uint32_t __vtmem[" +  dword_size + "];");
 	for(var i=0;i<mem.alloc.length;i++){
 		var alloc = mem.alloc[i];
 		var scoped_name = ast_util.get_scoped_name(alloc.sym, "_", PVAR);
