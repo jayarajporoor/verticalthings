@@ -251,6 +251,7 @@ function allocate_addresses(max_lifetime){
 		}
 
 		var sym_alloc = {sym: sym, loc: next_loc, lifetime: {full: true, start: 0, end: max_lifetime}};
+		sym.info.size = Math.ceil(sym.info.size/alignment)
 		alloc.push(sym_alloc);
 		var aligned_size = sym.info.size;
 		next_loc += aligned_size;
