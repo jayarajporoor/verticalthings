@@ -16,14 +16,15 @@ xmlhttp.onreadystatechange = function() {
         // for calculating the total no of resources
         for(i=0;i<info.length;i++)
         {
-          var res=info[i].acquires;
-          var it=0;
-          for(it=0;it<res.length;it++)
-          {
-            m.set(res[it],[]);
-          }
+          var obj=  new Object();
+          obj["steppedLine"]=true;
+          obj["label"]=;
+          obj["borderColor"]="#3e95cd";
+          obj["fill"]=false;
+          obj["data"]=parseInt(info[i].timeAnalysis);
+          jsondata[i]=obj;
+          i++;
         }
-        var sum=0;
         for(i=0;i<info.length;i++)
         {
           module_name[i]=info[i].label;
@@ -78,7 +79,7 @@ xmlhttp.onreadystatechange = function() {
           obj["label"]=k;
           obj["borderColor"]="#3e95cd";
           obj["fill"]=false;
-          obj["data"]=m.get(k);
+          obj["data"]=info[i];
         //  console.log(obj);
           jsondata[i]=obj;
           i++;
@@ -88,7 +89,7 @@ xmlhttp.onreadystatechange = function() {
 
     }
 };
-xmlhttp.open("GET", "analysis.json", true);
+xmlhttp.open("GET", "moduleinfo.json", true);
 xmlhttp.send();
 
 
