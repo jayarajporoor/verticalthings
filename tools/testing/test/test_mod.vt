@@ -7,5 +7,5 @@ default flow test_func(){
     A=0;
     B=0;
     C=0;
-    C=(A+B);
+    B=(A*C);
 }
