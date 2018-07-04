@@ -2,6 +2,37 @@ module protonn_test;
 
 use arduino;
 
+include model;
+
+int scores[6];
+
+default flow predict(float[FEATURE_LENGTH] x, int length){
+	float[ldDim] x_cap,prototype;
+	float[numLabels] y_cap,prototypeLabel;
+	float weight = 0.0; 
+	if(length != featDim)
+		return -1.0;
+	y_cap=0.0;
+	// Project x onto ldDim dimension
+	x_cap=x*ldProjectionMatrix;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const float[5][5] ldProjectionMatrix;
 const int N = 20;
 float[N] buf;

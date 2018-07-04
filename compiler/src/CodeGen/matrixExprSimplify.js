@@ -171,7 +171,7 @@ function get_dim(ast,ctx){
 
 function transform_expr(ast, ctx){
 	// console.log(ast);
-	var details = get_dim(ast, ctx);
+	var details = astlib.deep_copy(get_dim(ast, ctx));
 	details.info.type.dim.dim = astlib.deep_copy(details.dim);
 	// console.log(details.info.type.dim);
 	details.info.is_temp=true;
