@@ -31,7 +31,7 @@ default flow normalize(int16_t[3] acc, int16_t[3] gyr, int16_t numNewReadings, i
 	normAY.push(normAcc[y]);
 	normAZ.push(normAcc[z]);
 	normGX.push(normGyr[x]);
-	normGX.push(normGyr[y]);
+	normGY.push(normGyr[y]);
 	normGZ.push(normGyr[z]);
 	numNewReadings = numNewReadings + 1;
 	samplesAfterReset = samplesAfterReset + 1;
