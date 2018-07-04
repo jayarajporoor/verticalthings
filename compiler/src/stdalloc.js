@@ -250,11 +250,12 @@ function allocate_addresses(max_lifetime){
 			continue;//ignore constants.
 		}
 
-		var sym_alloc = {sym: sym, loc: next_loc, lifetime: {full: true, start: 0, end: max_lifetime}};
+		var sym_alloc = {sym: sym, loc: next_loc/alignment, lifetime: {full: true, start: 0, end: max_lifetime}};
 		alloc.push(sym_alloc);
-		next_loc += sym.info.size;
-		total_alloc_size += sym_alloc.sym.info.size;
-		total_obj_size += sym_alloc.sym.info.size;
+		var aligned_size = Math.ceil(sym.info.size / alignment)*alignment;
+		next_loc += aligned_size;
+		total_alloc_size += aligned_size;
+		total_obj_size += aligned_size;
 	}
 
 	for(var i=0;i<regions.length;i++){

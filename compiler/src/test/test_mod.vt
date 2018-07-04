@@ -3,6 +3,8 @@ use arduino;
 
 MPU mpu;
 
+int ring[10] buf;
+
 default flow test_func(){
     int sum, size;
     pinPeripheral(3,false);
@@ -15,10 +17,11 @@ default flow test_func(){
 void temp(){
     int sum1;
     uint8_t[10] A;
-    int[20] B;
-    int C;
+    int[10] B;
+    int[10] C;
     B = 0;
     C= 0;
     A = 0;
+    Serial.print(buf[0]);
     C = (B + A)*(B+A);
 }

@@ -84,7 +84,10 @@ function fcall(ast){
 			if(param_sym && param_sym.info.type.dim && param_sym.info.type.dim.is_ring){
 				var sym = symtbl.lookup("__pos_" + paramid);
 				if(sym){
-					str = str + ", " + ast_util.get_scoped_name(sym, "_", PVAR);
+					var resolv = ast_util.resolve_matrix_expr(param.expr, symtbl);
+					if(resolv.dim.length > 0){					
+						str = str + ", " + ast_util.get_scoped_name(sym, "_", PVAR);
+					}
 				}
 			}
 		}
@@ -113,7 +116,10 @@ function fcall(ast){
 					var param_id = param.expr.id || (param.expr.qid && param.expr.qid[0]);
 					var sym = symtbl.lookup("__pos_" + param_id);
 					if(sym){
-						str = str + scoped_pos_param_name + " = " + ast_util.get_scoped_name(sym, "_", PVAR) + ";";
+						var resolv = ast_util.resolve_matrix_expr_by_sym(param.expr, sym);
+						if(resolv.dim.length > 0){					
+							str = str + scoped_pos_param_name + " = " + ast_util.get_scoped_name(sym, "_", PVAR) + ";";
+						}
 					}					
 				}				
 			}else{
@@ -172,10 +178,13 @@ function expr(ast){
         		vtbuild.error("The array symbol ", id, " not found in symbol table.");
         	}else{
 				if(sym.info.type.dim.is_ring){
-					var sym_pos = symtbl.lookup("__pos_" + id);
-					var size = sym.info.type.dim.dim[0].iconst;	
-					var pos_str = ast_util.get_scoped_name(sym_pos, "_", PVAR);
-					str=str + "[ ( (" + expr(ast.dim.dim[0]) + ") + " + pos_str + ") % " + size + "]";
+					var resolv = ast_util.resolve_matrix_expr_by_sym(ast, sym);
+					if(resolv.dim.length > 0){
+						var sym_pos = symtbl.lookup("__pos_" + id);
+						var size = sym.info.type.dim.dim[0].iconst;	
+						var pos_str = ast_util.get_scoped_name(sym_pos, "_", PVAR);
+						str=str + "[ ( (" + expr(ast.dim.dim[0]) + ") + " + pos_str + ") % " + size + "]";
+					}
 				}else{
 		            for(var i in ast.dim.dim){
 		                str=str + "[" + expr(ast.dim.dim[i]) + "]";
@@ -404,7 +413,7 @@ function str_parray(elemtype, name, dimstr){
 
 function memdefs(mem){
 	strglobals.push("/*Managed memory variables*/");
-	var dword_size = Math.ceil(mem.total_alloc_size);
+	var dword_size = Math.ceil(mem.total_alloc_size/4);
 	strglobals.push("uint32_t __vtmem[" +  dword_size + "];");
 	for(var i=0;i<mem.alloc.length;i++){
 		var alloc = mem.alloc[i];

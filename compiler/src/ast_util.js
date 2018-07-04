@@ -40,16 +40,8 @@ function deep_copy(obj){
 	return JSON.parse(JSON.stringify(obj));
 }
 
-function resolve_matrix_expr(ast, symtbl){
-	var resolv = {};
-	var id = ast.id;
-	if(ast.qid){
-		id = ast.qid[0];
-	}
-	if(!id){
-		return null;
-	}
-	var sym = symtbl.lookup(id);
+function resolve_matrix_expr_by_sym(ast, sym){
+	var resolv = {};	
 	if(!sym){
 		return null;
 	}
@@ -71,6 +63,18 @@ function resolve_matrix_expr(ast, symtbl){
 	resolv.id = id;	
 	resolv.sym = sym;
 	return resolv;
+}
+
+function resolve_matrix_expr(ast, symtbl){
+	var id = ast.id;
+	if(ast.qid){
+		id = ast.qid[0];
+	}
+	if(!id){
+		return null;
+	}
+	var sym = symtbl.lookup(id);
+	return resolve_matrix_expr_by_sym(ast, sym);
 }
 
 function get_scoped_name(sym, sep, pfx){
@@ -134,3 +138,4 @@ exports.get_scoped_name = get_scoped_name;
 exports.get_var_id = get_var_id;
 exports.first_pipeline_entry = first_pipeline_entry;
 exports.lookup_effect = lookup_effect;
+exports.resolve_matrix_expr_by_sym=resolve_matrix_expr_by_sym;
