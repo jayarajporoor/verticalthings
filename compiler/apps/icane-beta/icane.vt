@@ -4,7 +4,6 @@ pipeline icane {
 	mpu_acq,
 	normalize_mpu_ag,	
 	tlc_featurizer,
-	int2float,
 	protonn,	
 	thresholding,
 	majority_vote(10),
