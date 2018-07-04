@@ -71,6 +71,7 @@ function assign(ast, ctx){
 	change =1;
 	while(change === 1){
 		change=0;
+		// console.log(ast.expr);
 	 	expre=expr(ast.expr, ctx, true);
 	}
 	if(block_stmts.length > 0){
@@ -181,7 +182,8 @@ function transform_expr(ast, ctx){
 }
 
 function expr(ast, ctx, isRoot){
-	if(typeof ast.up != 'undefined' || typeof ast.id != 'undefined' || typeof ast.iconst != 'undefined' || typeof ast.fcall != 'undefined'){
+	// console.log(ast);
+	if(typeof ast.bconst!='undefined' || typeof ast.fconst!='undefined' || typeof ast.up != 'undefined' || typeof ast.id != 'undefined' || typeof ast.iconst != 'undefined' || typeof ast.fcall != 'undefined'){
 		return ast;
 	}
 	var lexpr_is_varconst = is_varconst(ast.lexpr);

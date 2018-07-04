@@ -67,6 +67,7 @@ function is_varconst(ast){
 
 function checkIfLoopNeeded(ast,ctx){
 	if(typeof ast.expr.id!='undefined'){
+		// console.log(ast.expr);
 		var lvalue=astlib.resolve_matrix_expr(ast,ctx.symtbl);
 		var rvalue=astlib.resolve_matrix_expr(ast.expr,ctx.symtbl);
 		if(lvalue && rvalue){
