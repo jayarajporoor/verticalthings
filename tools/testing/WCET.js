@@ -157,7 +157,7 @@ exports.analyseWCET = function(filename,source,arch,debugflag){
     debug = debugflag;
     var power;
     var fs = require('fs');
-    var asm = JSON.parse(fs.readFileSync("arch/"+arch+".json",'utf8'));
+    var asm = JSON.parse(fs.readFileSync(__dirname + "/arch/"+arch+".json",'utf8'));
     jumpstatements = asm['jumpstatements'];
     overhead = asm['overhead'];
     var floatdata = asm['extern'];

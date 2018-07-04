@@ -8,18 +8,18 @@ default flow test_func(){
     anothertemp();
 }
 void just_a_function(){
-    int[20][20] A;
-    int[20][20] B;
-    int[20][20] C;
+    int[20][20] A=0;
+    int[20][20] B=0;
+    int[20][20] C=0;
     for i in [0,10]{
         C = A * B;
     }
 }
 void anothertemp(){
     int sum = 0;
-    int[20][20] A;
-    int[20][20] B;
-    int[20][20] C;
+    int[20][20] A=0;
+    int[20][20] B=0;
+    int[20][20] C=0;
     for i in [0,10]{
         if (i > 5){
             C = A * B;

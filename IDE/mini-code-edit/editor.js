@@ -6,14 +6,16 @@ var hasWriteAccess;
 tabTextarea = [[],[]];
 tabID=1;
 var memory;
+var res;
 
 var gui = require("nw.gui");
 var fs = require("fs");
 var deb= nw.Window.get().showDevTools();
-var express= require('express');
-var app = express();
-var clipboard = gui.Clipboard.get();
 
+var clipboard = gui.Clipboard.get();
+var compilerObj = require('./../../compiler/src/vtcompiler.js');
+//var analyse = require('./../../tools/testing/analyse.js');
+//var config = require('./../../tools/testing/paths.json');
 var modules;
 var xmlhttp = new XMLHttpRequest();
 xmlhttp.onreadystatechange = function() {
@@ -21,9 +23,9 @@ xmlhttp.onreadystatechange = function() {
         modules   = JSON.parse(this.responseText);
     }
 };
-xmlhttp.open("GET", "moduleinfo.json", true);
+xmlhttp.open("GET","moduleinfo.json", true);
 xmlhttp.send();
-var compilerObj = require('./../../compiler/src/vtcompiler.js');
+
 
 function handleDocumentChange(title) {
   var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
@@ -65,7 +67,12 @@ function setFile(theFileEntry, isWritable) {
 
 function readFileIntoEditor(theFileEntry) {
   var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
-  var obj=document.getElementsByClassName('tab active show')[0];
+  if(tabID==1)
+  {
+      var obj=document.getElementsByClassName('tab')[0];
+  }else {
+      var obj=document.getElementsByClassName('tab active show')[0];
+  }
   console.log("printing the obj");
   console.log(obj);
   tabTextarea[id]["filePath"]=theFileEntry;
@@ -151,13 +158,14 @@ function handleSaveButton() {
 function handleNewTab()
 {
   tabID++;
-  //$('#tab-list').removeClass("active");
-  //$('.nav-tabs li.active').removeClass('active');
+  $('#tab-list').removeClass("active new");
+  $('.nav-tabs li.active').removeClass('active');
 
-  $('#tab-list').append($('<li class='+'"active show"><a href="#' + tabID + '" class="tab show active" data-toggle="tab">Untitled<button class="close" type="button" title="Remove this page">×</button></a></li>'));
+  $('#tab-list').append($('<li><a href="#' + tabID + '" class="tab new" data-toggle="tab">Untitled<button class="close" type="button" title="Remove this page">×</button></a></li>'));
   $('#tab-content').append($('<div class=" editor tab-pane in fade" id="' + tabID + '"></div>'));
   //highlighting the latest tab
-  //$('#2').parents('li').tab('show');
+  console.log(document.getElementById("2"));
+  console.log($('2').parents('li').tab('show'));
 
   console.log("hello");
   var id=tabID;
@@ -183,6 +191,8 @@ function handleNewTab()
         "Ctrl-Space": "autocomplete"
       }
     });
+    console.log(document.getElementById("2"));
+    console.log($('#2').parents('li').tab('show'));
     tabTextarea[tabID]["fileName"]="Untitled";
     tabTextarea[tabID]["filePath"]="Null";
     newFile();
@@ -260,15 +270,14 @@ function createChart()
 }
 
 function handleCompileButton(){
-
-    console.log(compilerObj);
     var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
-    console.log(tabTextarea[id]["filePath"]);
     try{
-      var res = compilerObj.compile([tabTextarea[id]["filePath"]]);
-      //  console.log("RESULT", res.ctx.mem);
+      var srcPath = tabTextarea[id]["filePath"];
+      var configPath = './../../tools/testing/paths.json';
+      var analysePath = './../../tools/testing/analyse.js';
+      res = compilerObj.compile([srcPath,"-config",configPath,"-xast",analysePath]);
+      console.log(res);
       memory= res.ctx.mem;
-      console.log(memory);
       var w = window.open("memory.html");
       w.myvariable = memory;
 
@@ -299,7 +308,7 @@ function handleCompileButton(){
         el.append(warningdiv);
         for(i=0;i<warnlen;i++)
         {
-          warndiv.innerHTML += "<br>"+global.vtbuild.warnings[i].text;
+          warningdiv.innerHTML += "<br>"+global.vtbuild.warnings[i].text;
         }
       }
       console.log(el);
@@ -335,7 +344,8 @@ function initWindowMenu(){
   file.append(new gui.MenuItem({
       label :'Analyse',
       click:function(){
-      window.open('chart.html', '_blank');
+      var w=window.open('../Charts/timing.html', '_blank');
+      w.info=res.ctx.WCET;
       }
   }));
   file.append(new gui.MenuItem({
