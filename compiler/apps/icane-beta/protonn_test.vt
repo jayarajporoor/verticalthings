@@ -21,8 +21,8 @@ default flow predict(float[FEATURE_LENGTH] x){
 		weight=(x_cap-prototypeMatrix[i]) * (x_cap-prototypeMatrix[i]);
 		weight=-1*gamma*gamma*weight;
 		weight=exp(weight);
-		prototypeLabelMatrix[i]=prototypeLabelMatrix[i]*weight;
-		y_cap=y_cap+prototypeLabelMatrix[i];
+		y_cap=prototypeLabelMatrix[i]*weight + y_cap;
+		//y_cap=y_cap+prototypeLabelMatrix[i];
 	}
 	//scores=100000*y_cap;
 	maxScore= -FLT_MAX;
@@ -30,7 +30,7 @@ default flow predict(float[FEATURE_LENGTH] x){
 	for i in [0,numLabels]{
 		if(y_cap[i] > maxScore){
 			maxIndex=i;
-			maxScore=labelScores[i];
+			maxScore=y_cap[i];
 		}
 	}
 	//next(maxIndex);

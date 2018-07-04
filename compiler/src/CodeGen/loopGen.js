@@ -60,7 +60,7 @@ function assign(ast, ctx){
 function is_varconst(ast){
 	if(typeof ast==='undefined')
 		return false;
-	if(typeof ast.id != 'undefined' || typeof ast.qid != 'undefined' || typeof ast.iconst != 'undefined')
+	if(typeof ast.id != 'undefined' || typeof ast.qid != 'undefined' || typeof ast.iconst != 'undefined' || typeof ast.fconst!='undefined')
 		return true;
 	return false;
 }
@@ -105,7 +105,7 @@ function checkIfLoopNeeded(ast,ctx){
 			}
 		}
 	}
-	else if(typeof ast.expr.iconst!='undefined'){
+	else if(typeof ast.expr.iconst!='undefined' || typeof ast.expr.fconst!='undefined'){
 		// console.log(ast);
 		var lvalue=astlib.resolve_matrix_expr(ast,ctx.symtbl);
 		if(lvalue){
@@ -216,9 +216,120 @@ function checkIfLoopNeeded(ast,ctx){
 			}
 		}
 		else if(ast.expr.op == '*'){
-			if(Left && Right){
+			if(Left || Right){
 				var temp=astlib.deep_copy(ast);
-				if(Left.dim.length==1 && Right.dim.length==1){
+				if(Left && !Right){
+					if(Left.dim.length==1){
+						var range={from: {iconst: 0}, to: {iconst: Left.dim[0].iconst}, is_inclusive:false};	
+						if(typeof temp.expr.lexpr.dim!='undefined' && temp.expr.lexpr.id.indexOf("__")!=0){
+							temp.expr.lexpr.dim.dim.push({id: '__i'});
+						}
+						else if(temp.expr.lexpr.id.indexOf("__")!=0)
+							temp.expr.lexpr.dim={dim: [{id: '__i'}]};
+						if(typeof temp.dim!='undefined' && temp.id.indexOf("__")!=0)
+							temp.dim.dim.push({id: '__i'});
+						else if(temp.id.indexOf("__")!=0)
+							temp.dim = {dim: [{id: '__i'}]};
+						ast = { kind: "block"
+							  , stmts:  [ { kind: "assign"
+										  , id: temp.id
+										  , dim: temp.dim
+										  , expr: {iconst: 0}
+									      }
+										, {	kind: "for"
+										  , ids:['__i']
+										  ,range: range
+										  , body: { kind:"block"
+										  		  , stmts: [ { kind: "assign"
+										  			 		 , id: temp.id
+										  			 		 , dim: temp.dim
+										  			 		 , expr: { op: "+"
+										  			 		 		 , lexpr: temp.expr
+										  			 		 		 , rexpr: { id: temp.id, dim: temp.dim }
+										  			 		 }
+										  			 }
+										  		   ]
+										  		  }
+										  }
+										]
+							  };
+					}
+					else if(Left.dim.length==2){
+						var range1={from: {iconst: 0}, to: {iconst: Left.dim[0].iconst}, is_inclusive: false};
+						var range2={from: {iconst: 0}, to: {iconst: Left.dim[1].iconst}, is_inclusive: false};
+						// console.log(range1);
+						if(typeof temp.expr.lexpr.dim!='undefined' && temp.expr.lexpr.id.indexOf("__")!=0){
+							temp.expr.lexpr.dim.dim.push({id: '__i'});
+							temp.expr.lexpr.dim.dim.push({id: '__j'});
+						}
+						else if(temp.expr.lexpr.id.indexOf("__")!=0)
+							temp.expr.lexpr.dim={dim: [{id: '__i'},{id: '__j'}]};
+						if(typeof temp.dim!='undefined' && temp.id.indexOf("__")!=0){
+							temp.dim.dim.push({id: '__i'});
+							temp.dim.dim.push({id: '__j'});
+						}
+						else if(temp.id.indexOf("__")!=0)
+							temp.dim = {dim: [{id: '__i'},{id: '__j'}]};
+						ast = { kind: "block", stmts: [ { kind: "for", ids: ['__i'], range: range1, body: { kind: "block", stmts: [ { kind: "assign", id: temp.id, expr: {iconst:0}, dim: temp.dim }, { kind: "for", ids: ['__j'], range: range2, body: { kind: "block", stmts: [ { kind: "assign", id: temp.id, expr: { op: "+", lexpr: temp.expr, rexpr: { id: temp.id, dim: temp.dim} }, dim: temp.dim } ] } } ] } } ] };
+
+					}
+				}
+				else if(!Left && Right){
+					if(Right.dim.length==1){
+						var range={from: {iconst: 0}, to: {iconst: Right.dim[0].iconst}, is_inclusive:false};	
+						if(typeof temp.expr.rexpr.dim!='undefined' && temp.expr.rexpr.id.indexOf("__")!=0){
+							temp.expr.rexpr.dim.dim.push({id: '__i'});
+						}
+						else if(temp.expr.rexpr.id.indexOf("__")!=0)
+							temp.expr.rexpr.dim={dim: [{id: '__i'}]};
+						if(typeof temp.dim!='undefined' && temp.id.indexOf("__")!=0)
+							temp.dim.dim.push({id: '__i'});
+						else if(temp.id.indexOf("__")!=0)
+							temp.dim = {dim: [{id: '__i'}]};
+						ast = { kind: "block"
+							  , stmts:  [ { kind: "assign"
+										  , id: temp.id
+										  , dim: temp.dim
+										  , expr: {iconst: 0}
+									      }
+										, {	kind: "for"
+										  , ids:['__i']
+										  ,range: range
+										  , body: { kind:"block"
+										  		  , stmts: [ { kind: "assign"
+										  			 		 , id: temp.id
+										  			 		 , dim: temp.dim
+										  			 		 , expr: { op: "+"
+										  			 		 		 , lexpr: temp.expr
+										  			 		 		 , rexpr: { id: temp.id, dim: temp.dim }
+										  			 		 }
+										  			 }
+										  		   ]
+										  		  }
+										  }
+										]
+							  };
+					}
+					else if(Right.dim.length==2){
+						var range1={from: {iconst: 0}, to: {iconst: Right.dim[0].iconst}, is_inclusive: false};
+						var range2={from: {iconst: 0}, to: {iconst: Right.dim[1].iconst}, is_inclusive: false};
+						// console.log(range1);
+						if(typeof temp.expr.rexpr.dim!='undefined' && temp.expr.rexpr.id.indexOf("__")!=0){
+							temp.expr.rexpr.dim.dim.push({id: '__i'});
+							temp.expr.rexpr.dim.dim.push({id: '__j'});
+						}
+						else if(temp.expr.rexpr.id.indexOf("__")!=0)
+							temp.expr.rexpr.dim={dim: [{id: '__i'},{id: '__j'}]};
+						if(typeof temp.dim!='undefined' && temp.id.indexOf("__")!=0){
+							temp.dim.dim.push({id: '__i'});
+							temp.dim.dim.push({id: '__j'});
+						}
+						else if(temp.id.indexOf("__")!=0)
+							temp.dim = {dim: [{id: '__i'},{id: '__j'}]};
+						ast = { kind: "block", stmts: [ { kind: "for", ids: ['__i'], range: range1, body: { kind: "block", stmts: [ { kind: "assign", id: temp.id, expr: {iconst:0}, dim: temp.dim }, { kind: "for", ids: ['__j'], range: range2, body: { kind: "block", stmts: [ { kind: "assign", id: temp.id, expr: { op: "+", lexpr: temp.expr, rexpr: { id: temp.id, dim: temp.dim} }, dim: temp.dim } ] } } ] } } ] };
+					}
+				}
+				else if(Left.dim.length==1 && Right.dim.length==1){
 					var range={from: {iconst: 0}, to: {iconst: Left.dim[0].iconst}, is_inclusive:false};
 					if(typeof temp.expr.lexpr.dim!='undefined' && temp.expr.lexpr.id.indexOf("__")!=0){
 						temp.expr.lexpr.dim.dim.push({id: '__i'});
