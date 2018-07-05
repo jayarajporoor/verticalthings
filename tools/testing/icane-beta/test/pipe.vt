@@ -3,6 +3,6 @@ module pipe;
 pipeline pipe{
     mpu_acq_test,
     normalize_inp_test,
-    tlcfeaturizer_test
-  //  protonn_test
+    tlcfeaturizer_test,
+    protonn_test
 };
