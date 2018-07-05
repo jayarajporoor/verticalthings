@@ -10,8 +10,8 @@
     "nw-builder": "^3.1.2"
   },
   "window": {
-    "width": 1000,
-    "height": 800,
+    "width": 1800,
+    "height": 1200,
     "show": false,
     "title": "Verteditor",
     "toolbar": true
@@ -22,6 +22,7 @@
     "jquery": "^3.3.1",
     "nw": "^0.31.4",
     "popper": "^1.0.1",
-    "popper.js": "^1.14.3"
+    "popper.js": "^1.14.3",
+    "serialport": "^6.2.1"
   }
 }

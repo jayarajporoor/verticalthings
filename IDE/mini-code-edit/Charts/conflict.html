@@ -1,0 +1,130 @@
+<!doctype html>
+    <head>
+
+        <title>Audience Comparison</title>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+        <link href='https://fonts.googleapis.com/css?family=Quicksand:400,700' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <script src="venn.js"></script>
+
+            <style>
+                body {
+                    font-family: 'Quicksand', sans-serif;
+                    font-weight: 700;
+                    font-size : 14px;
+                    margin: 2% 2% 2% 2%;
+                }
+
+               .venntooltip {
+                    font-size : 14px;
+                    position: absolute;
+                    text-align: center;
+                    width: 128px;
+                    height: 85px;
+                    background: #333;
+                    color: #fff;
+                    padding: 2px;
+                    border: 0px;
+                    border-radius: 8px;
+                    opacity: 0;
+                }
+
+
+            </style>
+
+
+
+    </head>
+
+<body>
+
+
+<div id="container">
+   <h1>Audience Comparison</h1>
+   <p>Venn Diagram created with Ben Federickson's "<a href="http://www.benfrederickson.com/better-venn-diagrams/">A Better Algorithm for Area Proportional Venn and Euler Diagrams</a>"</p>
+
+    <div id="venn_one" style=float:left>
+        <h3>Audience One</h3>
+    </div>
+
+
+    <div id="venn_two" style=float:left>
+        <h3>Audience Two</h3>
+    </div>
+
+
+
+
+
+    <script>
+        var sets = [
+                    {sets:["Audio"], figure: 8.91, label: "Audio", size: 8.91},
+                    {sets:["Direct Buy"], figure: 34.53, label: "Direct Buy", size: 34.53},
+                    {sets:["Branded Takeover"], figure: 40.9, label: "Branded Takeover", size: 40.9},
+                    {sets: ["Audio", "Direct Buy"], figure: 5.05, label: "Audio and Direct Buy", size: 5.05},
+                    {sets: ["Audio", "Branded Takeover"], figure: 3.65, label: "Audio and Branded Takeover", size: 3.65},
+                    {sets: ["Direct Buy", "Branded Takeover"], figure: 4.08, label: "Direct Buy and Branded Takeover", size: 4.08},
+                    {sets: ["Audio", "Direct Buy", "Branded Takeover"], figure: 2.8, label: "Audio, Direct Buy, and Branded Takeover", size: 2.8}
+                    ];
+
+
+        var chart = venn.VennDiagram()
+            .width(500)
+            .height(400)
+
+
+
+        var div = d3.select("#venn_one").datum(sets).call(chart);
+            div.selectAll("text").style("fill", "white");
+            div.selectAll(".venn-circle path")
+                    .style("fill-opacity", .8)
+                    .style("stroke-width", 1)
+                    .style("stroke-opacity", 1)
+                    .style("stroke", "fff");
+
+
+
+        var tooltip = d3.select("#venn_one").append("div")
+            .attr("class", "venntooltip");
+
+
+        div.selectAll("g")
+            .on("mouseover", function(d, i) {
+                // sort all the areas relative to the current item
+                venn.sortAreas(div, d);
+
+                // Display a tooltip with the current size
+                tooltip.transition().duration(40).style("opacity", 1);
+                tooltip.text(d.size + "% of Audience One saw " + d.label);
+
+                // highlight the current path
+                // highlight the current path
+                var selection = d3.select(this).transition("tooltip").duration(400);
+                selection.select("path")
+                    .style("stroke-width", 3)
+                    .style("fill-opacity", d.sets.length == 1 ? .8 : 0)
+                    .style("stroke-opacity", 1);
+            })
+
+            .on("mousemove", function() {
+                tooltip.style("left", (d3.event.pageX) + "px")
+                       .style("top", (d3.event.pageY - 28) + "px");
+            })
+
+            .on("mouseout", function(d, i) {
+                tooltip.transition().duration(2000).style("opacity", 0);
+                var selection = d3.select(this).transition("tooltip").duration(400);
+                selection.select("path")
+                    .style("stroke-width", 3)
+                    .style("fill-opacity", d.sets.length == 1 ? .8 : 0)
+                    .style("stroke-opacity", 1);
+            });
+        </script>
+</div>
+</body>
+</html>

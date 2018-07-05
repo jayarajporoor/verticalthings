@@ -1,0 +1,15 @@
+{
+	"codegen":{
+		"stdincludes" :["Arduino.h","Wire.h"],
+		"pathincludes" :[]
+	},
+	"ide" :{
+		"tmp_folder" : "/home/pvsuryachaitanya/Verteditor/Verticalthings/verticalthings/IDE/mini-code-edit/tmp"
+	},
+	"build":{
+		"arduino":"/home/pvsuryachaitanya/.arduino15",
+		"objdump":"arm-linux-gnueabi-objdump"
+	}
+
+
+}
