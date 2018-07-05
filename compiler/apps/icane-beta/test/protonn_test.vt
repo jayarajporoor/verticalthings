@@ -25,7 +25,9 @@ default flow predict(float[FEATURE_LENGTH] x){
 		y_cap=prototypeLabelMatrix[i]*weight + y_cap;
 		//y_cap=y_cap+prototypeLabelMatrix[i];
 	}
-	scores=100000*y_cap;
+	for i in [0,numLabels]{
+		scores[i]=100000*y_cap[i];
+	}
 	maxScore= FLT_NMIN;
 	maxIndex=0;
 	for i in [0,numLabels]{
@@ -34,6 +36,6 @@ default flow predict(float[FEATURE_LENGTH] x){
 			maxScore=y_cap[i];
 		}
 	}
-	//next(maxIndex);
+	next(scores,maxIndex);
 }
 

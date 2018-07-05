@@ -1,0 +1,16 @@
+module if_changed_test;
+
+int prevVoteResult=1;
+
+default flow is_changed(int voteResult){
+	if(voteResult == prevVoteResult)
+	{	
+		prevVoteResult = voteResult;
+		voteResult = 1;
+	}
+	else
+	{
+		prevVoteResult = voteResult;
+		next(voteResult);
+	}
+}
