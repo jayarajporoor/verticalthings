@@ -6,20 +6,27 @@ int[11] resultScores;   // Max Label Index +1
 
 default flow Threshold(int[10] scores, int result){
 	int out,maxCount=-1,voteResult=1;
-	if(scores[result]<scoreThreshold[result]){
-		result=1;
+	Serial.print("Result:  ");
+	Serial.println(result);	
+	if(result<0 || result>=10){
+		Serial.println("Out of Bound");	
 	}
-	out=vote.push(result);
-	resultScores[result]=resultScores[result]+1;
-	if(out!=0){
-		resultScores[out]=resultScores[out]-1;
-	}
-	for i in [0,10]{
-		if(resultScores[i]>maxCount)
-		{
-			maxCount=resultScores[i];
-			voteResult=i;
+	else{
+		if(scores[result]<scoreThreshold[result]){
+			result=1;
 		}
+		out=vote.push(result);
+		resultScores[result]=resultScores[result]+1;
+		if(out!=0){
+			resultScores[out]=resultScores[out]-1;
+		}
+		for i in [0,10]{
+			if(resultScores[i]>maxCount)
+			{
+				maxCount=resultScores[i];
+				voteResult=i;
+			}
+		}
+		next(voteResult);
 	}
-	next(voteResult);
 }

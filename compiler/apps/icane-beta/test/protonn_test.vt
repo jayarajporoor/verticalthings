@@ -36,6 +36,7 @@ default flow predict(float[FEATURE_LENGTH] x){
 			maxScore=y_cap[i];
 		}
 	}
+	Serial.println(maxIndex);
 	next(scores,maxIndex);
 }
 

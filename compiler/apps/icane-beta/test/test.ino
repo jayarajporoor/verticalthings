@@ -186,8 +186,6 @@ void _mpu_acq_test_init()
         if((mpu_acq_test_init_devStatus==0))
         {
             mpu_acq_test_mpu1.setDMPEnabled(true);
-            delay(5000);
-            Serial.println("DMP Enabled");
         }
         else
         {
@@ -214,7 +212,6 @@ void _mpu_acq_test_mpu_acq()
                 mpu_acq_test_mpu1.dmpGetAccel(&(mpu_acq_test_mpu_acq_acc__), mpu_acq_test_fifoBuffer);
                 mpu_acq_test_mpu1.dmpGetGyro(&(mpu_acq_test_mpu_acq_gyr__), mpu_acq_test_fifoBuffer);
                 mpu_acq_test_mpu_acq_acc[mpu_acq_test_x]=mpu_acq_test_mpu_acq_acc__.x;
-                //Serial.println(mpu_acq_test_mpu_acq_acc[mpu_acq_test_x]);
                 mpu_acq_test_mpu_acq_acc[mpu_acq_test_y]=mpu_acq_test_mpu_acq_acc__.y;
                 mpu_acq_test_mpu_acq_acc[mpu_acq_test_z]=mpu_acq_test_mpu_acq_acc__.z;
                 mpu_acq_test_mpu_acq_gyr[mpu_acq_test_x]=mpu_acq_test_mpu_acq_gyr__.x;
@@ -487,39 +484,47 @@ void _protonn_test_predict()
                 protonn_test_predict_maxScore=protonn_test_predict_y_cap[i];
             }
         }
+        Serial.println(protonn_test_predict_maxIndex);
         thresholding_test_Threshold_scores_p = &(protonn_test_scores); thresholding_test_Threshold_result = protonn_test_predict_maxIndex; __state = __thresholding_test_Threshold;
     }
 }
 void _thresholding_test_Threshold()
 {
-  Serial.println("Entering Threshold");
     int thresholding_test_Threshold_out, thresholding_test_Threshold_maxCount=(-1), thresholding_test_Threshold_voteResult=1;
     {
-        if((thresholding_test_Threshold_scores[thresholding_test_Threshold_result]<thresholding_test_scoreThreshold[thresholding_test_Threshold_result]))
+        Serial.print("Result:  ");
+        Serial.println(thresholding_test_Threshold_result);
+        if(((thresholding_test_Threshold_result<0)||(thresholding_test_Threshold_result>=10)))
         {
-            thresholding_test_Threshold_result=1;
+            Serial.println("Out of Bound");
         }
-        thresholding_test_Threshold_out=(thresholding_test_vote[thresholding_test___pos_vote = (thresholding_test___pos_vote + 1 == 10 ? 0: thresholding_test___pos_vote + 1)] = thresholding_test_Threshold_result);
-        thresholding_test_resultScores[thresholding_test_Threshold_result]=(thresholding_test_resultScores[thresholding_test_Threshold_result]+1);
-        if((thresholding_test_Threshold_out!=0))
+        else
         {
-            thresholding_test_resultScores[thresholding_test_Threshold_out]=(thresholding_test_resultScores[thresholding_test_Threshold_out]-1);
-        }
-        for(int i=0; i<10; i++)
-        {
-            if((thresholding_test_resultScores[i]>thresholding_test_Threshold_maxCount))
+            if((thresholding_test_Threshold_scores[thresholding_test_Threshold_result]<thresholding_test_scoreThreshold[thresholding_test_Threshold_result]))
             {
-                thresholding_test_Threshold_maxCount=thresholding_test_resultScores[i];
-                thresholding_test_Threshold_voteResult=i;
+                thresholding_test_Threshold_result=1;
             }
+            thresholding_test_Threshold_out=(thresholding_test_vote[thresholding_test___pos_vote = (thresholding_test___pos_vote + 1 == 10 ? 0: thresholding_test___pos_vote + 1)] = thresholding_test_Threshold_result);
+            thresholding_test_resultScores[thresholding_test_Threshold_result]=(thresholding_test_resultScores[thresholding_test_Threshold_result]+1);
+            if((thresholding_test_Threshold_out!=0))
+            {
+                thresholding_test_resultScores[thresholding_test_Threshold_out]=(thresholding_test_resultScores[thresholding_test_Threshold_out]-1);
+            }
+            for(int i=0; i<10; i++)
+            {
+                if((thresholding_test_resultScores[i]>thresholding_test_Threshold_maxCount))
+                {
+                    thresholding_test_Threshold_maxCount=thresholding_test_resultScores[i];
+                    thresholding_test_Threshold_voteResult=i;
+                }
+            }
+            if_changed_test_is_changed_voteResult = thresholding_test_Threshold_voteResult; __state = __if_changed_test_is_changed;
         }
-        if_changed_test_is_changed_voteResult = thresholding_test_Threshold_voteResult; __state = __if_changed_test_is_changed;
     }
 }
 void _if_changed_test_is_changed()
 {
     {
-      //Serial.println(if_changed_test_is_changed_voteResult);
         if((if_changed_test_is_changed_voteResult==if_changed_test_prevVoteResult))
         {
             if_changed_test_prevVoteResult=if_changed_test_is_changed_voteResult;
