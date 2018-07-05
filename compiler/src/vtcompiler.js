@@ -172,7 +172,7 @@ function compile(argv)
 	var ast_transforms = [];
 	var code_path = null;
 	var ctx_attr = null;
-	var config_path;
+	var config_paths =[];
 
 	var mod_params = {};
 
@@ -237,7 +237,7 @@ function compile(argv)
 			break;
 			case "-config":
 				if(argv[i+1]){
-					config_path = argv[i+1];
+					config_paths.push(argv[i+1]);
 					i++;
 				}else{
 					return vtbuild.error("Please specify the configuration file after the -config parameter.");
@@ -275,10 +275,11 @@ function compile(argv)
 
 	loadPipeline(ast, path.dirname(srcpath), symtbl);
 
-	var transform_ctx = {symtbl: symtbl, params: mod_params, resources: {}};
+	var transform_ctx = {symtbl: symtbl, params: mod_params, resources: {}, config: {}};
 
-	if(config_path){
-		transform_ctx.config = JSON.parse(fs.readFileSync(config_path));
+	for(var i=0;i<config_paths.length;i++){
+		var config = JSON.parse(fs.readFileSync(config_paths[i]));
+		transform_ctx.config = Object.assign(transform_ctx.config, config);
 	}
 
 	for(var i=0;i<ast_transforms.length;i++){
