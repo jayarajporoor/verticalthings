@@ -122,5 +122,5 @@ default flow featurizer(float ring[400] normAX,float ring[400] normAY,float ring
 	getBucket(normGZ,false);
 	featureVectorF = featureVector;
 	//Serial.println(featureVectorF[0]);
-	 //next(featureVectorF);
+	next(featureVectorF);
 }

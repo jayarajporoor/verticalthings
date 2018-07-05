@@ -30,29 +30,49 @@ function get_loop(loopcount,data){
     return temp;
 }
 function WCETfor(stat,power){
+    //console.log("gen for ");
+    //console.log(stat);
     var analyse = require('./WCET.js');
-    var gen = require('../../compiler/src/CodeGen/Codegen.js');
+    gen.set_symtbl(ctxobj.symtbl);
+    //console.log('wcet for symtbl scope', ctxobj.symtbl.current_scope.name);
     var code = [];
-    modvars.forEach(function(variable){
-        code.push(gen.var(variable) + ';');
-    });
+    code.push("#define true 1");
+    code.push("#define false 0");
+    code.push("typedef int boolean;");
+    //console.log("vars are ");
+    code = code.concat(modulevariables);
     funcvars.forEach(function(variable){
-        code.push(gen.var(variable) + ';');
+        var res = gen.vardef(variable);
+        if (res){
+            code.push(res + ';');
+        }
+        // console.log(variable);
+    });
+    userdefinedloopvars.forEach(function(variable){
+        code.push("int " + variable + ";");
     });
     funcparams.forEach(function(variable){
-        console.log(gen);
-        code.push(gen.params(variable) + ';');
+        //console.log(gen);
+        var res = gen.fparam(variable);
+        if (res){
+            res = res.replace(",",";");
+            code.push(res + ";");
+        }
+        // console.log(variable);
     });
     code.push("int main(){");
     gen.stmt(stat,code);
     code.push("return 0;");
     code.push("}");
-    var str = code.join('\n');
+    var finalcode = gen.strglobals.concat(code);
+    finalcode.unshift("#include<stdint.h>;");
+    var str = finalcode.join('\n');
     var tmp = require('tmp');
     var tmpobj = tmp.fileSync({ mode: parseInt('0644', 8), prefix: 'code', postfix: '.c' });
     fs.writeFileSync(tmpobj.name,str);
+    console.log(tmpobj.name);
     var execSync = require('child_process').execSync;
-    var command = paths['arduino'] + "/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin/arm-none-eabi-g++ -mcpu=cortex-m0plus -mthumb -c -g -Os -w -std=gnu++11 -ffunction-sections -fdata-sections -fno-threadsafe-statics -nostdlib --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -MMD -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_MKR1000 -DARDUINO_ARCH_SAMD  -D__SAMD21G18A__ -DUSB_VID=0x2341 -DUSB_PID=0x804e -DUSBCON" + '-DUSB_MANUFACTURER="Arduino LLC"' + '-DUSB_PRODUCT="Arduino MKR1000"' + "-I"+paths['arduino']+"/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include/ -I"+paths['arduino']+"/packages/arduino/tools/CMSIS-Atmel/1.1.0/CMSIS/Device/ATMEL/ -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/cores/arduino -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/variants/mkr1000 -I"+paths['arduino']+"/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include " + tmpobj.name + " -o " + tmpobj.name + ".o";
+    var command = paths['arduino'] + "/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin/arm-none-eabi-g++ -mcpu=cortex-m0plus -mthumb -c -g -Os -w -std=c++11 -ffunction-sections -fdata-sections -fno-threadsafe-statics -nostdlib --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -MMD -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_MKR1000 -DARDUINO_ARCH_SAMD  -D__SAMD21G18A__ -DUSB_VID=0x2341 -DUSB_PID=0x804e -DUSBCON" + '-DUSB_MANUFACTURER="Arduino LLC"' + '-DUSB_PRODUCT="Arduino MKR1000"' + "-I"+paths['arduino']+"/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include/ -I"+paths['arduino']+"/packages/arduino/tools/CMSIS-Atmel/1.1.0/CMSIS/Device/ATMEL/ -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/cores/arduino -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/variants/mkr1000 -I"+paths['arduino']+"/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/libraries/Wire " + tmpobj.name + " -o " + tmpobj.name + ".o";
     //console.log(command);
     execSync(command);
     command = paths['objdump'] + " -d -l " + tmpobj.name +".o > " + tmpobj.name +".asm";
@@ -80,9 +100,11 @@ function WCETstat(stat,power){
     }
     else if (stat['kind'] == "for"){
         power = power * (stat['range']['to']['iconst'] - stat['range']['from']['iconst']);
+        userdefinedloopvars = userdefinedloopvars.concat(stat['ids']);
         stat['body']['stmts'].forEach(function(statement){
             result += WCETstat(statement,power);
         });
+        userdefinedloopvars;
     }
     else if (stat['kind'] == "if"){
         result += WCETif(stat,power);
@@ -108,9 +130,14 @@ function WCETstat(stat,power){
                     //throw compiler error the function is trying to call another function which is already open!!!
                 }
                 else{
-                    var thisfunc = temp;
+                    var thisfunc = globalfuncname;
+                    var tempuserdefinedloopvars = userdefinedloopvars;
+                    ctxobj.symtbl.exitNestedScope();
+                    console.log("calling another " + next.id);
                     var count = calculatefunction(next);
                     result += power*count;
+                    userdefinedloopvars = tempuserdefinedloopvars;
+                    ctxobj.symtbl.enterNestedScope(thisfunc.id);
                     set(thisfunc);
                 }
             }
@@ -128,7 +155,7 @@ function WCETif(data,power){
         ifcycle += WCETstat(stat,power);                
     });
     if (Object.keys(data).indexOf("else_body") != -1){
-        console.log(data);
+       // console.log(data);
         if (Object.keys(data['else_body']).indexOf("stmts")!=-1){
             data['else_body']['stmts'].forEach(function(stat){
                 elsecycle += WCETstat(stat,power);                
@@ -147,12 +174,16 @@ var funcvars;
 var funcparams;
 var fs = require('fs');
 var lookup = require('../../compiler/src/ast_util.js');
+var gen = require('../../compiler/src/codegen.js');
 var paths;
 var uses;
 var computing = [];
 var WCET = {};
 var modulename;
-var temp;
+var modulevariables = [];
+var userdefinedloopvars = [];
+var globalfuncname;
+var ctxobj;
 function set(func){
     //set's the parameters of the function
     funcparams = func['params'];
@@ -164,8 +195,10 @@ function reset(){
 }
 function calculatefunction(func){
    // console.log(func);
-    temp = func;
+    globalfuncname = func;
     computing[func['id']] = true;
+    ctxobj.symtbl.enterNestedScope(func.id);
+    //console.log('scope ', ctxobj.symtbl.current_scope.name);
     set(func);
     var cyclecount = 0;
     func['body']['stmts'].forEach(function(stat){
@@ -176,13 +209,19 @@ function calculatefunction(func){
         WCET['time'] = cyclecount;
     }
     computing[func['id']] = false;
+    ctxobj.symtbl.exitNestedScope();
     return cyclecount;
 }
 function WCETanalysis(data,ctx){
     var start = lookup.first_pipeline_entry(data);
     ast = data;
+    ctxobj = ctx;
+    //console.log('ctx is ');
+    //console.log(ctx);
     paths = ctx.config['build'];
     ctx.WCET = [];
+    gen.strglobals.length = 0;
+    gen.memdefs(ctx.mem);
     while (true){
         reset();
         modulename = start['qname'][0];
@@ -190,6 +229,33 @@ function WCETanalysis(data,ctx){
         mod = data['modules'][modulename];
         modvars = mod['vars'];
         uses = mod['uses'];
+        ctxobj.symtbl.enterNestedScope(modulename);
+        modvars.forEach(function(variable){
+            var res = gen.vardef(variable);
+            if (res){
+                // if (variable['defs'][0].id == "ldProjectionMatrix"){
+                //     //console.log("god save the queen ",res);
+                // }
+                modulevariables.push(res + ';');
+            }
+            // else{
+            //     // console.log(variable);
+            //     // if (variable['defs'][0].id == "ldProjectionMatrix"){
+            //     //     console.log("good grief");
+            //     // }
+            // }
+            // // console.log("mod variable is");
+            // console.log(variable);
+        });
+    
+        // modvars.forEach(function(vari){
+        //     console.log(vari['type'][]);
+        // });
+        //console.log("mod is " + modulename);
+        //console.log("vars are");
+        //modvars.forEach(function(vari){
+        //    console.log(vari);
+        //});
         mod['fdefs'].every(function(func){
             if (func['id'] == start['qname'][1]){
                 calculatefunction(func);
@@ -197,12 +263,13 @@ function WCETanalysis(data,ctx){
             }
             return true;
         });
+        ctxobj.symtbl.exitNestedScope();
         ctx.WCET.push(WCET);
         if (Object.keys(start).indexOf("next") == -1){
             break;
         }
         start = start.next;
     }
-    console.log(ctx);
+    console.log(ctx.WCET);
 }
 exports.transform = WCETanalysis;
