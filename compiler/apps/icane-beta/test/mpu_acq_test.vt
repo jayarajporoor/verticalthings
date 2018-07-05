@@ -35,8 +35,8 @@ default flow mpu_acq(){
 	if((mpuIntStatus & 0x10) || fifoCount == 1024){
 		// FIFO Overflow..
 		mpu1.resetFIFO();
-		samplesAfterReset = 0;
-		numNewReadings = 0;
+		//samplesAfterReset = 0;
+		//numNewReadings = 0;
 	}
 	else if((mpuIntStatus & 0x02)){
 		if(fifoCount >= fifoPacketSize){

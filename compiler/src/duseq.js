@@ -202,15 +202,16 @@ class DUSeq{
       var qname= ast.qid[1];
       var is_flow = false;
       var qid_unresolved = null;
+      var is_array_op = false;
 
       if(qname){
         if(ast_util.vector_ops.indexOf(qname) >= 0){
           var sym = this.dynscope.lookup_sym(fname);
           use_syms.push(sym);
           def_syms.push(sym);
-        }else{
-          qid_unresolved = ast.qid;
+          is_array_op = true;
         }
+        qid_unresolved = ast.qid;        
       }else{
         var mod_ast;
         if(fname === 'next'){
@@ -271,7 +272,11 @@ class DUSeq{
       if(qid_unresolved){
         var write_params = [];
 
-        var effects_found = this.effects(ast, qid_unresolved, use_syms, def_syms, write_params);
+        var effects_found = null;
+
+        if(!is_array_op){
+          effects_found = this.effects(ast, qid_unresolved, use_syms, def_syms, write_params);
+        }
 
         for(var k=0;k<ast.params.length;k++){
           if(write_params.indexOf(k) < 0){
@@ -282,7 +287,7 @@ class DUSeq{
             }
           }
         }
-        if(!effects_found){
+        if(!effects_found && !is_array_op){
           vtbuild.warning("Unresolved function name ", qid_unresolved, " in scope ", this.symtbl.getCurrentScope().name);
         }
       }

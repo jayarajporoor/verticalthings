@@ -127,11 +127,13 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 	var candidate = candidate_region.blocks;
 	
 	var tidx = run_start;
+	var saved_run_start = run_start;
 	var cidx = 0;
 	var tblock = null;
 	var cblock = null;
 	var done = false;
 	var size_saving = 0;
+	var last_was_matching = false;
 
 	while(!done){
 		if(!tblock){
@@ -159,10 +161,13 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 
 		if( is_adjacent_and_non_overlapping(cblock.lt_end, tblock.lt_start, adjacency) || 
 			is_adjacent_and_non_overlapping(tblock.lt_end, cblock.lt_start, adjacency) ){
-			var merged_block = {  lt_start: Math.min(tblock.lt_start, tblock.lt_start), 
+
+			var merged_block = {  lt_start: Math.min(tblock.lt_start, cblock.lt_start), 
 				 				  lt_end: Math.max(tblock.lt_end,cblock.lt_end), 
                         		  owners: tblock.owners.concat(cblock.owners) 
                         		};
+			//print_block("Try cblock ", cblock);
+			//print_block("Try tblock ", tblock);
             if(tblock.size > cblock.size){
 				tblock.size = tblock.size - cblock.size;
 				merged_block.size = cblock.size;
@@ -175,13 +180,16 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 				tblock = null;
             }else{
 				merged_block.size = tblock.size;
-				size_saving = tblock.size;
+				size_saving += tblock.size;
 				tblock = cblock = null;
             }
             if(merged_blocks){
 				merged_blocks.push(merged_block);
+				//print_block("Merging blocks ", merged_block);
 			}
+
 			if(size_saving === 0) run_start = i;//we're just starting a merge-run.
+			last_was_matching = true;
 		}else{
 			if(merged_blocks) merged_blocks = [];
 			size_saving = 0;
@@ -189,16 +197,22 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 			t = run_start;
 			c = 0;
 			tblock = cblock = null;
+			last_was_matching = false;
 		}
 		assert(!(tblock && cblock));//both not pending together.
 		if(merged_blocks){
+			for(var i=0;i<saved_run_start;i++){
+				merged_blocks.unshift(target[i]);
+			}
 			if(tblock){
 				merged_blocks.push(tblock);
+				//print_block("Extra tblock ", tblock);				
 			}			
 			if(!cblock){
 				cblock = candidate[cidx++];
 			}
 			while(cblock){
+				//print_block("Extra cblock ", cblock);								
 				merged_blocks.push(cblock);
 				target_region.size += cblock.size;
 				cblock = candidate[cidx++];				
@@ -206,7 +220,7 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 			target_region.blocks = merged_blocks;
 		}		
 	}
-	return {size_saving: size_saving, run_start: run_start};
+	return {size_saving: size_saving, run_start: run_start, match: last_was_matching};
 
 }
 
@@ -219,11 +233,11 @@ function optimize_regions(max_lifetime, merge_policy){
 
 			for(var i=0;i<regions.length && !changed;i++){
 				for(var j=0;j<regions.length && !changed;j++){
-					if(i == j ) continue;
+					if(i === j ) continue;
 					var target_region = regions[i];
 					var candidate_region = regions[j];
 					var res = merge_regions(target_region, candidate_region, 0, adjacency, false);
-					if(merge_policy(res.size_saving, candidate_region, target_region)){
+					if(res.match && merge_policy(res.size_saving, candidate_region, target_region)){
 						merge_regions(target_region, candidate_region, res.run_start, adjacency, true);
 						regions.splice(j, 1);
 						changed = true;
@@ -271,8 +285,10 @@ function allocate_addresses(max_lifetime){
 		for(var j=0;j<blocks.length;j++){
 			var block = blocks[j];
 			var owners = block.owners;
+			//console.log(" ADDRESS ", next_loc);
 			for(var k=0;k<owners.length;k++){
 				var sym = owners[k].sym;
+			//	console.log("owner ", sym.name, sym.scope_names, sym.info.size);
 				var scoped_name = ast_util.get_scoped_name(sym);
 				if(!address_assigned[scoped_name]){
 					address_assigned[scoped_name] = true;
@@ -289,6 +305,26 @@ function allocate_addresses(max_lifetime){
 	return {alloc: alloc, total_alloc_size: total_alloc_size, total_obj_size: total_obj_size};
 }
 
+function print_block(msg, block){
+	var str = msg + ", size=" + block.size + "; owners: ";
+	var owners = block.owners;
+	for(var k=0;k<owners.length;k++){
+		var sym = owners[k].sym;
+		var scoped_name = ast_util.get_scoped_name(sym);
+		str += scoped_name + "=" + sym.info.size + ", ";
+	}
+	console.log(str);
+}
+
+function print_regions(){
+	for(var i=0;i<regions.length;i++){
+		var blocks = regions[i].blocks;
+		for(var j=0;j<blocks.length;j++){
+			var block = blocks[j];
+			print_block("Region " + i + ", block: " + j, block);
+		}
+	}	
+}
 exports.transform = function(ast, ctx){
 	if(!ctx.duseq){
 		console.log("DUseq must be created prior to calling stdalloc.");
@@ -304,7 +340,14 @@ exports.transform = function(ast, ctx){
 	
 	var max_lifetime = init_regions();
 	
+	//console.log(JSON.stringify(regions, null, 1));
+//	print_regions();
+
 	optimize_regions(max_lifetime, default_merge_policy);
+
+//	console.log("After optimize");
+//	print_regions();
+	//console.log(JSON.stringify(regions));
 
 	ctx.stdalloc.regions = regions;
 	//console.log(JSON.stringify(regions));
