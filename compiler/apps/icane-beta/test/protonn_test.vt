@@ -5,7 +5,7 @@ use arduino;
 include model;
 include Config;
 include limit;
-//int scores[10];
+int[10] scores;
 
 
 default flow predict(float[FEATURE_LENGTH] x){
@@ -13,6 +13,7 @@ default flow predict(float[FEATURE_LENGTH] x){
 	float[numLabels] y_cap;
 	float weight = 0.0, maxScore;
 	int maxIndex;
+	//scores=0;
 	y_cap=0.0;
 	// Project x onto ldDim dimension
 	x_cap= ldProjectionMatrix*x;
@@ -24,7 +25,7 @@ default flow predict(float[FEATURE_LENGTH] x){
 		y_cap=prototypeLabelMatrix[i]*weight + y_cap;
 		//y_cap=y_cap+prototypeLabelMatrix[i];
 	}
-	//scores=100000*y_cap;
+	scores=100000*y_cap;
 	maxScore= FLT_NMIN;
 	maxIndex=0;
 	for i in [0,numLabels]{
