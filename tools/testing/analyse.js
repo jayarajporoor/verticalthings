@@ -40,6 +40,7 @@ function WCETfor(stat,power){
         code.push(gen.var(variable) + ';');
     });
     funcparams.forEach(function(variable){
+        console.log(gen);
         code.push(gen.params(variable) + ';');
     });
     code.push("int main(){");
@@ -127,9 +128,15 @@ function WCETif(data,power){
         ifcycle += WCETstat(stat,power);                
     });
     if (Object.keys(data).indexOf("else_body") != -1){
-        data['else_body']['stmts'].forEach(function(stat){
-            elsecycle += WCETstat(stat,power);                
-        });
+        console.log(data);
+        if (Object.keys(data['else_body']).indexOf("stmts")!=-1){
+            data['else_body']['stmts'].forEach(function(stat){
+                elsecycle += WCETstat(stat,power);                
+            });
+        }
+        else{
+            elsecycle = WCETif(data['else_body'],power);
+        }
     }
     return Math.max(ifcycle,elsecycle);
 }

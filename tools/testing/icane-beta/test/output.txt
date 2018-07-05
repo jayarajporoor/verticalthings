@@ -1,0 +1,28 @@
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/pipe.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/mpu_acq_test.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/arduino.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/normalize_inp_test.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/Config.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/tlcfeaturizer_test.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/Config.vt
+{ kind: 'if',
+  expr: 
+   { op: '<',
+     lexpr: { qid: [Object], id: 'samplesAfterReset' },
+     rexpr: { src: [Object], iconst: 250 },
+     src: { start: [Object], end: [Object] } },
+  if_body: 
+   { stmts: [ [Object] ],
+     kind: 'block',
+     src: { start: [Object], end: [Object] } },
+  src: { start: { line: 42, col: 1 }, end: { line: 51, col: 1 } },
+  else_body: 
+   { kind: 'if',
+     expr: { op: '==', lexpr: [Object], rexpr: [Object], src: [Object] },
+     if_body: { stmts: [Object], kind: 'block', src: [Object] },
+     src: { start: [Object], end: [Object] } } }
+{ transform: [Function: codeGen],
+  stmt: [Function: stmts],
+  fdef: [Function: fdefs],
+  fparam: [Function: params],
+  var: [Function: vars] }
