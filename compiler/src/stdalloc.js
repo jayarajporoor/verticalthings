@@ -135,6 +135,7 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 	var size_saving = 0;
 	var last_was_matching = false;
 
+	//console.log("New merge run");
 	while(!done){
 		if(!tblock){
 			if(tidx < target.length){
@@ -185,7 +186,7 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
             }
             if(merged_blocks){
 				merged_blocks.push(merged_block);
-				//print_block("Merging blocks ", merged_block);
+			//	print_block("Merged block ", merged_block);
 			}
 
 			if(size_saving === 0) run_start = i;//we're just starting a merge-run.
@@ -199,27 +200,41 @@ function merge_regions(target_region, candidate_region, run_start, adjacency, co
 			tblock = cblock = null;
 			last_was_matching = false;
 		}
-		assert(!(tblock && cblock));//both not pending together.
-		if(merged_blocks){
-			for(var i=0;i<saved_run_start;i++){
-				merged_blocks.unshift(target[i]);
-			}
-			if(tblock){
-				merged_blocks.push(tblock);
-				//print_block("Extra tblock ", tblock);				
-			}			
-			if(!cblock){
-				cblock = candidate[cidx++];
-			}
-			while(cblock){
-				//print_block("Extra cblock ", cblock);								
-				merged_blocks.push(cblock);
-				target_region.size += cblock.size;
-				cblock = candidate[cidx++];				
-			}
-			target_region.blocks = merged_blocks;
-		}		
 	}
+
+	//assert(!(tblock && cblock));//both not pending together.
+
+	if( (tblock || tidx < target.length ) &&
+		(cblock || cidx < candidate.length ) ){
+			last_was_matching = false;
+			//console.log("Last was not matching!");
+	}
+	if(merged_blocks){
+		for(var i=0;i<saved_run_start;i++){
+			//print_block("pushing run start ", target[i]);
+			merged_blocks.unshift(target[i]);
+		}
+		if(!tblock){
+			tblock = target[tidx++];
+		}
+		while(tblock){
+			//print_block("Extra tblock ", tblock);								
+			merged_blocks.push(tblock);
+			tblock = target[tidx++];				
+		}
+
+		if(!cblock){
+			cblock = candidate[cidx++];
+		}
+		while(cblock){
+			//print_block("Extra cblock ", cblock);								
+			merged_blocks.push(cblock);
+			target_region.size += cblock.size;
+			cblock = candidate[cidx++];				
+		}
+		target_region.blocks = merged_blocks;
+	}		
+
 	return {size_saving: size_saving, run_start: run_start, match: last_was_matching};
 
 }
