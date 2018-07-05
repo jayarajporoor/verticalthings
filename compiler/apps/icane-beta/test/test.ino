@@ -160,19 +160,16 @@ float (*protonn_test_predict_x_p)[124];
 const int thresholding_test_scoreThreshold[10]={ 0, 0, 0, 90000, 60000, 70000, 0, 70000, 0, 45000} ;
 int thresholding_test___pos_vote = 0;
 /*End of module vars for thresholding_test*/
+int thresholding_test_Threshold_result;
 int (*thresholding_test_Threshold_scores_p)[10];
 #define thresholding_test_Threshold_scores (*thresholding_test_Threshold_scores_p)
-int (*thresholding_test_Threshold_result_p);
-#define thresholding_test_Threshold_result (*thresholding_test_Threshold_result_p)
 /*Module vars for if_changed_test*/
 int if_changed_test_prevVoteResult=1;
 /*End of module vars for if_changed_test*/
-int (*if_changed_test_is_changed_voteResult_p);
-#define if_changed_test_is_changed_voteResult (*if_changed_test_is_changed_voteResult_p)
+int if_changed_test_is_changed_voteResult;
 /*Module vars for print_action_test*/
 /*End of module vars for print_action_test*/
-int (*print_action_test_print_voteResult_p);
-#define print_action_test_print_voteResult (*print_action_test_print_voteResult_p)
+int print_action_test_print_voteResult;
 typedef enum { __mpu_acq_test_mpu_acq, __normalize_inp_test_normalize, __tlcfeaturizer_test_featurizer, __protonn_test_predict, __thresholding_test_Threshold, __if_changed_test_is_changed, __print_action_test_print}  __pipe;
  __pipe __state = __mpu_acq_test_mpu_acq;
 void _mpu_acq_test_init()
@@ -485,7 +482,7 @@ void _protonn_test_predict()
             }
         }
         Serial.println(protonn_test_predict_maxIndex);
-        thresholding_test_Threshold_scores_p = &(protonn_test_scores); thresholding_test_Threshold_result = protonn_test_predict_maxIndex; __state = __thresholding_test_Threshold;
+        thresholding_test_Threshold_result = protonn_test_predict_maxIndex; thresholding_test_Threshold_scores_p = &(protonn_test_scores); __state = __thresholding_test_Threshold;
     }
 }
 void _thresholding_test_Threshold()
@@ -504,7 +501,8 @@ void _thresholding_test_Threshold()
             {
                 thresholding_test_Threshold_result=1;
             }
-            thresholding_test_Threshold_out=(thresholding_test_vote[thresholding_test___pos_vote = (thresholding_test___pos_vote + 1 == 10 ? 0: thresholding_test___pos_vote + 1)] = thresholding_test_Threshold_result);
+            thresholding_test_Threshold_out=thresholding_test_vote[ ( (0) + thresholding_test___pos_vote) % 10];
+            (thresholding_test_vote[thresholding_test___pos_vote = (thresholding_test___pos_vote + 1 == 10 ? 0: thresholding_test___pos_vote + 1)] = thresholding_test_Threshold_result);
             thresholding_test_resultScores[thresholding_test_Threshold_result]=(thresholding_test_resultScores[thresholding_test_Threshold_result]+1);
             if((thresholding_test_Threshold_out!=0))
             {
