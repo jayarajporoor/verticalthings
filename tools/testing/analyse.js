@@ -30,35 +30,28 @@ function get_loop(loopcount,data){
     return temp;
 }
 function WCETfor(stat,power){
-    //console.log("gen for ");
-    //console.log(stat);
     var analyse = require('./WCET.js');
     gen.set_symtbl(ctxobj.symtbl);
-    //console.log('wcet for symtbl scope', ctxobj.symtbl.current_scope.name);
     var code = [];
     code.push("#define true 1");
     code.push("#define false 0");
     code.push("typedef int boolean;");
-    //console.log("vars are ");
     code = code.concat(modulevariables);
     funcvars.forEach(function(variable){
         var res = gen.vardef(variable);
         if (res){
             code.push(res + ';');
         }
-        // console.log(variable);
     });
     userdefinedloopvars.forEach(function(variable){
         code.push("int " + variable + ";");
     });
     funcparams.forEach(function(variable){
-        //console.log(gen);
         var res = gen.fparam(variable);
         if (res){
             res = res.replace(",",";");
             code.push(res + ";");
         }
-        // console.log(variable);
     });
     code.push("int main(){");
     gen.stmt(stat,code);
@@ -82,7 +75,7 @@ function WCETfor(stat,power){
     var loopcount = 0;
     code.forEach(function(line){
         if (line.includes("for")){
-                lines[linecount] = get_loop(loopcount,stat);
+            lines[linecount] = get_loop(loopcount,stat);
             loopcount = loopcount + 1;
         }
         linecount = linecount + 1;
@@ -91,6 +84,10 @@ function WCETfor(stat,power){
     s.lines = lines;
     s.code = new String(fs.readFileSync(tmpobj.name+".asm").toString());
     var cycles = analyse.analyseWCET(tmpobj.name,s,"cortexm0+",false);
+    if (isNaN(cycles*power)){
+        //console.log("code is ",str);
+        console.log("pwer is ",power);
+    }
     return cycles*power;
 }
 function WCETstat(stat,power){
@@ -99,12 +96,42 @@ function WCETstat(stat,power){
         result += WCETfor(stat,power);
     }
     else if (stat['kind'] == "for"){
-        power = power * (stat['range']['to']['iconst'] - stat['range']['from']['iconst']);
+        var from;
+        var to;
+        if (Object.keys(stat.range.from).indexOf("iconst") == -1){
+            if (Object.keys(stat.range.from).indexOf("id") != -1){
+                from = ctxobj.symtbl.lookup(stat.range.from.id).info.value.iconst
+            }
+            else{
+                vtbuild.push("uninitiailised variable at " + stat.range.from.src);
+            }
+        }
+        else{
+            from = stat.range.from.iconst;
+        }
+        if (Object.keys(stat.range.to).indexOf("iconst") == -1){
+            if (Object.keys(stat.range.to).indexOf("id") != -1){
+                to = ctxobj.symtbl.lookup(stat.range.to.id).info.value.iconst;
+            }
+            else{
+                vtbuild.push("uninitiailised variable at " + stat.range.to.src);
+            }
+        }
+        else{
+            to = stat.range.to.iconst;
+        }
+        console.log("mult by ",to - from);
+        power = power * (to - from);
         userdefinedloopvars = userdefinedloopvars.concat(stat['ids']);
         stat['body']['stmts'].forEach(function(statement){
             result += WCETstat(statement,power);
         });
-        userdefinedloopvars;
+        stat['ids'].forEach(function(id){
+            var index = userdefinedloopvars.indexOf(id);
+            if (index != -1){
+                userdefinedloopvars.splice(index,1);
+            }
+        });
     }
     else if (stat['kind'] == "if"){
         result += WCETif(stat,power);
@@ -145,6 +172,10 @@ function WCETstat(stat,power){
                 //called function is neither there in supporting modules (arduino etc) nor in the present module as well
             }
         }
+    }
+    //console.log("result is ",result);
+    if (isNaN(result)){
+        console.log(stat['body']);
     }
     return result;
 }
@@ -194,7 +225,6 @@ function reset(){
     computing = {};
 }
 function calculatefunction(func){
-   // console.log(func);
     globalfuncname = func;
     computing[func['id']] = true;
     ctxobj.symtbl.enterNestedScope(func.id);
@@ -204,7 +234,7 @@ function calculatefunction(func){
     func['body']['stmts'].forEach(function(stat){
         cyclecount += WCETstat(stat,1);
     });
-    //console.log("time taken for " +func['id'] + " " + cyclecount);
+    console.log("time taken for " +func['id'] + " " + cyclecount);
     if (Object.keys(func).indexOf("flow") != -1){
         WCET['time'] = cyclecount;
     }
@@ -216,8 +246,6 @@ function WCETanalysis(data,ctx){
     var start = lookup.first_pipeline_entry(data);
     ast = data;
     ctxobj = ctx;
-    //console.log('ctx is ');
-    //console.log(ctx);
     paths = ctx.config['build'];
     ctx.WCET = [];
     gen.strglobals.length = 0;
@@ -233,29 +261,9 @@ function WCETanalysis(data,ctx){
         modvars.forEach(function(variable){
             var res = gen.vardef(variable);
             if (res){
-                // if (variable['defs'][0].id == "ldProjectionMatrix"){
-                //     //console.log("god save the queen ",res);
-                // }
                 modulevariables.push(res + ';');
             }
-            // else{
-            //     // console.log(variable);
-            //     // if (variable['defs'][0].id == "ldProjectionMatrix"){
-            //     //     console.log("good grief");
-            //     // }
-            // }
-            // // console.log("mod variable is");
-            // console.log(variable);
         });
-    
-        // modvars.forEach(function(vari){
-        //     console.log(vari['type'][]);
-        // });
-        //console.log("mod is " + modulename);
-        //console.log("vars are");
-        //modvars.forEach(function(vari){
-        //    console.log(vari);
-        //});
         mod['fdefs'].every(function(func){
             if (func['id'] == start['qname'][1]){
                 calculatefunction(func);
