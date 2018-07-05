@@ -30,12 +30,14 @@ function get_loop(loopcount,data){
     return temp;
 }
 function WCETfor(stat,power){
+    console.log("oh boy");
+    console.log("str globs is ",gen.strglobals);
     var analyse = require('./WCET.js');
     gen.set_symtbl(ctxobj.symtbl);
     var code = [];
     code.push("#define true 1");
     code.push("#define false 0");
-    code.push("typedef int boolean;");
+    code.push("typedef bool boolean;");
     code = code.concat(modulevariables);
     funcvars.forEach(function(variable){
         var res = gen.vardef(variable);
@@ -65,8 +67,8 @@ function WCETfor(stat,power){
     fs.writeFileSync(tmpobj.name,str);
     console.log(tmpobj.name);
     var execSync = require('child_process').execSync;
-    var command = paths['arduino'] + "/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin/arm-none-eabi-g++ -mcpu=cortex-m0plus -mthumb -c -g -Os -w -std=c++11 -ffunction-sections -fdata-sections -fno-threadsafe-statics -nostdlib --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -MMD -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_MKR1000 -DARDUINO_ARCH_SAMD  -D__SAMD21G18A__ -DUSB_VID=0x2341 -DUSB_PID=0x804e -DUSBCON" + '-DUSB_MANUFACTURER="Arduino LLC"' + '-DUSB_PRODUCT="Arduino MKR1000"' + "-I"+paths['arduino']+"/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include/ -I"+paths['arduino']+"/packages/arduino/tools/CMSIS-Atmel/1.1.0/CMSIS/Device/ATMEL/ -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/cores/arduino -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/variants/mkr1000 -I"+paths['arduino']+"/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/libraries/Wire " + tmpobj.name + " -o " + tmpobj.name + ".o";
-    //console.log(command);
+    var command = paths['arduino'] + "/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin/arm-none-eabi-g++ -mcpu=cortex-m0plus -mthumb -c -g -Os -w -std=c++11 -ffunction-sections -fdata-sections -fno-threadsafe-statics -nostdlib --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -MMD -DF_CPU=48000000L -DARDUINO=10805 -DARDUINO_SAMD_MKR1000 -DARDUINO_ARCH_SAMD  -D__SAMD21G18A__ -DUSB_VID=0x2341 -DUSB_PID=0x804e -DUSBCON" + '-DUSB_MANUFACTURER="Arduino LLC"' + '-DUSB_PRODUCT="Arduino MKR1000"' + "-I"+paths['arduino']+"/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include/ -I"+paths['arduino']+"/packages/arduino/tools/CMSIS-Atmel/1.1.0/CMSIS/Device/ATMEL/ -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/cores/arduino -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/variants/mkr1000 -I"+paths['arduino']+"/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include -I"+paths['arduino']+"/packages/arduino/hardware/samd/1.6.18/libraries/Wire -I"+paths['src']+ " " + tmpobj.name + " -o " + tmpobj.name + ".o";
+    console.log(command);
     execSync(command);
     command = paths['objdump'] + " -d -l " + tmpobj.name +".o > " + tmpobj.name +".asm";
     execSync(command);
@@ -84,10 +86,6 @@ function WCETfor(stat,power){
     s.lines = lines;
     s.code = new String(fs.readFileSync(tmpobj.name+".asm").toString());
     var cycles = analyse.analyseWCET(tmpobj.name,s,"cortexm0+",false);
-    if (isNaN(cycles*power)){
-        //console.log("code is ",str);
-        console.log("pwer is ",power);
-    }
     return cycles*power;
 }
 function WCETstat(stat,power){
@@ -250,6 +248,7 @@ function WCETanalysis(data,ctx){
     ctx.WCET = [];
     gen.strglobals.length = 0;
     gen.memdefs(ctx.mem);
+    gen.includes(ctxobj.config.codegen);
     while (true){
         reset();
         modulename = start['qname'][0];
