@@ -210,7 +210,11 @@ function expr(ast){
 	}
 	else if(typeof ast.fcall != 'undefined'){
 		str = fcall(ast.fcall);
+	}else if(typeof ast.sconst !== 'undefined'){
+		str = ast.sconst ;
 	}
+
+
 	if(ast.address_of){
 		str = "&(" + str + ")";
 	}

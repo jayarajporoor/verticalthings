@@ -10,6 +10,7 @@ float[NNN] fff;
 default flow test_func(){
     int sum, size;    
     pinPeripheral(3,false);
+    Serial.print("Hello");
 	mpu.getFIFOBytes(buf, size);
     for i in [0,20]{
         temp();
