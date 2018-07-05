@@ -1,9 +1,0 @@
-Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/pipe.vt
-Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/mpu_acq_test.vt
-Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/arduino.vt
-Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/normalize_inp_test.vt
-Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/Config.vt
-Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/tlcfeaturizer_test.vt
-Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/Config.vt
-Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/protonn_test.vt
-Parsing /home/arduino/Desktop/verticalthings/tools/testing/icane-beta/test/model.vt

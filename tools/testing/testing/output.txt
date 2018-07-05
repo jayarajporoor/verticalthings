@@ -1,0 +1,20 @@
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/final-icane/pipe.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/final-icane/mpu_acq_test.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/final-icane/arduino.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/final-icane/normalize_inp_test.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/final-icane/Config.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/final-icane/tlcfeaturizer_test.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/final-icane/Config.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/final-icane/protonn_test.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/final-icane/model.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/final-icane/Config.vt
+Parsing /home/arduino/Desktop/verticalthings/tools/testing/final-icane/limit.vt
+VERY VERY BAD
+result is  undefined
+time taken for mpu_acq 1000
+calling another minMaxNormalize
+time taken for minMaxNormalize 0
+calling another minMaxNormalize
+time taken for minMaxNormalize 0
+time taken for normalize 0
+/tmp/code22422KbOr4T9KiB0R.c

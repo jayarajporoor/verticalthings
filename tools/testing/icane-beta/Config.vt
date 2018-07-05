@@ -1,5 +1,5 @@
 module Config;
-const int16_t BAUD_RATE=115200;
+const int32_t BAUD_RATE=115200;
 const int16_t NUM_BUCKETS=20;
 const int16_t STRIDE=20;
 const int16_t BUCKET_WIDTH=20;

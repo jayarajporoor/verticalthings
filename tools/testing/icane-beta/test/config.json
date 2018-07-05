@@ -1,6 +1,0 @@
-{
-	"codegen":{
-		"stdincludes" :["Arduino.h","Wire.h"],
-		"pathincludes" :[]
-	}
-}

@@ -1,0 +1,11 @@
+module pipe;
+
+pipeline pipe{
+    mpu_acq_test,
+    normalize_inp_test,
+    tlcfeaturizer_test,
+    protonn_test,
+    thresholding_test,
+    if_changed_test,
+    print_action_test
+};
