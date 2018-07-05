@@ -371,14 +371,19 @@ function fdef(ast,strbuf){
 			var param = ast.params[i];
 			var stype = stringify_type(param.type);
 			var scoped_name = get_current_scoped_name(param.id, PVAR);
-			var scoped_name_p = scoped_name + SPTR;
-			var def =  str_parray(stype.base, scoped_name_p, stype.dim) + ";" ;
-			strglobals.push(def);
-			def = "#define " + scoped_name + " (*" + scoped_name_p +")";
-			strglobals.push(def);
-			if(param.type.dim && param.type.dim.is_ring){
-				var def_ringpos = "int " + get_current_scoped_name("__pos_" + param.id, PVAR) + ";";		
-				strglobals.push(def_ringpos);
+			if(param.type.dim){
+				var scoped_name_p = scoped_name + SPTR;				
+				var def =  str_parray(stype.base, scoped_name_p, stype.dim) + ";" ;
+				strglobals.push(def);
+				def = "#define " + scoped_name + " (*" + scoped_name_p +")";
+				strglobals.push(def);
+				if(param.type.dim.is_ring){
+					var def_ringpos = "int " + get_current_scoped_name("__pos_" + param.id, PVAR) + ";";		
+					strglobals.push(def_ringpos);
+				}
+			}else{
+				var def =  stype.base + " " + scoped_name + ";";
+				strglobals.push(def);				
 			}			
 		}
 
