@@ -12,11 +12,20 @@ for(i=0;i<size;i++)
 {
     var obj = {};
     obj.x_axis = currentx;
-    currentx = currentx+parseInt(modules[i].time)/100000;
+    currentx = currentx+parseInt(modules[i].time)/10;
+    if(modules[i].time==0)
+    {
+      currentx+=50;
+    }
+
     obj.y_axis = currenty;
     currenty += 30;
     obj.height = 30;
-    obj.width = parseInt(modules[i].time)/100000;
+    obj.width = parseInt(modules[i].time)/10;
+    if(modules[i].time==0)
+    {
+      obj.width+=50;
+    }
     obj.color = colors[(i+1)%6];
     obj.name = modules[i].name[0];
     console.log(obj);
@@ -40,8 +49,6 @@ if(jsonRectangles.length<5)
     }
 }
 
-
-
 var max_x = 0;
 var max_y = 0;
 
@@ -55,17 +62,18 @@ for (var i = 0; i < jsonRectangles.length; i++) {
     if ( temp_y >= max_y ) { max_y = temp_y; }
 }
 
-var digits=max_x.toString().length;
-console.log(digits);
+var xdigits=max_x.toString().length;
+
 
 var xscale;
-console.log(digits);
-if(digits==4)
+
+if(xdigits==4)
 {
-  xscale=10000;
-}else if(digits ==7) {
-  xscale=1;
+  xscale=7;
+}else if(xdigits>7) {
+  xscale=1000;
 }
+
 xscale=parseInt(xscale);
 
 var svgContainer = d3.select("body").append("svg")
@@ -74,7 +82,7 @@ var svgContainer = d3.select("body").append("svg")
 
 var axisScale = d3.scaleLinear()
                         .domain([0,max_x])
-                        .range([0,(max_x)])
+                        .range([0,(max_x)/5])
 var yaxisScale = d3.scaleLinear()
                         .domain([0,max_y])
                         .range([0,(max_y)]);
@@ -99,15 +107,15 @@ var rectangles = xAxisGroup.selectAll("rect")
                            .attr("width", function (d) { return d.width; })
                            .style("fill", function(d) { return d.color; })
                            .attr("y",function(d) { return (d.y_axis); })
-                           .attr("height", function (d) { return d.height; });
-                           //.attr("transform","scale("+1/xscale+")");
+                           .attr("height", function (d) { return d.height; })
+                           .attr("transform","scale("+1/5+",1)");
 
  var rectangleText =xAxisGroup.selectAll("textRect")
                                .data(jsonRectangles)
                                .enter()
                                .append("text");
  rectangleText
-            .attr("x", function(d) { return d.x_axis+d.width/2; })
+            .attr("x", function(d) { return (d.x_axis+d.width/2)/5+30; })
             .attr("y", function(d) { return d.y_axis+d.height/2; })
             .attr("fill", "#000")
             .attr("text-anchor", "middle")

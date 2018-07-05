@@ -12,6 +12,8 @@ var gui = require("nw.gui");
 var fs = require("fs");
 var deb= nw.Window.get().showDevTools();
 
+
+
 var clipboard = gui.Clipboard.get();
 
 //var analyse = require('./../../tools/testing/analyse.js');
@@ -269,21 +271,52 @@ function createChart()
                             .attr("height", function (d) { return d.height; });
 
 }
-
 function handleCompileButton(){
     var id=document.getElementsByClassName('editor tab-pane in fade active show')[0].id;
     try{
-      console.log(compilerObj);
+      var usedmodules= require('./../../compiler/src/modules.js');
+
+      var i;
+      for(i=0;i<usedmodules.length;i++)
+      {
+        var name = require.resolve(usedmodules[i]);
+        delete require.cache[name];
+      }
       var compilerObj = require('./../../compiler/src/vtcompiler.js');
       var srcPath = tabTextarea[id]["filePath"];
       var configPath = './../../tools/testing/paths.json';
       var analysePath = './../../tools/testing/analyse.js';
-      res = compilerObj.compile([srcPath,"-config",configPath,"-xast",analysePath]);
-      //res = compilerObj.compile([srcPath,"-printalloc"]);
-      var i=0;
+    //  res = compilerObj.compile([srcPath,"-config",configPath,"-xast",analysePath]);
+      res = compilerObj.compile([srcPath,"-xast",analysePath,"-config", "./ide-config.json"]);
       console.log(res);
+      var i=0;
+
+      //for getting the executable;
+      var code = res.ctx.code.join("\n");
+      fs.writeFile(res.ctx.config.ide.tmp_folder + "/code.ino",code,function(err){
+        //console.log(res.ctx.code);
+        if(err)
+        {
+            return console.log(err);
+        }
+        console.log("The file was saved");
+      });
 
 
+      var command ='/home/pvsuryachaitanya/Downloads/arduino-1.8.5/arduino'+" --upload "+ res.ctx.config.ide.tmp_folder + '/code.ino' +" --port "+ "/dev/ttyACM0 " +" --board arduino:samd:mkr1000";
+      console.log(command);
+      require('child_process').exec(command, function(error, stdout, stderr){
+        console.log("arduino process done");
+      });
+
+
+      // display successfull complilation
+      var el=document.getElementById("analysis");
+      el.style.display="none";
+      el.innerHTML="Compiled Successfully";
+      //console.log(el);
+      el.style.display="block";
+      resize();
     }catch(e)
     {
       console.log(e, e.stack);
@@ -358,9 +391,15 @@ function initWindowMenu(){
       label :'Memory  ',
       click:function(){
         memory= res.ctx.mem;
-        var w = window.open("memory.html");
+        var w = window.open("../Charts/memory.html");
         w.myvariable = memory;
       }
+  }));
+  file.append(new gui.MenuItem({
+        label :'serial-monitor',
+        click:function(){
+          window.open("../Charts/serial-monitor.html",'_blank');
+        }
   }));
   file.append(new gui.MenuItem({
       label :'Compile',

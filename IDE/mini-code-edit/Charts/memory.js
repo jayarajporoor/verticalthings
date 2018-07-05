@@ -1,4 +1,4 @@
-var deb= nw.Window.get().showDevTools();
+//var deb= nw.Window.get().showDevTools();
 var memory = window.myvariable;
 var size= memory.alloc.length;
 var array=memory.alloc;
@@ -7,7 +7,10 @@ var i,j;
 
 var jsonRectangles = [
     ];
-var colors = ["rgb(100,100,100,0.15)","rgb(20,20,20,0.1)","rgb(100,200,50,0.15)","rgb(200,100,250,0.2)","rgb(100,100,23,0.1)","rgb(200,100,30,0.1)","rgb(200,200,200,0.15)","rgb(150,150,100,0.1)","rgb(10,20,100,0.2)"];
+var colors = ["rgb(100,100,100,0.15)","rgb(0,20,200,0.2)",,"rgb(130,10,200,0.1)",
+              "rgb(100,200,50,0.15)","rgb(200,100,250,0.2)","rgb(100,100,23,0.1)",
+              "rgb(200,100,30,0.1)","rgb(200,200,200,0.15)","rgb(150,150,100,0.1)",
+              "rgb(10,20,100,0.2)","rgb(40,100,256,0.1)","rgb(0,20,130,0.15)","rgb(150,250,200,0.1)"];
 
 for(i=0;i<size;i++)
 {
@@ -36,16 +39,43 @@ for (var i = 0; i < jsonRectangles.length; i++) {
     if ( temp_y >= max_y ) { max_y = temp_y; }
 }
 
-var digits=max_y.toString().length;
-console.log(digits);
+
+var digits = max_y.toString().length;
+var xdigits = max_x.toString().length;
+
+if(xdigits == 5)
+{
+   xscale = 100;
+}else if(xdigits == 4)
+{
+  if(max_x<=5000)
+  {
+    xscale = 2.25 ;
+  }else if(max_x<=1000) {
+    xscale = 4;
+  }
+}else if(xdigits == 3)
+{
+  xscale =1;
+}else {
+  xscale =1;
+}
 
 var yscale;
-console.log(digits);
-if(digits==4)
-{
-  yscale=10;
-}else {
-  yscale=1;
+if(digits==5){
+  yscale=100;
+}
+else if(digits==4){
+  yscale=4;
+}
+else if(digits==3){
+  yscale = 1;
+}
+else if(digits==2){
+  yscale = 0.1;
+}
+else if(digits ==1){
+  yscale = 0.01;
 }
 
 var svgContainer = d3.select("body").append("svg")
@@ -66,7 +96,7 @@ svgContainer.append('text')
 
 var axisScale = d3.scaleLinear()
                         .domain([0,max_x])
-                        .range([0,(max_x)])
+                        .range([0,(max_x)/xscale])
 var yaxisScale = d3.scaleLinear()
                         .domain([0,max_y])
                         .range([0,max_y/yscale]);
@@ -88,11 +118,11 @@ var rectangles = xAxisGroup.selectAll("rect")
  console.log(rectangles);
  var rectangleAttributes = rectangles
                            .attr("x", function (d) { return d.x_axis; })
-                           .attr("width", function (d) { return d.width; })
+                           .attr("width", function (d) { return (d.width); })
                            .style("fill", function(d) { return d.color; })
                            .attr("y",function(d) { return (d.y_axis); })
                            .attr("height", function (d) { return d.height; })
-                           .attr("transform","scale(1,"+yscale/100+')');
+                           .attr("transform","scale(+"+1/xscale+","+1/yscale+')');
 
 
  var rectangleText =xAxisGroup.selectAll("textRect")
@@ -101,8 +131,8 @@ var rectangles = xAxisGroup.selectAll("rect")
                                .append("text");
 
  rectangleText
-            .attr("x", function(d) { return d.x_axis+d.width/2; })
-            .attr("y", function(d) { return (d.y_axis+(d.height/2))/10; })
+            .attr("x", function(d) { return (d.x_axis+d.width/2)/xscale; })
+            .attr("y", function(d) { return (d.y_axis+(d.height/2))/yscale; })
             .attr("fill", "#000")
             .attr("text-anchor", "middle")
             .text(function(d) { return d.name})
