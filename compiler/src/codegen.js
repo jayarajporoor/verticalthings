@@ -3,7 +3,6 @@ const ast_util = require("./ast_util.js");
 var symtbl;
 var pipeline_next_state = {};
 var pipeline_states = [];
-var curr_mod_ast = null;
 var strglobals = [];
 
 const PFUNC = "_";
@@ -522,7 +521,6 @@ function code_gen(ast,ctx){
     for(var mod_name in ast.modules){
         symtbl.enterNestedScope(mod_name);    	
         var mod_ast = ast.modules[mod_name];
-        curr_mod_ast = mod_ast;
 	
 		strglobals.push("/*Module vars for " + mod_name + "*/");
 		for(var i =0;i<mod_ast.vars.length;i++){
@@ -590,3 +588,4 @@ exports.fdef=fdef;
 exports.fparam=fparam;
 exports.var=vardef;
 exports.set_symtbl = set_symtbl;
+exports.strglobals = strglobals;
