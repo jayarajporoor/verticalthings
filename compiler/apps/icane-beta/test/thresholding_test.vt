@@ -1,6 +1,6 @@
 module thresholding_test;
 
-int[10] scoreThreshold={0,0,0,90000,60000,70000,0,70000,0,45000};
+const int[10] scoreThreshold={0,0,0,90000,60000,70000,0,70000,0,45000};
 int ring[10] vote;
 int[11] resultScores;   // Max Label Index +1
 

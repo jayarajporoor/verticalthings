@@ -157,6 +157,7 @@ const float protonn_test_FLT_NMIN=(-3.402823e+30);
 float (*protonn_test_predict_x_p)[124];
 #define protonn_test_predict_x (*protonn_test_predict_x_p)
 /*Module vars for thresholding_test*/
+const int thresholding_test_scoreThreshold[10]={ 0, 0, 0, 90000, 60000, 70000, 0, 70000, 0, 45000} ;
 int thresholding_test___pos_vote = 0;
 /*End of module vars for thresholding_test*/
 int (*thresholding_test_Threshold_scores_p)[10];
@@ -185,6 +186,8 @@ void _mpu_acq_test_init()
         if((mpu_acq_test_init_devStatus==0))
         {
             mpu_acq_test_mpu1.setDMPEnabled(true);
+            delay(5000);
+            Serial.println("DMP Enabled");
         }
         else
         {
@@ -211,6 +214,7 @@ void _mpu_acq_test_mpu_acq()
                 mpu_acq_test_mpu1.dmpGetAccel(&(mpu_acq_test_mpu_acq_acc__), mpu_acq_test_fifoBuffer);
                 mpu_acq_test_mpu1.dmpGetGyro(&(mpu_acq_test_mpu_acq_gyr__), mpu_acq_test_fifoBuffer);
                 mpu_acq_test_mpu_acq_acc[mpu_acq_test_x]=mpu_acq_test_mpu_acq_acc__.x;
+                //Serial.println(mpu_acq_test_mpu_acq_acc[mpu_acq_test_x]);
                 mpu_acq_test_mpu_acq_acc[mpu_acq_test_y]=mpu_acq_test_mpu_acq_acc__.y;
                 mpu_acq_test_mpu_acq_acc[mpu_acq_test_z]=mpu_acq_test_mpu_acq_acc__.z;
                 mpu_acq_test_mpu_acq_gyr[mpu_acq_test_x]=mpu_acq_test_mpu_acq_gyr__.x;
@@ -488,6 +492,7 @@ void _protonn_test_predict()
 }
 void _thresholding_test_Threshold()
 {
+  Serial.println("Entering Threshold");
     int thresholding_test_Threshold_out, thresholding_test_Threshold_maxCount=(-1), thresholding_test_Threshold_voteResult=1;
     {
         if((thresholding_test_Threshold_scores[thresholding_test_Threshold_result]<thresholding_test_scoreThreshold[thresholding_test_Threshold_result]))
@@ -514,6 +519,7 @@ void _thresholding_test_Threshold()
 void _if_changed_test_is_changed()
 {
     {
+      //Serial.println(if_changed_test_is_changed_voteResult);
         if((if_changed_test_is_changed_voteResult==if_changed_test_prevVoteResult))
         {
             if_changed_test_prevVoteResult=if_changed_test_is_changed_voteResult;
