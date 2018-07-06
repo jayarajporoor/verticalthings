@@ -1,10 +1,10 @@
 module thresholding;
 
-const int[10] scoreThreshold={0,0,0,90000,60000,70000,0,70000,0,45000};
+const int[10] scoreThreshold={0,0,0,10000,10000,10000,0,10000,0,10000};
 int ring[10] vote;
 int[11] resultScores;   // Max Label Index +1
 
-default flow Threshold(int result,int[10] scores){
+default flow Threshold(int result,int32_t [10] scores){
 	int out,maxCount=-1,voteResult=1;
 	Serial.print("Result:  ");
 	Serial.println(result);	

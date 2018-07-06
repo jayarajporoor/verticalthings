@@ -46,7 +46,7 @@ float (*tlc_featurizer_featureVectorF_p)[124]= (float (*)[124]) &__vtmem[2553];
 #define tlc_featurizer_featureVectorF (*tlc_featurizer_featureVectorF_p)
 float (*normalize_input_normalize_normAcc_p)[3]= (float (*)[3]) &__vtmem[2553];
 #define normalize_input_normalize_normAcc (*normalize_input_normalize_normAcc_p)
-int (*protonn_scores_p)[10]= (int (*)[10]) &__vtmem[2677];
+int32_t (*protonn_scores_p)[10]= (int32_t (*)[10]) &__vtmem[2677];
 #define protonn_scores (*protonn_scores_p)
 float (*protonn_predict_x_cap_p)[10]= (float (*)[10]) &__vtmem[2677];
 #define protonn_predict_x_cap (*protonn_predict_x_cap_p)
@@ -157,11 +157,11 @@ const float protonn_FLT_NMIN=(-3.402823e+30);
 float (*protonn_predict_x_p)[124];
 #define protonn_predict_x (*protonn_predict_x_p)
 /*Module vars for thresholding*/
-const int thresholding_scoreThreshold[10]={ 0, 0, 0, 90000, 60000, 70000, 0, 70000, 0, 45000} ;
+const int thresholding_scoreThreshold[10]={ 0, 0, 0, 10000, 10000, 10000, 0, 10000, 0, 10000} ;
 int thresholding___pos_vote = 0;
 /*End of module vars for thresholding*/
 int thresholding_Threshold_result;
-int (*thresholding_Threshold_scores_p)[10];
+int32_t (*thresholding_Threshold_scores_p)[10];
 #define thresholding_Threshold_scores (*thresholding_Threshold_scores_p)
 /*Module vars for if_changed*/
 int if_changed_prevVoteResult=1;
@@ -435,7 +435,6 @@ void _protonn_predict()
     float __t1;
     float __t2;
     float __t3;
-    float __t4;
     {
         for(int __i=0; __i<10; __i++)
         {
@@ -449,7 +448,6 @@ void _protonn_predict()
         }
         for(int i=0; i<protonn_numPrototypes; i++)
         {
-            protonn_predict_weight=0;
             __t3=0;
             for(int __i=0; __i<10; __i++)
             {
@@ -460,11 +458,10 @@ void _protonn_predict()
             protonn_predict_weight=__t3;
             protonn_predict_weight=((((-1)*protonn_gamma)*protonn_gamma)*protonn_predict_weight);
             protonn_predict_weight=exp(protonn_predict_weight);
-            __t4=0;
-            for(int __i=0; __i<10; __i++)
+           // Serial.println(protonn_predict_weight);
+            for(int j=0; j<protonn_numLabels; j++)
             {
-                __t4=((protonn_prototypeLabelMatrix[i][__i]*protonn_predict_weight)+__t4);
-                protonn_predict_y_cap[__i]=(__t4+protonn_predict_y_cap[__i]);
+                protonn_predict_y_cap[j]=((protonn_prototypeLabelMatrix[i][j]*protonn_predict_weight)+protonn_predict_y_cap[j]);
             }
         }
         for(int i=0; i<protonn_numLabels; i++)
@@ -481,7 +478,6 @@ void _protonn_predict()
                 protonn_predict_maxScore=protonn_predict_y_cap[i];
             }
         }
-        Serial.println(protonn_predict_maxIndex);
         thresholding_Threshold_result = protonn_predict_maxIndex; thresholding_Threshold_scores_p = &(protonn_scores); __state = __thresholding_Threshold;
     }
 }
@@ -545,7 +541,7 @@ void _print_action_print()
         else
         if((print_action_print_voteResult==5))
         {
-            Serial.println("right_twist");
+            Serial.println("left_twist");
         }
         else
         if((print_action_print_voteResult==4))

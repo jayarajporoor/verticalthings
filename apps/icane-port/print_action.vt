@@ -6,7 +6,7 @@ default flow print(int voteResult){
 	if(voteResult == 3){
 				Serial.println("double_tap");
 		} else if(voteResult == 5){
-				Serial.println("right_twist");
+				Serial.println("left_twist");
 		} else if(voteResult == 4){
 				Serial.println("right_twist");
 		} else if(voteResult == 7){
