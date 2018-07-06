@@ -115,7 +115,6 @@ function loadModule(ast, name, basepath, symtbl){
 	}
 
 	astBuilder.buildAst(tree, mod_ast, symtbl);
-
 	symtbl.exitNestedScope();
 	mod_ast.srcpath = filepath;
 	if(mod_ast.name !== name){
@@ -127,6 +126,7 @@ function loadModule(ast, name, basepath, symtbl){
 			loadModule(ast, mod_ast.uses[j].name, basepath, symtbl);
 		}
 	}
+
 }
 
 function loadPipelineBlock(block, basepath, symtbl, ast){

@@ -1,5 +1,7 @@
 module print_action;
 
+use arduino;
+
 default flow print(int voteResult){
 	if(voteResult == 3){
 				Serial.println("double_tap");

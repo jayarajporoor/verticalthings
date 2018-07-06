@@ -152,8 +152,8 @@ class DUSeq{
         var effects = mod_use.effectsMap[scoped_qname];
         if(effects){
           effects_found = true;
-          for(var k=0;k<effects.length;k++){
-            var effect = effects[k];
+          for(var j=0;j<effects.length;j++){
+            var effect = effects[j];
             switch(effect.kind){
               case 'write':                 
                 var writeparam = ast.params[effect.expr.param].expr;
@@ -193,7 +193,8 @@ class DUSeq{
           }
           //console.log("Effects for ", scoped_qname, effects);
         }
-      }    
+      }  
+
       return effects_found;
   }
 
