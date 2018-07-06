@@ -1,0 +1,51 @@
+module mpu_acq;
+
+use arduino;
+
+const int x = 0, y = 1, z = 2;
+
+MPU6050 mpu1;
+uint16_t fifoPacketSize;
+uint8_t[64] fifoBuffer;
+uint16_t currBucketBufferSize=0;
+uint32_t lastSent = 0; // Long
+void init(){
+	uint8_t devStatus;
+	Wire.begin();
+	Wire.setClock(400000);
+
+	mpu1.initialize();
+	devStatus = mpu1.dmpInitialize();
+
+	if(devStatus == 0){
+		// Enabling DMP...
+		mpu1.setDMPEnabled(true);
+	}
+	else{
+		// Initialization failed...
+	}
+	fifoPacketSize = mpu1.dmpGetFIFOPacketSize();
+}
+
+default flow mpu_acq(){
+	uint16_t fifoCount = mpu1.getFIFOCount();
+	uint8_t mpuIntStatus = mpu1.getIntStatus();
+	int16_t[3] acc,gyr;
+	VectorInt16 acc__,gyr__;
+	if((mpuIntStatus & 0x10) || fifoCount == 1024){
+		// FIFO Overflow..
+		mpu1.resetFIFO();
+		//samplesAfterReset = 0;
+		//numNewReadings = 0;
+	}
+	else if((mpuIntStatus & 0x02)){
+		if(fifoCount >= fifoPacketSize){
+			mpu1.getFIFOBytes(fifoBuffer, fifoPacketSize);
+			mpu1.dmpGetAccel(&acc__,fifoBuffer);
+			mpu1.dmpGetGyro(&gyr__,fifoBuffer);
+			acc[x]=acc__.x; acc[y]=acc__.y; acc[z]=acc__.z;
+			gyr[x]=gyr__.x; gyr[y]=gyr__.y; gyr[z]=gyr__.z;
+			next(acc,gyr);
+		}
+	}
+}

@@ -1,0 +1,15 @@
+module print_action;
+
+default flow print(int voteResult){
+	if(voteResult == 3){
+				Serial.println("double_tap");
+		} else if(voteResult == 5){
+				Serial.println("right_twist");
+		} else if(voteResult == 4){
+				Serial.println("right_twist");
+		} else if(voteResult == 7){
+				Serial.println("twirl");
+		} else if(voteResult == 9){
+				Serial.println("double_swipe");
+		} 
+}
