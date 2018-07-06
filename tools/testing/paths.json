@@ -2,6 +2,6 @@
     "build":{
         "arduino":"/home/sandeshghanta/.arduino15",
         "objdump":"arm-linux-gnueabi-objdump",
-	"src":"/home/arduino/Desktop/verticalthings/tools/testing/icane-beta"
+	"src":"/home/arduino/Desktop/verticalthings/apps/icane-port"
     }
 }

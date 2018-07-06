@@ -245,6 +245,7 @@ function WCETanalysis(data,ctx){
     ast = data;
     ctxobj = ctx;
     paths = ctx.config['build'];
+    //console.log(paths['src']);
     ctx.WCET = [];
     gen.strglobals.length = 0;
     gen.memdefs(ctx.mem);
