@@ -22,7 +22,7 @@ default flow predict(float[FEATURE_LENGTH] x){
 		weight=(x_cap-prototypeMatrix[i]) * (x_cap-prototypeMatrix[i]);
 		weight=-1*gamma*gamma*weight;
 		weight=exp(weight);
-		Serial.println(weight);
+		//Serial.println(weight);
 		for j in [0,numLabels]{
 			y_cap[j]=prototypeLabelMatrix[i][j]*weight + y_cap[j];		
 		}
