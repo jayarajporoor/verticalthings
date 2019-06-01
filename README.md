@@ -40,6 +40,12 @@ The config.json contains list of header files that must be added as #include(s) 
 
 The output code can be compiled using any C/C++ cross-compiler such as arm gcc. Since the generated code is arduino-compatible the Arduino IDE or its commandline tool can be used to build and load the code onto a device.
 
-# Notes
+## Notes
 
 The file compiler/src/vtparams contains the list of modules that are included in the compilation passes.
+
+# ICane port
+
+The ICane port to the DSL is at: apps/icane-port.
+
+The pipeline specification file is icane.vt which lists the pipeline modules and their execution order. Corresponding to each module the corresponding .vt file contains the module code in the DSL, e.g., protonn.vt contains the ProtoNN port to the DSL.
