@@ -40,3 +40,6 @@ The config.json contains list of header files that must be added as #include(s) 
 
 The output code can be compiled using any C/C++ cross-compiler such as arm gcc. Since the generated code is arduino-compatible the Arduino IDE or its commandline tool can be used to build and load the code onto a device.
 
+# Notes
+
+The file compiler/src/vtparams contains the list of modules that are included in the compilation passes.
