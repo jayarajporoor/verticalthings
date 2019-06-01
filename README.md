@@ -12,8 +12,9 @@ Author: Jayaraj Poroor
 
 ## Prerequisites
 
-### A recent version of node.js
-### For building the generated C, a GCC cross-compiler for the target platform or the arduino software. The build has been tested using the arm-gcc - both separately and the one that comes bundled with arduino.
+A recent version of node.js.
+
+For building the generated C, a GCC cross-compiler for the target platform or the arduino software. The build has been tested using the arm-gcc - both separately and the one that comes bundled with arduino.
 
 
 ## Usage
