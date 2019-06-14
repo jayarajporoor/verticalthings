@@ -1,0 +1,11 @@
+module icane;
+
+pipeline icane{
+    mpu_acq,
+    normalize_input,
+    tlc_featurizer,
+    protonn,
+    thresholding,
+    if_changed,
+    print_action
+};

@@ -1,0 +1,31 @@
+module test_mod;
+use arduino;
+
+const int NNN = 10;
+MPU mpu;
+
+int ring[10] buf;
+float[NNN] fff;
+
+default flow test_func(){
+    int sum, size;    
+    pinPeripheral(3,false);
+    Serial.print("Hello");
+	mpu.getFIFOBytes(buf, size);
+    for i in [0,20]{
+        temp();
+    }
+    sum = fff[0];
+}
+
+void temp(){
+    int sum1;
+    uint8_t[10] A;
+    int[10] B;
+    int[10] C;
+    B = 0;
+    C= 0;
+    A = 0;
+    Serial.print(buf[0]);
+    C = (B + A)*(B+A);
+}

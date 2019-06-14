@@ -1,0 +1,6 @@
+module m2;
+
+default flow hol(){
+	int b=0;
+	b=b+1;
+}

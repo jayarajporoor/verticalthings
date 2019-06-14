@@ -9,3 +9,52 @@ pipeline icane{
     if_changed,
     print_action
 };
+
+async function icane(){
+    buf = await mpu_acq();
+    nbuf = normalize_input(buf);
+    fvec = tlc_featurizer(nbuf);
+    predict = protonn(fvec);
+    res = thresholding(predict);
+    res = if_changed(res);
+    await print_action(res);
+}
+
+async function icane(){
+    await mpu_acq ->
+    normalize_input ->
+    tlc_featurizer ->
+    protonn ->
+    thresholding ->
+    if_changed ->
+    await print_action;
+}
+
+if_changed( lambda {
+    await print_action
+})
+
+
+async mpu_acq(){
+    buf = await pool_acquire();
+    buf = await spi_dma_receive(buf);
+    return buf;
+}
+
+bufs[2]
+free_list 
+signal pool_avail;
+async pool_acquire(){
+    if(free_list & 0x01)
+        return bufs[0];
+    else
+    if(free_list & 0x01)
+       return bufs[1];
+    await pool_avail;
+}
+
+pool_release(buf){
+    if buf == buf[0] free_list &= 0xE else free_List &= 0xD;
+
+    pool_avail.signal();
+}
