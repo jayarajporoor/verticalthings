@@ -17,51 +17,6 @@ VerticalThingsVisitor.prototype.visitModule = function(ctx) {
 };
 
 
-// Visit a parse tree produced by VerticalThings#effectsDef.
-VerticalThingsVisitor.prototype.visitEffectsDef = function(ctx) {
-};
-
-
-// Visit a parse tree produced by VerticalThings#effectStmt.
-VerticalThingsVisitor.prototype.visitEffectStmt = function(ctx) {
-};
-
-
-// Visit a parse tree produced by VerticalThings#effectTarget.
-VerticalThingsVisitor.prototype.visitEffectTarget = function(ctx) {
-};
-
-
-// Visit a parse tree produced by VerticalThings#effectParam.
-VerticalThingsVisitor.prototype.visitEffectParam = function(ctx) {
-};
-
-
-// Visit a parse tree produced by VerticalThings#effectCtx.
-VerticalThingsVisitor.prototype.visitEffectCtx = function(ctx) {
-};
-
-
-// Visit a parse tree produced by VerticalThings#effectSpec.
-VerticalThingsVisitor.prototype.visitEffectSpec = function(ctx) {
-};
-
-
-// Visit a parse tree produced by VerticalThings#opsList.
-VerticalThingsVisitor.prototype.visitOpsList = function(ctx) {
-};
-
-
-// Visit a parse tree produced by VerticalThings#effectExpr.
-VerticalThingsVisitor.prototype.visitEffectExpr = function(ctx) {
-};
-
-
-// Visit a parse tree produced by VerticalThings#effectTerm.
-VerticalThingsVisitor.prototype.visitEffectTerm = function(ctx) {
-};
-
-
 // Visit a parse tree produced by VerticalThings#pipelineDef.
 VerticalThingsVisitor.prototype.visitPipelineDef = function(ctx) {
 };
@@ -82,8 +37,8 @@ VerticalThingsVisitor.prototype.visitPipelineList = function(ctx) {
 };
 
 
-// Visit a parse tree produced by VerticalThings#useSpec.
-VerticalThingsVisitor.prototype.visitUseSpec = function(ctx) {
+// Visit a parse tree produced by VerticalThings#usingSpec.
+VerticalThingsVisitor.prototype.visitUsingSpec = function(ctx) {
 };
 
 
@@ -157,8 +112,18 @@ VerticalThingsVisitor.prototype.visitVarType = function(ctx) {
 };
 
 
-// Visit a parse tree produced by VerticalThings#flowType.
-VerticalThingsVisitor.prototype.visitFlowType = function(ctx) {
+// Visit a parse tree produced by VerticalThings#varTypeList.
+VerticalThingsVisitor.prototype.visitVarTypeList = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#tupleType.
+VerticalThingsVisitor.prototype.visitTupleType = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#returnType.
+VerticalThingsVisitor.prototype.visitReturnType = function(ctx) {
 };
 
 
@@ -214,6 +179,11 @@ VerticalThingsVisitor.prototype.visitReturnStmt = function(ctx) {
 
 // Visit a parse tree produced by VerticalThings#stmt.
 VerticalThingsVisitor.prototype.visitStmt = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#tupleIds.
+VerticalThingsVisitor.prototype.visitTupleIds = function(ctx) {
 };
 
 
@@ -282,8 +252,18 @@ VerticalThingsVisitor.prototype.visitExpr = function(ctx) {
 };
 
 
+// Visit a parse tree produced by VerticalThings#syncExpr.
+VerticalThingsVisitor.prototype.visitSyncExpr = function(ctx) {
+};
+
+
 // Visit a parse tree produced by VerticalThings#toplevelExpr.
 VerticalThingsVisitor.prototype.visitToplevelExpr = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#tupleExpr.
+VerticalThingsVisitor.prototype.visitTupleExpr = function(ctx) {
 };
 
 

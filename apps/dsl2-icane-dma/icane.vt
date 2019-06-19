@@ -1,11 +1,6 @@
-module icane;
 
-pipeline icane{
-    mpu_acq,
-    normalize_input,
-    tlc_featurizer,
-    protonn,
-    thresholding,
-    if_changed,
-    print_action
-};
+async void main(){
+    (acc, gyr) = await mpu_acq();
+    (normAX, normAY, normAZ, normGX, normGY, normGZ) = await normalize_input(acc, gyr);
+}
+

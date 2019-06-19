@@ -27,7 +27,7 @@ void init(){
 	fifoPacketSize = mpu1.dmpGetFIFOPacketSize();
 }
 
-default flow mpu_acq(){
+async void mpu_acq(){
 	uint16_t fifoCount = mpu1.getFIFOCount();
 	uint8_t mpuIntStatus = mpu1.getIntStatus();
 	int16_t[3] acc,gyr;

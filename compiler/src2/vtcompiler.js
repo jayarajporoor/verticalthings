@@ -2,10 +2,12 @@ const util = require('util')
 var fs = require('fs');
 const path = require('path');
 var antlr4 = require('antlr4/index');
-var VTLexer = require(__dirname + '/../grammar/out/parser/VTLexer');
-var VTParser = require(__dirname + '/../grammar/out/parser/VerticalThings');
+var VTLexer = require(__dirname + '/../grammar2/out/parser/VTLexer');
+var VTParser = require(__dirname + '/../grammar2/out/parser/VerticalThings');
 var astBuilder = require("./astbuilder.js");
 var SymbolTable = require("./symtbl.js");
+
+const SRC_FILE_EXTENSION = '.vt';
 
 var parseErrorListener = {};
 var errors=0;
@@ -70,7 +72,7 @@ function parse(srcpath, input) {
 }
 
 function loadInclude(name, basepath, symtbl){
-	var filepath = basepath + "/" + name + ".vt";
+	var filepath = basepath + "/" + name + SRC_FILE_EXTENSION;
 	var src;
 	try{
 		src = fs.readFileSync(filepath, 'utf8');
@@ -89,7 +91,7 @@ function loadModule(ast, name, basepath, symtbl){
 		return;//already loaded.
 	}
 
-	var filepath = basepath + "/" + name + ".vt";
+	var filepath = basepath + "/" + name + SRC_FILE_EXTENSION;
 	var src;
 	try{
 		src = fs.readFileSync(filepath, 'utf8');
@@ -115,6 +117,10 @@ function loadModule(ast, name, basepath, symtbl){
 	}
 
 	astBuilder.buildAst(tree, mod_ast, symtbl);
+	if(typeof mod_ast.name === 'undefined' ){
+		mod_ast.name = name;
+	}
+	mod_ast.name = name;
 	symtbl.exitNestedScope();
 	mod_ast.srcpath = filepath;
 	if(mod_ast.name !== name){
@@ -129,7 +135,7 @@ function loadModule(ast, name, basepath, symtbl){
 
 }
 
-function loadPipelineBlock(block, basepath, symtbl, ast){
+/*function loadPipelineBlock(block, basepath, symtbl, ast){
 	for(var i=0;i<block.length;i++){
 		var entry = block[i];
 		if(entry.qname){
@@ -149,7 +155,7 @@ function loadPipeline(ast, basepath, symtbl) {
 		return vtbuild.error("Pipeline definition not found.");
 	}
 	loadPipelineBlock(ast.pipeline.block, basepath, symtbl, ast);
-}
+}*/
 
 function print_object(obj, printJson, printColor){
 	if(printJson){
@@ -165,7 +171,7 @@ var printJson = false;
 
 function compile(argv)
 {
-	var srcpath;
+	var srcpaths = [];
 	var printAst = false;
 	var printSymtbl = false;
 
@@ -184,8 +190,9 @@ function compile(argv)
 		return vtbuild.error("Please provide the pipeline definition file name to be compiled.");
 	}
 
-	srcpath = argv[0];
-	argv.shift();
+	while(argv.length > 0 && !argv[0].startsWith("-")){
+		srcpaths.push(argv.shift());
+	}
 
 	try{
 		if(argv[0] !== "-bare"){
@@ -196,6 +203,12 @@ function compile(argv)
 	}catch(e){
 		vtbuild.warning("Default parameter file ", paramspath , "not accessible or properly formed.");
 	}
+
+
+	if(srcpaths.length == 0){
+		return vtbuild.error("Please provide at least the source path of the main source file.");
+	}
+
 
 	for(var i=0;i<argv.length;i++){
 		switch(argv[i]){
@@ -256,24 +269,35 @@ function compile(argv)
 		}
 	}
 
+/*
 	var input;
 
 	try{
-		input  = fs.readFileSync(srcpath, 'utf8');
+		input  = fs.readFileSync(srcpaths[0], 'utf8');
 	}catch(e){
-		return vtbuild.error("Cannot access source file " + srcpath);
+		return vtbuild.error("Cannot access source file " + srcpaths[0]);
 	}
-	var tree = parse(srcpath, input);
+	var tree = parse(srcpaths[0], input);*/
+
 	var symtbl = new SymbolTable("<root>");
-	var ast = astBuilder.buildAst(tree, symtbl);
+	var ast = {modules:{}, module_names: []};
 
-	if(ast.pipeline){
-		ast.pipeline.srcpath = srcpath;
+	//var ast = astBuilder.buildAst(tree, symtbl);
+
+	var basepath = path.dirname(srcpaths[0]);
+
+	for(var i=0;i<srcpaths.length;i++){
+		var module_name = path.basename(srcpaths[i], SRC_FILE_EXTENSION);
+		loadModule(ast, module_name, basepath, symtbl);
+		ast.module_names.push(module_name);
 	}
 
-	ast.modules = {};
+/*	if(ast.pipeline){
+		ast.pipeline.srcpath = srcpath;
+	}*/
 
-	loadPipeline(ast, path.dirname(srcpath), symtbl);
+
+//	loadPipeline(ast, path.dirname(srcpath), symtbl);
 
 	var transform_ctx = {symtbl: symtbl, params: mod_params, resources: {}, config: {}};
 

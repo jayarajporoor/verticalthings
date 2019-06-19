@@ -20,87 +20,6 @@ VerticalThingsListener.prototype.exitModule = function(ctx) {
 };
 
 
-// Enter a parse tree produced by VerticalThings#effectsDef.
-VerticalThingsListener.prototype.enterEffectsDef = function(ctx) {
-};
-
-// Exit a parse tree produced by VerticalThings#effectsDef.
-VerticalThingsListener.prototype.exitEffectsDef = function(ctx) {
-};
-
-
-// Enter a parse tree produced by VerticalThings#effectStmt.
-VerticalThingsListener.prototype.enterEffectStmt = function(ctx) {
-};
-
-// Exit a parse tree produced by VerticalThings#effectStmt.
-VerticalThingsListener.prototype.exitEffectStmt = function(ctx) {
-};
-
-
-// Enter a parse tree produced by VerticalThings#effectTarget.
-VerticalThingsListener.prototype.enterEffectTarget = function(ctx) {
-};
-
-// Exit a parse tree produced by VerticalThings#effectTarget.
-VerticalThingsListener.prototype.exitEffectTarget = function(ctx) {
-};
-
-
-// Enter a parse tree produced by VerticalThings#effectParam.
-VerticalThingsListener.prototype.enterEffectParam = function(ctx) {
-};
-
-// Exit a parse tree produced by VerticalThings#effectParam.
-VerticalThingsListener.prototype.exitEffectParam = function(ctx) {
-};
-
-
-// Enter a parse tree produced by VerticalThings#effectCtx.
-VerticalThingsListener.prototype.enterEffectCtx = function(ctx) {
-};
-
-// Exit a parse tree produced by VerticalThings#effectCtx.
-VerticalThingsListener.prototype.exitEffectCtx = function(ctx) {
-};
-
-
-// Enter a parse tree produced by VerticalThings#effectSpec.
-VerticalThingsListener.prototype.enterEffectSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by VerticalThings#effectSpec.
-VerticalThingsListener.prototype.exitEffectSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by VerticalThings#opsList.
-VerticalThingsListener.prototype.enterOpsList = function(ctx) {
-};
-
-// Exit a parse tree produced by VerticalThings#opsList.
-VerticalThingsListener.prototype.exitOpsList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by VerticalThings#effectExpr.
-VerticalThingsListener.prototype.enterEffectExpr = function(ctx) {
-};
-
-// Exit a parse tree produced by VerticalThings#effectExpr.
-VerticalThingsListener.prototype.exitEffectExpr = function(ctx) {
-};
-
-
-// Enter a parse tree produced by VerticalThings#effectTerm.
-VerticalThingsListener.prototype.enterEffectTerm = function(ctx) {
-};
-
-// Exit a parse tree produced by VerticalThings#effectTerm.
-VerticalThingsListener.prototype.exitEffectTerm = function(ctx) {
-};
-
-
 // Enter a parse tree produced by VerticalThings#pipelineDef.
 VerticalThingsListener.prototype.enterPipelineDef = function(ctx) {
 };
@@ -137,12 +56,12 @@ VerticalThingsListener.prototype.exitPipelineList = function(ctx) {
 };
 
 
-// Enter a parse tree produced by VerticalThings#useSpec.
-VerticalThingsListener.prototype.enterUseSpec = function(ctx) {
+// Enter a parse tree produced by VerticalThings#usingSpec.
+VerticalThingsListener.prototype.enterUsingSpec = function(ctx) {
 };
 
-// Exit a parse tree produced by VerticalThings#useSpec.
-VerticalThingsListener.prototype.exitUseSpec = function(ctx) {
+// Exit a parse tree produced by VerticalThings#usingSpec.
+VerticalThingsListener.prototype.exitUsingSpec = function(ctx) {
 };
 
 
@@ -272,12 +191,30 @@ VerticalThingsListener.prototype.exitVarType = function(ctx) {
 };
 
 
-// Enter a parse tree produced by VerticalThings#flowType.
-VerticalThingsListener.prototype.enterFlowType = function(ctx) {
+// Enter a parse tree produced by VerticalThings#varTypeList.
+VerticalThingsListener.prototype.enterVarTypeList = function(ctx) {
 };
 
-// Exit a parse tree produced by VerticalThings#flowType.
-VerticalThingsListener.prototype.exitFlowType = function(ctx) {
+// Exit a parse tree produced by VerticalThings#varTypeList.
+VerticalThingsListener.prototype.exitVarTypeList = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#tupleType.
+VerticalThingsListener.prototype.enterTupleType = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#tupleType.
+VerticalThingsListener.prototype.exitTupleType = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#returnType.
+VerticalThingsListener.prototype.enterReturnType = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#returnType.
+VerticalThingsListener.prototype.exitReturnType = function(ctx) {
 };
 
 
@@ -377,6 +314,15 @@ VerticalThingsListener.prototype.enterStmt = function(ctx) {
 
 // Exit a parse tree produced by VerticalThings#stmt.
 VerticalThingsListener.prototype.exitStmt = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#tupleIds.
+VerticalThingsListener.prototype.enterTupleIds = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#tupleIds.
+VerticalThingsListener.prototype.exitTupleIds = function(ctx) {
 };
 
 
@@ -497,12 +443,30 @@ VerticalThingsListener.prototype.exitExpr = function(ctx) {
 };
 
 
+// Enter a parse tree produced by VerticalThings#syncExpr.
+VerticalThingsListener.prototype.enterSyncExpr = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#syncExpr.
+VerticalThingsListener.prototype.exitSyncExpr = function(ctx) {
+};
+
+
 // Enter a parse tree produced by VerticalThings#toplevelExpr.
 VerticalThingsListener.prototype.enterToplevelExpr = function(ctx) {
 };
 
 // Exit a parse tree produced by VerticalThings#toplevelExpr.
 VerticalThingsListener.prototype.exitToplevelExpr = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#tupleExpr.
+VerticalThingsListener.prototype.enterTupleExpr = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#tupleExpr.
+VerticalThingsListener.prototype.exitTupleExpr = function(ctx) {
 };
 
 

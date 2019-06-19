@@ -4,27 +4,9 @@ parser grammar VerticalThings;
 options {tokenVocab = VTLexer;}
 
 module
-    :   useSpec* includeSpec* varDef*
-        (funcDef* | effectsDef)
+    :   usingSpec* includeSpec* varDef*
+        funcDef*
     ;
-
-effectsDef: EFFECTS LB (effectStmt SEMI)* RB;    
-
-effectStmt: effectTarget (COMMA effectCtx)* EASSIGN effectSpec (COMMA effectSpec)*;
-
-effectTarget: qualIdentifier LP (effectParam (COMMA effectParam)*)? RP;
-
-effectParam: BAND? Identifier;
-
-effectCtx: Identifier COLON Identifier;
-
-effectSpec: Identifier opsList? effectExpr;
-
-opsList: LS Identifier (COMMA Identifier)* RS;
-
-effectExpr: Identifier | exprConstant | StringLiteral | effectTerm ;
-
-effectTerm: Identifier LP (effectExpr (COMMA effectExpr)*)? RP;
 
 pipelineDef
     :  PIPELINE Identifier pipelineBlock SEMI?
@@ -41,8 +23,8 @@ pipelineList
     :   pipelineEntry (COMMA pipelineEntry)*  COMMA?
     ;
 
-useSpec
-    :   USE Identifier SEMI
+usingSpec
+    :   USING Identifier SEMI
     ;
 
 includeSpec
@@ -83,16 +65,20 @@ castableType
     ;
 
 primitiveType
-    : type=(INT | FLOAT | BOOLEAN | VOID | I8 | U8 | I16 | U16 | I32 | U32 | SEMAPHORE | FUTURE)
+    : type=(INT | FLOAT | BOOLEAN | VOID | I8 | U8 | I16 | U16 | I32 | U32 | EVENT | FUTURE)
     ;
 
 varType
     :   (qualIdentifier | cppQualIdentifier | rangeType | primitiveType) dimensionSpec?
     ;    
 
-flowType
-    :   DEFAULT? FLOW
+varTypeList
+    :  varType (COMMA varType)*
     ;
+
+tupleType : LP varTypeList RP;
+
+returnType : varType | tupleType;
 
 formalParam
     :   CONST? varType Identifier
@@ -128,17 +114,20 @@ whileStmt
     ;
 
 assignStmt  
-    : qualIdentifier dimensionExpr? ASSIGN toplevelExpr
+    : ((qualIdentifier dimensionExpr?) | tupleIds) ASSIGN toplevelExpr
     ;
 
-returnStmt: RETURN expr;
+returnStmt: RETURN toplevelExpr;
 
 stmt 
     :   stmtBlock | ifStmt | forStmt | whileStmt | assignStmt SEMI | functionCall SEMI | returnStmt SEMI
     ;    
 
+tupleIds : LP identifierList RP;
+
+
 funcDef
-    :  ASYNC? Identifier LP formalParams? RP 
+    :  ASYNC? returnType Identifier LP formalParams? RP 
         LB varDef* stmt* RB
     ;    
 
@@ -170,6 +159,7 @@ dimensionExpr
 arrayExpr: Identifier dimensionExpr;
 
 addressExpr: BAND (arrayExpr | qualIdentifier);
+
 
 castExpr : castableType LP basicExpr RP;
 
@@ -205,7 +195,12 @@ expr
         LP expr RP 
     ;     
 
-toplevelExpr: AWAIT? expr;
+
+syncExpr: (AWAIT | SIGNAL) (functionCall | Identifier);
+
+toplevelExpr: syncExpr | tupleExpr | expr;
+
+tupleExpr : LP actualParams RP;
 
 numConstant: IntegerConstant | FloatingConstant;
 

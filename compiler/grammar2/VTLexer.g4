@@ -5,10 +5,14 @@ ASYNC: 'async' ;
 
 AWAIT: 'await';
 
+SIGNAL : 'signal';
+
 FUTURE: 'future';
 
-SEMAPHORE: 'semaphore';
+EVENT: 'event';
 
+
+USING: 'using' ;
 
 MODULE
     :   'module'

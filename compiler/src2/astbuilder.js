@@ -266,6 +266,46 @@ function getRelExprAst(expr){
 	}
 }
 
+function getSyncExprAst(expr){
+	var ast = {src: src_info(expr)};
+	if(expr.AWAIT()){
+		ast.sync = 'await';
+	}else
+	if(expr.SIGNAL()){
+		ast.sync = 'signal';
+	}
+
+	var functionCall = expr.functionCall();
+
+	if(functionCall){
+		 ast.target = getFunctionCallAst(functionCall);
+	}else {
+		ast.target = getId(expr);
+	}
+	return ast;
+
+}
+
+function getTupleExprAst(expr){
+	var ast = {src: src_info(expr)};
+	ast.texpr = getActualParams(expr.tupleExpr().actualParams());
+}
+
+function getToplevelExprAst(expr){
+	var ast;
+	var syncExpr = expr.syncExpr();
+	var tupleExpr = expr.tupleExpr();
+	var normalExpr = expr.expr();
+	if(syncExpr){
+		ast = getSyncExprAst(syncExpr);
+	}else if(tupleExpr){
+		ast = getTupleExprAst(tupleExpr);
+	}else
+	{
+		ast  = getExprAst(normalExpr);
+	}
+	return ast;
+}
 
 function getExprAst(expr){
 	var ast = {src: src_info(expr)};
@@ -294,7 +334,7 @@ function getExprAst(expr){
 	return ast;
 }
 
-
+/*
 function astPipelineBlock(pipelineBlock, ast){
 	var list = pipelineBlock.pipelineList().pipelineEntry();
 	for(var i=0;i<list.length;i++) {
@@ -323,12 +363,12 @@ function astPipeline(pipelineDef, ast){
 	ast.name = getId(pipelineDef);
 	ast.block = [];
 	astPipelineBlock(pipelineDef.pipelineBlock(), ast.block);
-}
+}*/
 
-function astUseSpec(useSpec){
+function astUsingSpec(usingSpec){
 	var uses = [];
-	for(var i=0;i<useSpec.length;i++){
-		uses.push({name: getId(useSpec[i])});
+	for(var i=0;i<usingSpec.length;i++){
+		uses.push({name: getId(usingSpec[i])});
 	}
 	return uses;
 }
@@ -364,6 +404,24 @@ function astRangeType(rangeType){
 
 function astPrimitiveType(ptype){
 	return {primitive: ptype.type.text,  src: src_info(ptype)};
+}
+
+function astTupleType(ttype){
+	var type_list = [];
+	var varTypes = ttype.varTypeList().varType();
+	for(var i=0;i < varTypes.length;i++){
+		type_list.push(astVarType(varTypes[i]));
+	}
+	return {
+		ttype : type_list
+	};
+}
+
+function astReturnType(returnType){
+	var varType = returnType.varType();
+	var tupleType = returnType.tupleType();
+
+	return varType ? astVarType(varType) : astTupleType(tupleType);
 }
 
 function astVarType(varType){
@@ -556,13 +614,21 @@ function astFormalParam(param){
 
 function astAssignStmt(stmt){
 	//qualIdentifier dimensionSpec? ASSIGN expr
+	var qualId = stmt.qualIdentifier();
+	var tupleIds = stmt.tupleIds();
 	var ast = {
 		kind: 'assign',
-		qid : getIdList(stmt.qualIdentifier()),
-		expr: getExprAst(stmt.expr()),
+		expr: getToplevelExprAst(stmt.toplevelExpr()),
 		src: src_info(stmt)		
 	};
-	if(ast.qid.length === 1){
+	if(qualId){
+		ast.qid = getIdList(qualId);
+	}
+	if(tupleIds){
+		ast.tid = getIdList(tupleIds.identifierList());
+	}
+
+	if(ast.qid && ast.qid.length === 1){
 		ast.id = ast.qid[0];
 	}
 	var dimExpr = stmt.dimensionExpr();
@@ -619,7 +685,7 @@ function astReturnStmt(stmt){
 	//returnStmt: RETURN expr;
 	return {
 		kind: 'return',
-		expr: getExprAst(stmt.expr()),
+		expr: getToplevelExprAst(stmt.expr()),
 		src: src_info(stmt)
 	};
 }
@@ -671,19 +737,22 @@ function astStmtBlock(block){
 function astFuncDef(fdef){
 	var ast = {};
 	ast.src = src_info(fdef);	
-	var varType = fdef.varType();
-	var flowType = fdef.flowType();
+	var returnType = fdef.returnType();
+//	var flowType = fdef.flowType();
 
-	if(varType){
-		ast.type = astVarType(varType);
+	if(returnType){
+		ast.type = astReturnType(returnType);
 	}
-	if(flowType){
+	if(fdef.ASYNC()){
+		ast.is_async = true;
+	}
+/*	if(flowType){
 		if(flowType.DEFAULT()){
 			ast.flow = 'default';
 		}else{
 			ast.flow = 'normal';
 		}
-	}
+	}*/
 	ast.id = getId(fdef);
 	ast.params = [];
 
@@ -728,7 +797,7 @@ function src_info(node){
 	return src;
 }
 
-
+/*
 function astEffectTerm(term, params){
 //effectExpr: Identifier | exprConstant | StringLiteral | effectTerm ;
 //effectTerm: Identifier LP (effectExpr (COMMA effectExpr)*)? RP;
@@ -828,6 +897,7 @@ function astEffectStmt(estmt, effectsmap){
 	}
 }
 
+
 function astEffectsDef(ast){
 	var effectsmap = {};
 	var estmts = ast.effectStmt();
@@ -836,15 +906,15 @@ function astEffectsDef(ast){
 		astEffectStmt(estmt, effectsmap);
 	}
 	return effectsmap;
-}
+}*/
 
 function astModule(moduleDef, ast) {
-	ast.name = getId(moduleDef);
+	//ast.name = getId(moduleDef);
 	ast.src = src_info(moduleDef);
-	var useSpec = moduleDef.useSpec();
+	var usingSpec = moduleDef.usingSpec();
 
-	if(useSpec){
-		ast.uses = astUseSpec(useSpec);
+	if(usingSpec){
+		ast.uses = astUsingSpec(usingSpec);
 	}else{
 		ast.uses = [];
 	}
@@ -857,11 +927,11 @@ function astModule(moduleDef, ast) {
 			ast.vars.push(astVarDef(varDef[i]));
 		}
 	}
-	var pipeline = moduleDef.pipelineDef();
+/*	var pipeline = moduleDef.pipelineDef();
 	if(pipeline) {
 		ast.pipeline = {};
 		astPipeline(pipeline, ast.pipeline);
-	}
+	}*/
 	var funcDef = moduleDef.funcDef();
 	if(funcDef){
 		if(!ast.fdefs){
@@ -871,16 +941,16 @@ function astModule(moduleDef, ast) {
 			ast.fdefs.push(astFuncDef(funcDef[i]));
 		}
 	}
-	var effectsDef = moduleDef.effectsDef();
+	/*var effectsDef = moduleDef.effectsDef();
 	if(effectsDef){
 		ast.effectsMap = astEffectsDef(effectsDef);
-	}
+	}*/
 	return ast;
 }
 
-function buildAst(tree, mod_ast, symtbl) {
+function buildAst(parseTree, mod_ast, symtbl) {
 	ctx.symtbl = symtbl;
-	astModule(tree, mod_ast);
+	astModule(parseTree, mod_ast);
 	return mod_ast;
 }
 
