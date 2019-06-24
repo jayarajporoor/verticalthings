@@ -1,6 +1,6 @@
 
 async void main(){
-    (acc, gyr) = await mpu_acq();
-    (normAX, normAY, normAZ, normGX, normGY, normGZ) = await normalize_input(acc, gyr);
+    float[100] v;
+    v[0] = 1;
 }
 

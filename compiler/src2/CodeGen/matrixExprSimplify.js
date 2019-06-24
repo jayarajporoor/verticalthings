@@ -204,13 +204,13 @@ function expr(ast, ctx, isRoot){
 		}
 	}
 	else{
-		if(!lexpr_is_varconst){
+		if(!lexpr_is_varconst && ast.lexpr){
 			var texpr = expr(ast.lexpr, ctx, false);
 			if(texpr){
 				ast.lexpr = texpr;
 			}
 		}
-		if(!rexpr_is_varconst){
+		if(!rexpr_is_varconst && ast.rexpr){
 			var texpr = expr(ast.rexpr, ctx, false);
 			if(texpr){
 				ast.rexpr = texpr;

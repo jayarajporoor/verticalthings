@@ -5,6 +5,12 @@ var pipeline_next_state = {};
 var pipeline_states = [];
 var strglobals = [];
 
+var curr = {
+	is_async: false,
+	arec_names : [],
+	arec_decl : []
+};//current context - must be explicitly cleared appropriately.
+
 const PFUNC = "_";
 const PVAR = "";
 const SPTR = "_p";
@@ -130,6 +136,16 @@ function fcall(ast){
 	return str;
 }
 
+function get_arec_qualified_name(sym){
+	var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);
+	if(curr.is_async){
+		if(curr.arec_names.indexOf(scoped_name) >= 0){
+			return "this->" + scoped_name;
+		}
+	}	
+	return scoped_name;
+}
+
 function expr(ast){
 	// console.log(ast);
 	var str="";
@@ -154,7 +170,7 @@ function expr(ast){
 		if(ast.qid && ast.qid.length > 1){
 			sym = symtbl.lookup(ast.qid[0]);
 			if(sym){
-				str = str + ast_util.get_scoped_name(sym, "_", PVAR);
+				str = str + get_arec_qualified_name(sym, "_", PVAR);
 				for(var j=1;j<ast.qid.length;j++){
 					str += "." + ast.qid[j];
 				}
@@ -164,7 +180,7 @@ function expr(ast){
 		}else{
 			sym = symtbl.lookup(id);
 			if(sym && !sym.info.is_temp){
-				str = str + ast_util.get_scoped_name(sym, "_", PVAR);
+				str = str + get_arec_qualified_name(sym, "_", PVAR);
 			}else{
 				str = str + id;//loop variables are not in symbol table now.
 				if(!sym){
@@ -234,7 +250,8 @@ function block(ast,str){
 function stmt(ast,strbuf){
 	switch(ast.kind){
 		case "assign":
-			strbuf.push(expr(ast) + "=" + expr(ast.expr) + ";");
+			var lvalue = expr(ast);
+			strbuf.push(lvalue + "=" + expr(ast.expr) + ";");
 			break;
 		case "if":
 			// console.log(ast);
@@ -295,6 +312,7 @@ function stringify_type(ast){
 
 function vardef(ast)
 {	
+	var defs = [];
 	var s="";
 	if(ast.type.dim && !ast.type.is_const){
 		//for RAM arrays we do our own memory allocation. However, for ring bufs we need to add a vardef for
@@ -303,11 +321,16 @@ function vardef(ast)
 			for(var i in ast.defs){
 				var def = ast.defs[i];
 				var sym = symtbl.lookup("__pos_" + def.id);
-				var str_ringpos = "int " + ast_util.get_scoped_name(sym, "_", PVAR) + " = 0;";
-				strglobals.push(str_ringpos);
+				var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);
+				var str_ringpos = "int " + scoped_name + " = 0;";
+				if(curr.is_async){
+					curr.arec_names.push(scoped_name);
+				}
+				//strglobals.push(str_ringpos);
+				defs.push(str_ringpos);
 			}			
 		}
-		return null;
+		//return null;
 	}
 	// console.log(ast.type.is_const);
 	if(typeof ast.type.is_const != 'undefined'){
@@ -325,11 +348,16 @@ function vardef(ast)
 		if(typeof def.init != 'undefined'){
 			temp.push(name+type.dim+"="+expr(def.init));
 		}
-		else
+		else{
 			temp.push(name+type.dim);
+		}
+		if(curr.is_async){
+			curr.arec_names.push(name);
+		}
 	}
 	s=s+temp.join(", ");
-	return s;
+	defs.push(s);
+	return defs;
 }
 
 function fparam(ast){
@@ -364,8 +392,13 @@ function fdef(ast,strbuf){
 	else{
 		hdr= hdr+"void ";
 	}
-	hdr = hdr + get_current_scoped_name("", PFUNC) + "(";//Note:we're already in function scope - so no need to add fname
+	var scoped_fname = get_current_scoped_name("", PFUNC);
+	var arec_name = "arec_" + scoped_fname;
+
+	hdr = hdr + scoped_fname + "(";//Note:we're already in function scope - so no need to add fname
+	/*
 	if(ast.flow){
+
 		//for flow routines params are globally assigned.
 		for(var i=0;i<ast.params.length;i++){
 			var param = ast.params[i];
@@ -388,12 +421,21 @@ function fdef(ast,strbuf){
 		}
 
 	}else{
-		var params=[];
-		for(var i in ast.params){
-			params.push(fparam(ast.params[i]));
-		}	
-		hdr = hdr+ params.join(", ");
+	*/
+	var params=[];
+	var is_async = ast.is_async;
+
+	if(is_async){
+		params.push("struct " + arec_name + "* this");
+		curr.is_async = true;
 	}
+	for(var i in ast.params){
+		params.push(fparam(ast.params[i]));
+	}	
+	hdr = hdr+ params.join(", ");
+	
+	/*}*/
+
 	hdr = hdr + ")";
 	strbuf.push(hdr);
 
@@ -401,15 +443,35 @@ function fdef(ast,strbuf){
 	// str.push("__state = __" + states[0] + ";");
 	// cur_ind=0;
 
+	if(is_async){
+		curr.arec_decl.push("struct " + arec_name + "{");
+	}
+
 	for(var i =0;i<ast.vars.length;i++){
-		var strdef = vardef(ast.vars[i]);
-		if(strdef){
-			strbuf.push(strdef + ";");
+		var strdefs = vardef(ast.vars[i]);
+		for(strdef of strdefs){
+			if(is_async){
+				curr.arec_decl.push(strdef + ";");
+			}else{
+				strbuf.push(strdef + ";");
+			}
 		}
 	}
+
 	stmt(ast.body,strbuf);
     strbuf.push("}");
     symtbl.exitNestedScope();
+
+	if(is_async){
+		curr.arec_decl.push("}");
+		for(var arec_decl_line of curr.arec_decl){
+			strglobals.push(arec_decl_line);			
+		}
+	}
+
+    curr.is_async = false;
+    curr.arec_names = [];
+    curr.arec_decl = [];
 }
 
 function str_parray(elemtype, name, dimstr){
@@ -491,8 +553,11 @@ function code_gen(ast,ctx){
 	var code = ctx.code;
 	symtbl = ctx.symtbl;
 
-	memdefs(ctx.mem);
+	if(ctx.mem){
+		memdefs(ctx.mem);
+	}
    
+   /*
     var current_pipeline_entry = ast_util.first_pipeline_entry(ast);
 
 	var pipeline_state_names = [];
@@ -526,6 +591,7 @@ function code_gen(ast,ctx){
 
     code.push("typedef enum " + "{ __" + pipeline_state_names.join(", __") + "} " + " __" + ast.pipeline.name + ";");
     code.push( " __" + ast.pipeline.name + " __state = __" + pipeline_state_names[0] + ";");
+	*/
 
     for(var mod_name in ast.modules){
         symtbl.enterNestedScope(mod_name);    	
@@ -533,8 +599,8 @@ function code_gen(ast,ctx){
 	
 		strglobals.push("/*Module vars for " + mod_name + "*/");
 		for(var i =0;i<mod_ast.vars.length;i++){
-			var strdef = vardef(mod_ast.vars[i]);
-			if(strdef){
+			var strdefs = vardef(mod_ast.vars[i]);
+			for(strdef in strdefs){
 				strglobals.push(strdef + ";");
 			}
 		}
@@ -545,7 +611,7 @@ function code_gen(ast,ctx){
         }
         symtbl.exitNestedScope();
     }
-
+/*
     code.push("void loop()");
     code.push("{");
     code.push("switch(__state)");
@@ -573,6 +639,7 @@ function code_gen(ast,ctx){
        }
     }
     code.push("}");
+*/    
 
     if(strglobals.length > 0){
     	//add defines to the beginning of code.
