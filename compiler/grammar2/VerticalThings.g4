@@ -65,7 +65,7 @@ castableType
     ;
 
 primitiveType
-    : type=(INT | FLOAT | BOOLEAN | VOID | I8 | U8 | I16 | U16 | I32 | U32 | EVENT)
+    : type=(INT | FLOAT | BOOLEAN | VOID | I8 | U8 | I16 | U16 | I32 | U32)
     ;
 
 futureType: FUTURE LT qualIdentifier GT;
@@ -121,10 +121,12 @@ assignStmt
 
 awaitStmt: AWAIT  qualIdentifier;
 
+signalStmt: SIGNAL  qualIdentifier;
+
 returnStmt: RETURN toplevelExpr;
 
 stmt 
-    :   stmtBlock | ifStmt | forStmt | whileStmt | assignStmt SEMI | functionCall SEMI | returnStmt SEMI | awaitStmt SEMI
+    :   stmtBlock | ifStmt | forStmt | whileStmt | assignStmt SEMI | functionCall SEMI | returnStmt SEMI | awaitStmt SEMI | signalStmt SEMI
     ;    
 
 tupleIds : LP identifierList RP;

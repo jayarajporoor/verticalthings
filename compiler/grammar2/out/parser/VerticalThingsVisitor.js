@@ -182,6 +182,11 @@ VerticalThingsVisitor.prototype.visitAwaitStmt = function(ctx) {
 };
 
 
+// Visit a parse tree produced by VerticalThings#signalStmt.
+VerticalThingsVisitor.prototype.visitSignalStmt = function(ctx) {
+};
+
+
 // Visit a parse tree produced by VerticalThings#returnStmt.
 VerticalThingsVisitor.prototype.visitReturnStmt = function(ctx) {
 };

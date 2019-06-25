@@ -9,9 +9,6 @@ SIGNAL : 'signal';
 
 FUTURE: 'future';
 
-EVENT: 'event';
-
-
 USING: 'using' ;
 
 MODULE

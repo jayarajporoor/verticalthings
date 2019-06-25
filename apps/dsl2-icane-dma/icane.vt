@@ -1,6 +1,8 @@
 
 future<m> f;
 
+future<event> e;
+
 async float m(int y){
     int x;
 }
@@ -12,5 +14,13 @@ async void main(){
     res = await m(3);
     f = m(4);
     res = await f;
+
+    e = event();
+
+    await e;
 }
 
+
+void irq(){
+    signal e;
+}

@@ -688,6 +688,18 @@ function astAwaitStmt(stmt){
 	return ast;
 }
 
+function astSignalStmt(stmt){
+	var ast = {
+		kind: 'signal',
+		expr: {qid : getIdList(stmt.qualIdentifier())}
+	};
+
+	if(ast.expr.qid.length === 1){
+		ast.expr.id = ast.expr.qid[0];
+	}
+	return ast;
+}
+
 function astStmt(stmt){
 	//stmtBlock | ifStmt | forStmt | whileStmt | assignStmt SEMI | functionCall SEMI
 	var stmtBlock = stmt.stmtBlock();
@@ -698,6 +710,7 @@ function astStmt(stmt){
 	var forStmt = stmt.forStmt();
 	var retStmt = stmt.returnStmt();
 	var awaitStmt = stmt.awaitStmt();
+	var signalStmt = stmt.signalStmt();
 
 	if(retStmt){
 		return astReturnStmt(retStmt);
@@ -724,6 +737,9 @@ function astStmt(stmt){
 	}else
 	if(awaitStmt){
 		return astAwaitStmt(awaitStmt);
+	}else
+	if(signalStmt){
+		return astSignalStmt(signalStmt);
 	}
 }
 

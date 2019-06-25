@@ -52,7 +52,15 @@ function array_method_call(ast){
 }
 
 
-function typedef_fptr(qid, typedef_name_only, func_name_only){
+const func_info = {
+	PTR_TYPE : 0,
+	PTR_TYPE_NAME: 1,
+	FUNC_NAME: 2,
+	AREC_NAME: 3
+};
+
+
+function get_func_info(qid, info_req){
 	var ast;
 	var mod_ast;
 	var scoped_fname;
@@ -63,16 +71,28 @@ function typedef_fptr(qid, typedef_name_only, func_name_only){
 	}else{
 		mod_ast = curr.mod_ast;
 		fname = qid[0];		
-	    scoped_fname = PFUNC + mod_ast.name + "_" + fname;
+		if(fname === 'event'){
+			scoped_fname =  fname;
+		}else{
+	    	scoped_fname = PFUNC + mod_ast.name + "_" + fname;
+	    }
 	}
 
-	if(func_name_only){
+	if(info_req === func_info.FUNC_NAME){
 		return scoped_fname;
+	}
+
+	if(info_req === func_info.AREC_NAME){
+		return "_arec_" + scoped_fname;
+	}
+
+	if(info_req === func_info.AREC_TYPE){
+		return "struct _arec_" + scoped_fname;
 	}
 
 	var typedef_name =  "_t_" + scoped_fname ;
 
-	if(typedef_name_only){
+	if(info_req === func_info.PTR_TYPE_NAME){
 		return typedef_name;
 	}
 
@@ -136,7 +156,7 @@ function typedef_fptr(qid, typedef_name_only, func_name_only){
 }
 
 
-function is_async_fn(qid){
+function is_async_fn(qid, info){
 	if(!qid)
 		return false;
 	var mod_ast = null;
@@ -147,10 +167,15 @@ function is_async_fn(qid){
 		fname = qid[1];
 	}else{
 		mod_ast = curr.mod_ast;
-		fname = qid[0];		
+		fname = qid[0];				
 	}
-	return mod_ast && (mod_ast.asyncs.indexOf(fname) >= 0);	
+	if(fname === 'event'){
+		info.is_event = true;
+	}
+	return info.is_event || (mod_ast && (mod_ast.asyncs.indexOf(fname) >= 0));	
 }
+
+var buildin_functions = [];
 
 function fcall(ast, retParams, is_async, info){
 	var strs=[];
@@ -176,11 +201,15 @@ function fcall(ast, retParams, is_async, info){
 			}
 		}
 	}else{
-		var sym = symtbl.lookup(qid[0]);
-		if(sym){
-			name =  ast_util.get_scoped_name(sym, "_", PFUNC);
+		if(buildin_functions.indexOf(qid[0]) >= 0){
+			name = PFUNC + qid[0];
 		}else{
-			name = qid[0];
+			var sym = symtbl.lookup(qid[0]);
+			if(sym){
+				name =  ast_util.get_scoped_name(sym, "_", PFUNC);
+			}else{
+				name = qid[0];
+			}
 		}
 	}
 
@@ -364,13 +393,18 @@ function block(ast,str){
 function stmt_fcall(ast_fcall, strbuf, lvalue){
 	var label = "";
 	var strs = [];
+	var info = {};
 
-	var is_async_fcall = is_async_fn(ast_fcall.qid);
+	var is_async_fcall = is_async_fn(ast_fcall.qid, info);
 
 	if(is_async_fcall){
 		var info = {};
 		var fcall_params = [];
 		if(ast_fcall.sync === 'await'){
+			if(info.is_event){
+				console.log("ERROR: Cannot await on event() call");
+				return;
+			}
 			if(lvalue){
 				fcall_params = [ "&(" + lvalue + ")"];
 			}
@@ -384,13 +418,17 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 			var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return this->_state;} ";
 			strbuf.push(stateCtrl);
 		}else{
-			strs = fcall(ast_fcall, [], true, info);
-			for(i = 0; i< strs.length;i++){
-				strbuf.push(strs[i] + ";");
-			}
-			if(lvalue){
-				var assignFuture = lvalue + "= &(_this->" + info.arec_name + ");";
-				strbuf.push(assignFuture);
+			if(info.is_event && lvalue){
+				strs.push(lvalue + "._state = 1;");
+			}else{
+				strs = fcall(ast_fcall, [], true, info);
+				for(i = 0; i< strs.length;i++){
+					strbuf.push(strs[i] + ";");
+				}
+				if(lvalue){
+					var assignFuture = lvalue + "= &(_this->" + info.arec_name + ");";
+					strbuf.push(assignFuture);
+				}
 			}
 		}
 	}else{
@@ -406,17 +444,39 @@ function stmt_await_on_id(id_expr, lvalue, strbuf){
 	var strExpr = expr(id_expr);
 	//var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);
 	var fqid = sym.info.type.future_qid;
-	if(fqid){
-		var scoped_fname = typedef_fptr(fqid, false, true);
-		var fcall = scoped_fname + "(" + strExpr;
-		if(lvalue){
-			fcall += ", (&" + lvalue + ") ";
+	if(fqid)
+	{
+		var scoped_fname = get_func_info(fqid, func_info.FUNC_NAME);
+		var fcall = "";
+		if(scoped_fname === 'event')
+		{
+			fcall = strExpr + "._state";
+		}else
+		{
+			fcall = scoped_fname + "(" + strExpr;
+			if(lvalue)
+			{
+				fcall += ", (&" + lvalue + ") ";
+			}
+			fcall += ")";
 		}
-		fcall += ")";
-		strbuf.push(fcall + ";");
-	}else{
+
+		label = get_next_label() + ": ";
+		strbuf.push(label + "_state = " + fcall + ";");
+
+		var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return this->_state;} ";
+		strbuf.push(stateCtrl);
+
+	}else
+	{
 		console.log("ERROR: Couldn't find the future type for the variable " + id_expr.id);
 	}	
+}
+
+function stmt_signal(id_expr, strbuf){
+	var sym = symtbl.lookup(id_expr.id);
+	var strExpr = expr(id_expr);
+	strbuf.push(strExpr + "._state = 0;");
 }
 
 function stmt(ast,strbuf){
@@ -476,6 +536,9 @@ function stmt(ast,strbuf){
 		case 'await':
 			stmt_await_on_id(ast.expr, null, strbuf);
 		break;
+		case 'signal':
+			stmt_signal(ast.expr, strbuf);
+		break;
 	}
 
 }
@@ -495,7 +558,7 @@ function stringify_type(ast){
 	}
 
 	if(!base && ast.future_qid){
-		var base = typedef_fptr(ast.future_qid, true);
+		var base = get_func_info(ast.future_qid, func_info.AREC_TYPE);
 	}
 
 	var dim="";
@@ -594,8 +657,8 @@ function get_next_label(){
 
 function fdef(ast,strbuf){
 
-	var fptr = typedef_fptr([ast.id]);
-	if(fptr){
+	var fptr = get_func_info([ast.id], func_info.PTR_TYPE);
+	if(fptr){		
 		for(var i=0;i< fptr.length - 1;i++){
 			strglobals.push(fptr[i] + ";");//forward struct declarations.
 		}
@@ -768,6 +831,7 @@ function boiler_plate(){
 	strglobals.push("This code is automatically generated by the VerticalThings compiler. DO NOT EDIT!");
 	strglobals.push("********************************************************************************/");
 	strglobals.push("");
+	strglobals.push("struct _arec_event")
 }
 
 function includes(cfg){

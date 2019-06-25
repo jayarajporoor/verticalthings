@@ -317,6 +317,15 @@ VerticalThingsListener.prototype.exitAwaitStmt = function(ctx) {
 };
 
 
+// Enter a parse tree produced by VerticalThings#signalStmt.
+VerticalThingsListener.prototype.enterSignalStmt = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#signalStmt.
+VerticalThingsListener.prototype.exitSignalStmt = function(ctx) {
+};
+
+
 // Enter a parse tree produced by VerticalThings#returnStmt.
 VerticalThingsListener.prototype.enterReturnStmt = function(ctx) {
 };
