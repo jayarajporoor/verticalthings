@@ -107,6 +107,11 @@ VerticalThingsVisitor.prototype.visitPrimitiveType = function(ctx) {
 };
 
 
+// Visit a parse tree produced by VerticalThings#futureType.
+VerticalThingsVisitor.prototype.visitFutureType = function(ctx) {
+};
+
+
 // Visit a parse tree produced by VerticalThings#varType.
 VerticalThingsVisitor.prototype.visitVarType = function(ctx) {
 };
@@ -169,6 +174,11 @@ VerticalThingsVisitor.prototype.visitWhileStmt = function(ctx) {
 
 // Visit a parse tree produced by VerticalThings#assignStmt.
 VerticalThingsVisitor.prototype.visitAssignStmt = function(ctx) {
+};
+
+
+// Visit a parse tree produced by VerticalThings#awaitStmt.
+VerticalThingsVisitor.prototype.visitAwaitStmt = function(ctx) {
 };
 
 

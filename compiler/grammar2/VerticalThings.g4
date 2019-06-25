@@ -65,11 +65,13 @@ castableType
     ;
 
 primitiveType
-    : type=(INT | FLOAT | BOOLEAN | VOID | I8 | U8 | I16 | U16 | I32 | U32 | EVENT | FUTURE)
+    : type=(INT | FLOAT | BOOLEAN | VOID | I8 | U8 | I16 | U16 | I32 | U32 | EVENT)
     ;
 
+futureType: FUTURE LT qualIdentifier GT;
+
 varType
-    :   (qualIdentifier | cppQualIdentifier | rangeType | primitiveType) dimensionSpec?
+    :   (qualIdentifier | cppQualIdentifier | rangeType | primitiveType | futureType) dimensionSpec?
     ;    
 
 varTypeList
@@ -117,10 +119,12 @@ assignStmt
     : ((qualIdentifier dimensionExpr?) | tupleIds) ASSIGN toplevelExpr
     ;
 
+awaitStmt: AWAIT  qualIdentifier;
+
 returnStmt: RETURN toplevelExpr;
 
 stmt 
-    :   stmtBlock | ifStmt | forStmt | whileStmt | assignStmt SEMI | functionCall SEMI | returnStmt SEMI
+    :   stmtBlock | ifStmt | forStmt | whileStmt | assignStmt SEMI | functionCall SEMI | returnStmt SEMI | awaitStmt SEMI
     ;    
 
 tupleIds : LP identifierList RP;

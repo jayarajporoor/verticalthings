@@ -7,9 +7,12 @@ var strglobals = [];
 
 var curr = {
 	is_async: false,
-	arec_names : [],
+	arec_varnames : [],
 	arec_decl : [],
-	label_num: 0
+	label_num: 0,
+	toplevel_ast : null,
+	mod_ast : null,
+	allocated_arec_names : []
 };//current context - must be explicitly cleared appropriately.
 
 const PFUNC = "_";
@@ -49,7 +52,107 @@ function array_method_call(ast){
 }
 
 
-function fcall(ast, retParams){
+function typedef_fptr(qid, typedef_name_only, func_name_only){
+	var ast;
+	var mod_ast;
+	var scoped_fname;
+	if(qid.length > 1){
+		mod_ast = curr.toplevel_ast.modules[qid[0]];
+		fname = qid[1];
+		scoped_fname = PFUNC + qid[0] + "_" + qid[1];
+	}else{
+		mod_ast = curr.mod_ast;
+		fname = qid[0];		
+	    scoped_fname = PFUNC + mod_ast.name + "_" + fname;
+	}
+
+	if(func_name_only){
+		return scoped_fname;
+	}
+
+	var typedef_name =  "_t_" + scoped_fname ;
+
+	if(typedef_name_only){
+		return typedef_name;
+	}
+
+	for(f_ast of mod_ast.fdefs){
+		if(f_ast.id === fname){
+			ast = f_ast;
+		}
+	}
+	if(!ast){
+		return null;
+	}
+
+	var is_async = ast.is_async;
+
+	var hdr="";
+	var returnParamTypes = [];
+	if(typeof ast.type != 'undefined'){
+		//TODO process tuple types.
+		retType = stringify_type(ast.type);
+		if(is_async){
+			returnParamTypes.push(retType);
+			hdr= hdr+"void ";
+		}else{
+			var strRetType = retType.base + retType.dim;
+			hdr = hdr + strRetType + " ";//CHG: replaced ast.type.primitive with ReturnType
+		}
+	}else{
+		hdr= hdr+"void ";
+	}
+	var arec_name = "_arec_" + scoped_fname;
+
+	hdr = hdr + "(*" + typedef_name + ")" + " (";
+	var params=[];
+
+	if(is_async){
+		curr.is_async = true;
+	}
+
+	for(var i in ast.params){
+		params.push(fparam(ast.params[i]));
+	}
+
+	if(is_async){	
+		params = ["struct " + arec_name + "* _this"];
+	}
+
+	for(var i=0;i<returnParamTypes.length;i++){
+		var retType = returnParamTypes[i];
+		var base = retType.base;
+		if(retType.dim === ""){
+			base += "* ";//pointer
+		}
+		params.push(base + " _ret" + i + retType.dim);
+	}
+
+	hdr = hdr+ params.join(", ");	
+	hdr = hdr + ")";
+
+	return ["struct " + arec_name, hdr];
+
+}
+
+
+function is_async_fn(qid){
+	if(!qid)
+		return false;
+	var mod_ast = null;
+	var fname = "";
+
+	if(qid.length > 1){
+		mod_ast = curr.toplevel_ast.modules[qid[0]];
+		fname = qid[1];
+	}else{
+		mod_ast = curr.mod_ast;
+		fname = qid[0];		
+	}
+	return mod_ast && (mod_ast.asyncs.indexOf(fname) >= 0);	
+}
+
+function fcall(ast, retParams, is_async, info){
 	var strs=[];
 	var strFcall = "";
 	var qid = ast.qid || ast.qidCpp;
@@ -80,14 +183,19 @@ function fcall(ast, retParams){
 			name = qid[0];
 		}
 	}
-	if(ast.sync === 'await'){
-		var arec_name = "arec_" + name;
 
-		strs.push("this->" + arec_name + "._state = 0");
+	if(is_async){
+		var arec_name = "_arec_" + name;
+
+		if(info){
+			info.arec_name = arec_name;
+		}
+
+		strs.push("_this->" + arec_name + "._state = 0");
 		for(var i=0;i<ast.params.length;i++){
 			var param = ast.params[i];
 			var param_name  = "param";//TODO - param name
-			var param_str = "this->" + arec_name + "." + param_name + " = " + expr(param);
+			var param_str = "_this->" + arec_name + "." + param_name + " = " + expr(param);
 			strs.push(param_str);
 			var paramid = param.expr.id || (param.expr.qid && param.expr.qid[0]);
 			var param_sym = paramid && symtbl.lookup(paramid);
@@ -97,14 +205,17 @@ function fcall(ast, retParams){
 					var resolv = ast_util.resolve_matrix_expr(param.expr, symtbl);
 					if(resolv.dim.length > 0){	
 						var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);				
-						strs.push("this->" + arec_name + "." + scoped_name + " = " + 	get_arec_qualified_name(sym, "_", PVAR) );
+						strs.push("_this->" + arec_name + "." + scoped_name + " = " + 	get_arec_qualified_name(sym, "_", PVAR) );
 					}
 				}
 			}
 		}
 
-		strFcall = name + "( &(this->" + arec_name + ")";
-		curr.arec_decl.push("struct " + arec_name + " " + arec_name + ";")
+		strFcall = name + "( &(_this->" + arec_name + ")";
+		if(curr.allocated_arec_names.indexOf(arec_name) < 0){
+			curr.arec_decl.push("struct " + arec_name + " " + arec_name + ";")
+			curr.allocated_arec_names.push(arec_name);
+		}
 	}else{
 		strFcall = strFcall + name +"(";		
 		for(var i=0;i<ast.params.length;i++){
@@ -139,8 +250,8 @@ function fcall(ast, retParams){
 function get_arec_qualified_name(sym){
 	var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);
 	if(curr.is_async){
-		if(curr.arec_names.indexOf(scoped_name) >= 0){
-			return "this->" + scoped_name;
+		if(curr.arec_varnames.indexOf(scoped_name) >= 0){
+			return "_this->" + scoped_name;
 		}
 	}	
 	return scoped_name;
@@ -250,27 +361,80 @@ function block(ast,str){
 	str.push("}");
 }
 
+function stmt_fcall(ast_fcall, strbuf, lvalue){
+	var label = "";
+	var strs = [];
+
+	var is_async_fcall = is_async_fn(ast_fcall.qid);
+
+	if(is_async_fcall){
+		var info = {};
+		var fcall_params = [];
+		if(ast_fcall.sync === 'await'){
+			if(lvalue){
+				fcall_params = [ "&(" + lvalue + ")"];
+			}
+			strs = fcall(ast_fcall, fcall_params, true, info);
+			for(i = 0; i< strs.length - 1;i++){
+				strbuf.push(strs[i] + ";");
+			}
+			strExpr = strs[strs.length - 1];//last element is the actual function call.				
+			label = get_next_label() + ": ";
+			strbuf.push(label + "_state = " + strExpr + ";");
+			var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return this->_state;} ";
+			strbuf.push(stateCtrl);
+		}else{
+			strs = fcall(ast_fcall, [], true, info);
+			for(i = 0; i< strs.length;i++){
+				strbuf.push(strs[i] + ";");
+			}
+			if(lvalue){
+				var assignFuture = lvalue + "= &(_this->" + info.arec_name + ");";
+				strbuf.push(assignFuture);
+			}
+		}
+	}else{
+		var strs = fcall(ast_fcall) + ";" ;
+		for(str of strs){
+			strbuf.push(str);
+		}		
+	}	
+}
+
+function stmt_await_on_id(id_expr, lvalue, strbuf){
+	var sym = symtbl.lookup(id_expr.id);
+	var strExpr = expr(id_expr);
+	//var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);
+	var fqid = sym.info.type.future_qid;
+	if(fqid){
+		var scoped_fname = typedef_fptr(fqid, false, true);
+		var fcall = scoped_fname + "(" + strExpr;
+		if(lvalue){
+			fcall += ", (&" + lvalue + ") ";
+		}
+		fcall += ")";
+		strbuf.push(fcall + ";");
+	}else{
+		console.log("ERROR: Couldn't find the future type for the variable " + id_expr.id);
+	}	
+}
+
 function stmt(ast,strbuf){
 	switch(ast.kind){
 		case "assign":
 			var ast_fcall = ast.expr.fcall;
 			var strExpr = "";
-			var label = "";
 			var lvalue = expr(ast);
 
-			if(ast_fcall && ast_fcall.sync === 'await'){
-				strs = fcall(ast_fcall, [ "&(" + lvalue + ")"] );
-				for(i = 0; i< strs.length - 1;i++){
-					strbuf.push(strs[i] + ";");
-				}
-				strExpr = strs[strs.length - 1];//last element is the actual function call.				
-				label = get_next_label() + ": ";
-				strbuf.push(label + "_state = " + strExpr + ";");
-				var stateCtrl = "if (_state > 0) {this->_state = " + curr.label_num + "; return this->_state;}";
-				strbuf.push(stateCtrl);
-			}else{
+			if(ast_fcall){
+				stmt_fcall(ast_fcall, strbuf, lvalue);
+			}else
+			if(ast.expr.sync === 'await' && ast.expr.id){
+				stmt_await_on_id(ast.expr, lvalue, strbuf);
+			}else
+			{
 				strExpr = expr(ast.expr);
-				strbuf.push(label + lvalue + "=" + strExpr + ";");				
+				strbuf.push(lvalue + "=" + strExpr + ";");				
 			}
 			break;
 		case "if":
@@ -296,9 +460,9 @@ function stmt(ast,strbuf){
 			//TODO: tuple and array returns.
 			if(curr.is_async){
 				if(strRetExpr !== ""){
-					strbuf.push("*(this->_ret0) = " + strRetExpr);
+					strbuf.push("*(_this->_ret0) = " + strRetExpr);
 				}
-				strbuf.push("return this->_state; ");
+				strbuf.push("return _this->_state; ");
 			}else{
 				strbuf.push("return " + strRetExpr + ";");
 			}
@@ -307,10 +471,10 @@ function stmt(ast,strbuf){
 			block(ast,strbuf);
 			break;
 		case "fcall":
-			var strs = fcall(ast.fcall) + ";" ;
-			for(str of strs){
-				strbuf.push(str);
-			}
+			stmt_fcall(ast.fcall, strbuf, null);
+		break;
+		case 'await':
+			stmt_await_on_id(ast.expr, null, strbuf);
 		break;
 	}
 
@@ -328,6 +492,10 @@ function stringify_type(ast){
 	}
 	if(!base && ast.qidCpp){
 		base = ast.qidCpp.join("::");
+	}
+
+	if(!base && ast.future_qid){
+		var base = typedef_fptr(ast.future_qid, true);
 	}
 
 	var dim="";
@@ -355,7 +523,7 @@ function vardef(ast)
 				var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);
 				var str_ringpos = "int " + scoped_name + " = 0;";
 				if(curr.is_async){
-					curr.arec_names.push(scoped_name);
+					curr.arec_varnames.push(scoped_name);
 				}
 				//strglobals.push(str_ringpos);
 				defs.push(str_ringpos);
@@ -372,7 +540,7 @@ function vardef(ast)
 	s=s+type.base+" ";
 	// console.log(s);
 	var temp=[];
-	for(var i in ast.defs){
+	for(var i=0;i<ast.defs.length;i++){
 		var def = ast.defs[i];
 		var sym = symtbl.lookup(def.id);
 		var name = (!sym || sym.info.is_temp) ? def.id : get_current_scoped_name(def.id, PVAR);
@@ -383,7 +551,7 @@ function vardef(ast)
 			temp.push(name+type.dim);
 		}
 		if(curr.is_async){
-			curr.arec_names.push(name);
+			curr.arec_varnames.push(name);
 		}
 	}
 	s=s+temp.join(", ");
@@ -425,6 +593,15 @@ function get_next_label(){
 }
 
 function fdef(ast,strbuf){
+
+	var fptr = typedef_fptr([ast.id]);
+	if(fptr){
+		for(var i=0;i< fptr.length - 1;i++){
+			strglobals.push(fptr[i] + ";");//forward struct declarations.
+		}
+		strglobals.push("typedef " + fptr[fptr.length - 1] + ";");
+	}
+
     symtbl.enterNestedScope(ast.id);
 	var is_async = ast.is_async;
 
@@ -444,7 +621,7 @@ function fdef(ast,strbuf){
 		hdr= hdr+"void ";
 	}
 	var scoped_fname = get_current_scoped_name("", PFUNC);
-	var arec_name = "arec_" + scoped_fname;
+	var arec_name = "_arec_" + scoped_fname;
 
 	hdr = hdr + scoped_fname + "(";//Note:we're already in function scope - so no need to add fname
 	var params=[];
@@ -463,7 +640,7 @@ function fdef(ast,strbuf){
 		for(var i in ast.params){
 			curr.arec_decl.push(params[i] + ";");		
 		}
-		params = ["struct " + arec_name + "* this"];
+		params = ["struct " + arec_name + "* _this"];
 	}
 
 	for(var i=0;i<returnParamTypes.length;i++){
@@ -510,8 +687,8 @@ function fdef(ast,strbuf){
 		strbuf.push(activation_tbl + ";");
 
 		//save and reset the state.
-		strbuf.push("int _state = this->_state;");
-		strbuf.push("this->_state = 0;");
+		strbuf.push("int _state = _this->_state;");
+		strbuf.push("_this->_state = 0;");
 
 		var jmp_cmd = "if (_state > 0 && _state < " + curr.label_num + ") goto *(_atbl[_state]);";
 		
@@ -527,16 +704,17 @@ function fdef(ast,strbuf){
     symtbl.exitNestedScope();
 
 	if(is_async){
-		curr.arec_decl.push("}");
+		curr.arec_decl.push("};");
 		for(var arec_decl_line of curr.arec_decl){
 			strglobals.push(arec_decl_line);			
 		}
 	}
 
     curr.is_async = false;
-    curr.arec_names = [];
+    curr.arec_varnames = [];
     curr.arec_decl = [];
     curr.label_num = 0;
+    curr.allocated_arec_names = [];
 }
 
 function str_parray(elemtype, name, dimstr){
@@ -589,6 +767,7 @@ function boiler_plate(){
 	strglobals.push("/********************************************************************************");
 	strglobals.push("This code is automatically generated by the VerticalThings compiler. DO NOT EDIT!");
 	strglobals.push("********************************************************************************/");
+	strglobals.push("");
 }
 
 function includes(cfg){
@@ -622,24 +801,30 @@ function code_gen(ast,ctx){
 	if(ctx.mem){
 		memdefs(ctx.mem);
 	}
+
+	curr.toplevel_ast = ast;
    
 
     for(var mod_name in ast.modules){
         symtbl.enterNestedScope(mod_name);    	
         var mod_ast = ast.modules[mod_name];
+        curr.mod_ast = mod_ast;
 	
+        for(var i=0;i<mod_ast.fdefs.length;i++){
+            fdef(mod_ast.fdefs[i], code);
+        }
+
 		strglobals.push("/*Module vars for " + mod_name + "*/");
 		for(var i =0;i<mod_ast.vars.length;i++){
 			var strdefs = vardef(mod_ast.vars[i]);
-			for(strdef in strdefs){
+			for(strdef of strdefs){
 				strglobals.push(strdef + ";");
 			}
 		}
 		strglobals.push("/*End of module vars for " + mod_name + "*/");
 
-        for(var i=0;i<mod_ast.fdefs.length;i++){
-            fdef(mod_ast.fdefs[i], code);
-        }
+
+        curr.mod_ast = null;
         symtbl.exitNestedScope();
     }
 
@@ -648,6 +833,8 @@ function code_gen(ast,ctx){
 		var splice_args = [0, 0].concat(strglobals);
 		Array.prototype.splice.apply(code, splice_args);    
 	}
+
+	curr.toplevel_ast = null;
     // console.log("CODE :");
     // console.log(code);
     // return code;

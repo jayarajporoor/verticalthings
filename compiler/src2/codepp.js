@@ -13,7 +13,7 @@ function codepp(ast,ctx){
 			current_indent_depth++;
 			current_indent += indent;
 		}else
-		if(line === "}" || line.endsWith("}")){
+		if(line === "}" || line.endsWith("}") || line.endsWith("};")){
 			current_indent = current_indent.slice(0, -indent.length);
 			current_indent_depth--;
 			code[i] = current_indent + line;			

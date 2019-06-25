@@ -182,6 +182,15 @@ VerticalThingsListener.prototype.exitPrimitiveType = function(ctx) {
 };
 
 
+// Enter a parse tree produced by VerticalThings#futureType.
+VerticalThingsListener.prototype.enterFutureType = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#futureType.
+VerticalThingsListener.prototype.exitFutureType = function(ctx) {
+};
+
+
 // Enter a parse tree produced by VerticalThings#varType.
 VerticalThingsListener.prototype.enterVarType = function(ctx) {
 };
@@ -296,6 +305,15 @@ VerticalThingsListener.prototype.enterAssignStmt = function(ctx) {
 
 // Exit a parse tree produced by VerticalThings#assignStmt.
 VerticalThingsListener.prototype.exitAssignStmt = function(ctx) {
+};
+
+
+// Enter a parse tree produced by VerticalThings#awaitStmt.
+VerticalThingsListener.prototype.enterAwaitStmt = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#awaitStmt.
+VerticalThingsListener.prototype.exitAwaitStmt = function(ctx) {
 };
 
 

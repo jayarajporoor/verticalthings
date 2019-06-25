@@ -267,7 +267,7 @@ function getRelExprAst(expr){
 }
 
 function getSyncExprAst(expr){
-	var ast = null;
+	var ast = {src: src_info(expr)};
 	var sync = null;
 	
 	if(expr.AWAIT()){
@@ -283,7 +283,7 @@ function getSyncExprAst(expr){
 		 ast = getFunctionCallAst(functionCall);
 		 ast.fcall.sync = sync;
 	}else {
-		ast = getId(expr);
+		ast.id = getId(expr);
 		ast.sync = sync;
 	}
 
@@ -399,12 +399,20 @@ function astReturnType(returnType){
 	return varType ? astVarType(varType) : astTupleType(tupleType);
 }
 
+
+function astFutureType(futureType){
+	var ast = {};
+	ast.future_qid = getIdList(futureType.qualIdentifier());
+	return ast;
+}
+
 function astVarType(varType){
 	//(qualIdentifier | cppQualIdentifier | rangeType | builtinType)	
 	var qualIdentifier = varType.qualIdentifier();
 	var cppQualIdentifier = varType.cppQualIdentifier();
 	var rangeType = varType.rangeType();
 	var primitiveType = varType.primitiveType();
+	var futureType = varType.futureType();
 
 	var ast = {};
 
@@ -422,6 +430,9 @@ function astVarType(varType){
 	}else
 	if(primitiveType){
 		ast = astPrimitiveType(primitiveType);
+	}else
+	if(futureType){
+		ast = astFutureType(futureType);
 	}
 
 	var dimensionSpec = varType.dimensionSpec();  
@@ -665,6 +676,18 @@ function astReturnStmt(stmt){
 	};
 }
 
+function astAwaitStmt(stmt){
+	var ast = {
+		kind: 'await',
+		expr: {qid : getIdList(stmt.qualIdentifier())}
+	};
+
+	if(ast.expr.qid.length === 1){
+		ast.expr.id = ast.expr.qid[0];
+	}
+	return ast;
+}
+
 function astStmt(stmt){
 	//stmtBlock | ifStmt | forStmt | whileStmt | assignStmt SEMI | functionCall SEMI
 	var stmtBlock = stmt.stmtBlock();
@@ -674,6 +697,7 @@ function astStmt(stmt){
 	var functionCall = stmt.functionCall();
 	var forStmt = stmt.forStmt();
 	var retStmt = stmt.returnStmt();
+	var awaitStmt = stmt.awaitStmt();
 
 	if(retStmt){
 		return astReturnStmt(retStmt);
@@ -697,6 +721,9 @@ function astStmt(stmt){
 	}else
 	if(forStmt){
 		return astForStmt(forStmt);
+	}else
+	if(awaitStmt){
+		return astAwaitStmt(awaitStmt);
 	}
 }
 
@@ -770,6 +797,7 @@ function src_info(node){
 function astModule(moduleDef, ast) {
 	//ast.name = getId(moduleDef);
 	ast.src = src_info(moduleDef);
+	ast.asyncs = [];
 	var usingSpec = moduleDef.usingSpec();
 
 	if(usingSpec){
@@ -797,13 +825,18 @@ function astModule(moduleDef, ast) {
 			ast.fdefs = [];
 		}
 		for(var i=0;i<funcDef.length;i++){
-			ast.fdefs.push(astFuncDef(funcDef[i]));
+			var fdefAst = astFuncDef(funcDef[i]);
+			ast.fdefs.push(fdefAst);
+			if(fdefAst.is_async){
+				ast.asyncs.push(fdefAst.id);
+			}
 		}
 	}
 	/*var effectsDef = moduleDef.effectsDef();
 	if(effectsDef){
 		ast.effectsMap = astEffectsDef(effectsDef);
 	}*/
+	ctx.mod_ast = null;
 	return ast;
 }
 
