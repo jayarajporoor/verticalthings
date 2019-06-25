@@ -8,7 +8,8 @@ var strglobals = [];
 var curr = {
 	is_async: false,
 	arec_names : [],
-	arec_decl : []
+	arec_decl : [],
+	label_num: 0
 };//current context - must be explicitly cleared appropriately.
 
 const PFUNC = "_";
@@ -47,43 +48,70 @@ function array_method_call(ast){
 	return null;
 }
 
-function fcall(ast){
-	var str="";
+
+function fcall(ast, retParams){
+	var strs=[];
+	var strFcall = "";
 	var qid = ast.qid || ast.qidCpp;
 
 	var sep = ast.qidCpp ? "::" : ".";
 
-	if(qid.length > 1 || qid[0] !== "next"){
-		var name;
-		if(qid.length > 1){
-			var str_amethod = (sep === ".") ? array_method_call(ast) : null;
-			if(str_amethod){
-				return str_amethod;
-			}else{
-				var sym = symtbl.lookup(qid[0]);
-				if(sym){
-					name = ast_util.get_scoped_name(sym, "_", PVAR);
-					for(var j=1;j<qid.length;j++){
-						name += sep + qid[j];
-					}
-				}else{
-					name = qid.join(sep);
-				}
-			}
+	var name;
+	if(qid.length > 1){
+		var str_amethod = (sep === ".") ? array_method_call(ast) : null;
+		if(str_amethod){
+			return str_amethod;
 		}else{
 			var sym = symtbl.lookup(qid[0]);
 			if(sym){
-				name =  ast_util.get_scoped_name(sym, "_", PFUNC);
+				name = ast_util.get_scoped_name(sym, "_", PVAR);
+				for(var j=1;j<qid.length;j++){
+					name += sep + qid[j];
+				}
 			}else{
-				name = qid[0];
+				name = qid.join(sep);
 			}
 		}
-		str = str + name +"(";
+	}else{
+		var sym = symtbl.lookup(qid[0]);
+		if(sym){
+			name =  ast_util.get_scoped_name(sym, "_", PFUNC);
+		}else{
+			name = qid[0];
+		}
+	}
+	if(ast.sync === 'await'){
+		var arec_name = "arec_" + name;
+
+		strs.push("this->" + arec_name + "._state = 0");
 		for(var i=0;i<ast.params.length;i++){
 			var param = ast.params[i];
-			if(i > 0) str += ", ";
+			var param_name  = "param";//TODO - param name
+			var param_str = "this->" + arec_name + "." + param_name + " = " + expr(param);
+			strs.push(param_str);
+			var paramid = param.expr.id || (param.expr.qid && param.expr.qid[0]);
+			var param_sym = paramid && symtbl.lookup(paramid);
+			if(param_sym && param_sym.info.type.dim && param_sym.info.type.dim.is_ring){
+				var sym = symtbl.lookup("__pos_" + paramid);
+				if(sym){
+					var resolv = ast_util.resolve_matrix_expr(param.expr, symtbl);
+					if(resolv.dim.length > 0){	
+						var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);				
+						strs.push("this->" + arec_name + "." + scoped_name + " = " + 	get_arec_qualified_name(sym, "_", PVAR) );
+					}
+				}
+			}
+		}
+
+		strFcall = name + "( &(this->" + arec_name + ")";
+		curr.arec_decl.push("struct " + arec_name + " " + arec_name + ";")
+	}else{
+		strFcall = strFcall + name +"(";		
+		for(var i=0;i<ast.params.length;i++){
+			var param = ast.params[i];
+			if(i > 0) strFcall += ", ";
 			var param_str = expr(param);
-			str = str + param_str;
+			strFcall = strFcall + param_str;
 			var paramid = param.expr.id || (param.expr.qid && param.expr.qid[0]);
 			var param_sym = paramid && symtbl.lookup(paramid);
 			if(param_sym && param_sym.info.type.dim && param_sym.info.type.dim.is_ring){
@@ -91,50 +119,22 @@ function fcall(ast){
 				if(sym){
 					var resolv = ast_util.resolve_matrix_expr(param.expr, symtbl);
 					if(resolv.dim.length > 0){					
-						str = str + ", " + ast_util.get_scoped_name(sym, "_", PVAR);
+						strFcall = strFcall + ", " + ast_util.get_scoped_name(sym, "_", PVAR);
 					}
 				}
 			}
 		}
-		str += ")";
 	}
-	else
-	{
-		var scoped_name = symtbl.getScopeNames().join("_");
-		var next_state = pipeline_next_state[scoped_name];
-		next_state = pipeline_states[next_state];
-		var flow_params = next_state.flowdef.params;
-		for(var i=0;i<ast.params.length;i++){
-			var param = ast.params[i];
-			var flow_param = flow_params[i];
-			if(flow_param){
-				var scoped_param_name = PVAR + next_state.qname + "_" + flow_param.id;				
-				var expr_str = expr(param);
-				if(flow_param.type.dim){//array param
-					expr_str = "&(" + expr_str + ")";//assign address.
-					scoped_param_name = scoped_param_name + SPTR;
-				}
-				var param_assign = scoped_param_name + " = " + expr_str + "; ";
-				str += param_assign;
-				if(flow_param.type.dim && flow_param.type.dim.is_ring){
-					var scoped_pos_param_name = PVAR + next_state.qname + "_" + "__pos_" + flow_param.id;
-					var param_id = param.expr.id || (param.expr.qid && param.expr.qid[0]);
-					var sym = symtbl.lookup("__pos_" + param_id);
-					if(sym){
-						var resolv = ast_util.resolve_matrix_expr(param.expr, symtbl);
-						if(resolv.dim.length > 0){					
-							str = str + scoped_pos_param_name + " = " + ast_util.get_scoped_name(sym, "_", PVAR) + ";";
-						}
-					}					
-				}				
-			}else{
-				vtbuild.error("Flow param mismatch for ", next_state.name, ". flow from ", scoped_name);
-			}
-		}
-		str +=  "__state = __" + next_state.qname;
+
+	for(retParam of retParams){
+		strFcall = strFcall + ", " + retParam;
 	}
-	return str;
+	strFcall += ") ";
+	strs.push(strFcall);
+
+	return strs;
 }
+
 
 function get_arec_qualified_name(sym){
 	var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);
@@ -225,7 +225,9 @@ function expr(ast){
 		str += "} ";
 	}
 	else if(typeof ast.fcall != 'undefined'){
-		str = fcall(ast.fcall);
+		strs = fcall(ast.fcall);
+		//TODO: strs.length must always be 1 here, since async case is handled in assign stmt.
+		str = strs[0];
 	}else if(typeof ast.sconst !== 'undefined'){
 		str = ast.sconst ;
 	}
@@ -234,6 +236,7 @@ function expr(ast){
 	if(ast.address_of){
 		str = "&(" + str + ")";
 	}
+
 	return str;
 }
 
@@ -250,8 +253,25 @@ function block(ast,str){
 function stmt(ast,strbuf){
 	switch(ast.kind){
 		case "assign":
+			var ast_fcall = ast.expr.fcall;
+			var strExpr = "";
+			var label = "";
 			var lvalue = expr(ast);
-			strbuf.push(lvalue + "=" + expr(ast.expr) + ";");
+
+			if(ast_fcall && ast_fcall.sync === 'await'){
+				strs = fcall(ast_fcall, [ "&(" + lvalue + ")"] );
+				for(i = 0; i< strs.length - 1;i++){
+					strbuf.push(strs[i] + ";");
+				}
+				strExpr = strs[strs.length - 1];//last element is the actual function call.				
+				label = get_next_label() + ": ";
+				strbuf.push(label + "_state = " + strExpr + ";");
+				var stateCtrl = "if (_state > 0) {this->_state = " + curr.label_num + "; return this->_state;}";
+				strbuf.push(stateCtrl);
+			}else{
+				strExpr = expr(ast.expr);
+				strbuf.push(label + lvalue + "=" + strExpr + ";");				
+			}
 			break;
 		case "if":
 			// console.log(ast);
@@ -272,14 +292,25 @@ function stmt(ast,strbuf){
 			stmt(ast.body,strbuf);
 			break;
 		case "return":
-			strbuf.push("return " + expr(ast.expr) + ";");
+			var strRetExpr = expr(ast.expr);
+			//TODO: tuple and array returns.
+			if(curr.is_async){
+				if(strRetExpr !== ""){
+					strbuf.push("*(this->_ret0) = " + strRetExpr);
+				}
+				strbuf.push("return this->_state; ");
+			}else{
+				strbuf.push("return " + strRetExpr + ";");
+			}
 			break;
 		case "block":
 			block(ast,strbuf);
 			break;
 		case "fcall":
-			var s = fcall(ast.fcall) + ";" ;
-			strbuf.push(s);
+			var strs = fcall(ast.fcall) + ";" ;
+			for(str of strs){
+				strbuf.push(str);
+			}
 		break;
 	}
 
@@ -305,7 +336,7 @@ function stringify_type(ast){
 			dim=dim+"["+expr(ast.dim.dim[i])+"]";
 		}
 	}	
-	var astr = {base: base, dim: dim, is_ring: ast.dim && ast.dim.is_ring};
+	var astr = {base: base, dim: dim, is_ring: ast.dim && ast.dim.is_ring};	
 
 	return astr;
 }
@@ -383,69 +414,75 @@ function fparam(ast){
 	return s;
 }
 
+function get_label(num){
+	return "lstate_" + num;
+}
+
+function get_next_label(){
+	curr.label_num++;	
+	var str = get_label(curr.label_num);
+	return str;
+}
+
 function fdef(ast,strbuf){
     symtbl.enterNestedScope(ast.id);
+	var is_async = ast.is_async;
+
 	var hdr="";
+	var returnParamTypes = [];
 	if(typeof ast.type != 'undefined'){
-		hdr = hdr + ast.type.primitive + " ";
-	}
-	else{
+		//TODO process tuple types.
+		retType = stringify_type(ast.type);
+		if(is_async){
+			returnParamTypes.push(retType);
+			hdr= hdr+"void ";
+		}else{
+			var strRetType = retType.base + retType.dim;
+			hdr = hdr + strRetType + " ";//CHG: replaced ast.type.primitive with ReturnType
+		}
+	}else{
 		hdr= hdr+"void ";
 	}
 	var scoped_fname = get_current_scoped_name("", PFUNC);
 	var arec_name = "arec_" + scoped_fname;
 
 	hdr = hdr + scoped_fname + "(";//Note:we're already in function scope - so no need to add fname
-	/*
-	if(ast.flow){
-
-		//for flow routines params are globally assigned.
-		for(var i=0;i<ast.params.length;i++){
-			var param = ast.params[i];
-			var stype = stringify_type(param.type);
-			var scoped_name = get_current_scoped_name(param.id, PVAR);
-			if(param.type.dim){
-				var scoped_name_p = scoped_name + SPTR;				
-				var def =  str_parray(stype.base, scoped_name_p, stype.dim) + ";" ;
-				strglobals.push(def);
-				def = "#define " + scoped_name + " (*" + scoped_name_p +")";
-				strglobals.push(def);
-				if(param.type.dim.is_ring){
-					var def_ringpos = "int " + get_current_scoped_name("__pos_" + param.id, PVAR) + ";";		
-					strglobals.push(def_ringpos);
-				}
-			}else{
-				var def =  stype.base + " " + scoped_name + ";";
-				strglobals.push(def);				
-			}			
-		}
-
-	}else{
-	*/
 	var params=[];
-	var is_async = ast.is_async;
 
 	if(is_async){
-		params.push("struct " + arec_name + "* this");
 		curr.is_async = true;
 	}
+
 	for(var i in ast.params){
 		params.push(fparam(ast.params[i]));
-	}	
-	hdr = hdr+ params.join(", ");
-	
-	/*}*/
+	}
 
+	if(is_async){	
+		curr.arec_decl.push("struct " + arec_name + "{");
+		curr.arec_decl.push("int _state = 0;");
+		for(var i in ast.params){
+			curr.arec_decl.push(params[i] + ";");		
+		}
+		params = ["struct " + arec_name + "* this"];
+	}
+
+	for(var i=0;i<returnParamTypes.length;i++){
+		var retType = returnParamTypes[i];
+		var base = retType.base;
+		if(retType.dim === ""){
+			base += "* ";//pointer
+		}
+		params.push(base + " _ret" + i + retType.dim);
+	}
+
+	hdr = hdr+ params.join(", ");	
 	hdr = hdr + ")";
+
 	strbuf.push(hdr);
 
 	strbuf.push("{");
 	// str.push("__state = __" + states[0] + ";");
 	// cur_ind=0;
-
-	if(is_async){
-		curr.arec_decl.push("struct " + arec_name + "{");
-	}
 
 	for(var i =0;i<ast.vars.length;i++){
 		var strdefs = vardef(ast.vars[i]);
@@ -458,7 +495,34 @@ function fdef(ast,strbuf){
 		}
 	}
 
-	stmt(ast.body,strbuf);
+	var body_strbuf = [];
+
+	stmt(ast.body,body_strbuf);
+
+	if(is_async){
+		var activation_tbl = "__atbl = { "
+		for(var i=0;i< curr.label_num;i++){
+			if(i > 0)
+				activation_tbl += ", ";
+			activation_tbl += "&&" + get_label(i);
+		}
+		activation_tbl += " }";
+		strbuf.push(activation_tbl + ";");
+
+		//save and reset the state.
+		strbuf.push("int _state = this->_state;");
+		strbuf.push("this->_state = 0;");
+
+		var jmp_cmd = "if (_state > 0 && _state < " + curr.label_num + ") goto *(_atbl[_state]);";
+		
+		strbuf.push(jmp_cmd);
+		strbuf.push(get_label(0) + ": ");
+	}
+
+	for(str of body_strbuf){
+		strbuf.push(str);
+	}
+
     strbuf.push("}");
     symtbl.exitNestedScope();
 
@@ -472,6 +536,7 @@ function fdef(ast,strbuf){
     curr.is_async = false;
     curr.arec_names = [];
     curr.arec_decl = [];
+    curr.label_num = 0;
 }
 
 function str_parray(elemtype, name, dimstr){
@@ -549,49 +614,15 @@ function code_gen(ast,ctx){
 
 	if(!ctx.code){
 		ctx.code = [];
-	}
+	}	
 	var code = ctx.code;
+	
 	symtbl = ctx.symtbl;
 
 	if(ctx.mem){
 		memdefs(ctx.mem);
 	}
    
-   /*
-    var current_pipeline_entry = ast_util.first_pipeline_entry(ast);
-
-	var pipeline_state_names = [];
-
-	var curr_idx = 0;
-    while(current_pipeline_entry){
-    	var qname = current_pipeline_entry.qname;
-   		var mod_ast = ast.modules[qname[0]];
-   		var flow_def = ast_util.find_flow(mod_ast, qname[1]);
-
-    	if(qname.length === 1){
-    		qname.push(flow_def.id);//add the default flow's id to the qname.
-    	}
-
-   		qname =  qname.join("_");
-
-    	var next_idx = 0;//default to the first state.
-    	if(current_pipeline_entry.next){
-    		next_idx = curr_idx + 1;
-    	}
-    	
-    	pipeline_next_state[qname] = next_idx;
-    	
-    	pipeline_states.push({qname: qname, flowdef: flow_def});
-    	
-    	pipeline_state_names.push(qname);//for convenience.
-
-    	current_pipeline_entry = current_pipeline_entry.next;    	
-    	curr_idx++;
-    }
-
-    code.push("typedef enum " + "{ __" + pipeline_state_names.join(", __") + "} " + " __" + ast.pipeline.name + ";");
-    code.push( " __" + ast.pipeline.name + " __state = __" + pipeline_state_names[0] + ";");
-	*/
 
     for(var mod_name in ast.modules){
         symtbl.enterNestedScope(mod_name);    	
@@ -611,35 +642,6 @@ function code_gen(ast,ctx){
         }
         symtbl.exitNestedScope();
     }
-/*
-    code.push("void loop()");
-    code.push("{");
-    code.push("switch(__state)");
-    code.push("{");
-    for(var i=0;i<pipeline_state_names.length;i++){
-    	var curr_state_name = pipeline_state_names[i];
-        code.push("case __" + curr_state_name + ":");
-        code.push("__state = "+ "__" + pipeline_state_names[0] +";");
-        code.push(PFUNC + pipeline_state_names[i] + "();");
-        code.push("break;");
-    }
-    code.push("default :");
-    code.push("__state = __" + pipeline_state_names[0] + ";");
-    code.push("}");
-    code.push("}");
-
-    code.push("void setup()");
-    code.push("{");
-    // Calling all inits
-    for(var mod_name in ast.modules){
-    	var mod_ast= ast.modules[mod_name];
-    	var ast_init = ast_util.find_fdef(mod_ast, "init");
-       if(ast_init){
-            code.push(PFUNC + mod_ast.name +"_init();");
-       }
-    }
-    code.push("}");
-*/    
 
     if(strglobals.length > 0){
     	//add defines to the beginning of code.
@@ -668,3 +670,6 @@ exports.strglobals = strglobals;
 exports.boiler_plate = boiler_plate;
 exports.includes = includes;
 exports.memdefs = memdefs;
+
+
+

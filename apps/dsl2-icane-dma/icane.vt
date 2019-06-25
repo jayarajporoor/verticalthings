@@ -1,6 +1,12 @@
 
+async float m(int y){
+    int x;
+}
+
 async void main(){
     float[100] v;
+    float res;
     v[0] = 1;
+    res = await m(3);
 }
 
