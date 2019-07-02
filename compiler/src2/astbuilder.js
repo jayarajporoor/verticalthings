@@ -671,7 +671,7 @@ function astReturnStmt(stmt){
 	//returnStmt: RETURN expr;
 	return {
 		kind: 'return',
-		expr: getToplevelExprAst(stmt.expr()),
+		expr: getToplevelExprAst(stmt.toplevelExpr()),
 		src: src_info(stmt)
 	};
 }

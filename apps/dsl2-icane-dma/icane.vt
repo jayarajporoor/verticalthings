@@ -5,6 +5,8 @@ future<event> e;
 
 async float m(int y){
     int x;
+
+    return 3;
 }
 
 async void main(){
