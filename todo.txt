@@ -3,4 +3,5 @@
 * Move some of the async/await logic from codegen to AST transform.
 * Build an actual app.
 * fixed multiple async/await cooperatively multitasked tasks.
+* type checker
 * RX Observable/Observer library on top of async/await tasks.
