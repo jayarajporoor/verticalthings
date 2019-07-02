@@ -27,7 +27,7 @@ struct _arec_event*  icane_e;
 /*End of module vars for icane*/
 int _icane_m(struct _arec__icane_m* _this, float*  _ret0)
 {
-void * _atbl[] = { &&lstate_0, &&lstate_1 };
+static const void * _atbl[] = { &&lstate_0, &&lstate_1 };
 int _state = _this->_state;
 _this->_state = 0;
 if (_state > 0 && _state < 1) goto *(_atbl[_state]);
@@ -46,7 +46,7 @@ return _this->_state;
 }
 int _icane_main(struct _arec__icane_main* _this)
 {
-void * _atbl[] = { &&lstate_0, &&lstate_1, &&lstate_2, &&lstate_3 };
+static const void * _atbl[] = { &&lstate_0, &&lstate_1, &&lstate_2, &&lstate_3 };
 int _state = _this->_state;
 _this->_state = 0;
 if (_state > 0 && _state < 3) goto *(_atbl[_state]);

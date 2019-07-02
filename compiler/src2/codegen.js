@@ -803,7 +803,7 @@ function fdef(ast,strbuf){
 	stmt(ast.body,body_strbuf);
 
 	if(is_async){
-		var activation_tbl = "void * _atbl[] = { "
+		var activation_tbl = "static const void * _atbl[] = { "
 		for(var i=0;i<= curr.label_num;i++){
 			if(i > 0)
 				activation_tbl += ", ";
