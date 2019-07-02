@@ -57,7 +57,9 @@ const func_info = {
 	PTR_TYPE_NAME: 1,
 	FUNC_NAME: 2,
 	AREC_NAME: 3,
-	PARAM_NAMES: 4
+	PARAM_NAMES: 4,
+	VARSCOPE_NAME: 5,
+	RETS_NULL_ARRAY: 6	
 };
 
 
@@ -65,22 +67,30 @@ function get_func_info(qid, info_req){
 	var ast;
 	var mod_ast;
 	var scoped_fname;
+	var var_scope_name = "";
 	if(qid.length > 1){
 		mod_ast = curr.toplevel_ast.modules[qid[0]];
 		fname = qid[1];
 		scoped_fname = PFUNC + qid[0] + "_" + qid[1];
+		var_scope_name = PVAR + qid[0] + "_" + qid[1];
 	}else{
 		mod_ast = curr.mod_ast;
 		fname = qid[0];		
 		if(fname === 'event'){
 			scoped_fname =  fname;
+			var_scope_name = fname;
 		}else{
 	    	scoped_fname = PFUNC + mod_ast.name + "_" + fname;
+	    	var_scope_name = PVAR + mod_ast.name + "_" + fname;
 	    }
 	}
 
 	if(info_req === func_info.FUNC_NAME){
 		return scoped_fname;
+	}
+
+	if(info_req === func_info.VARSCOPE_NAME){
+		return var_scope_name;
 	}
 
 	if(info_req === func_info.AREC_NAME){
@@ -108,11 +118,25 @@ function get_func_info(qid, info_req){
 		return null;
 	}
 
+	if(info_req == func_info.RETS_NULL_ARRAY){
+		var rets = [];
+
+		var is_void = ast.type.primitive && ast.type.primitive === 'void';
+
+   	    if(typeof ast.type != 'undefined' && !is_void){
+			//TODO process tuple types.
+			retType = stringify_type(ast.type);
+			//ignore the type and just put a NULL as the argument
+			rets.push("((" + retType.base + retType.dim + "*) 0UL)");
+		}
+		return rets;
+	}
+
 	if(info_req === func_info.PARAM_NAMES){
 		var param_names = [];
 		for(var param_ast of ast.params)
 		{
-			var scoped_param_name = scoped_fname + "_" + param_ast.id;
+			var scoped_param_name = var_scope_name + "_" + param_ast.id;
 			param_names.push(scoped_param_name);
 		}	
 		return param_names;
@@ -192,7 +216,7 @@ function is_async_fn(qid, info){
 	return info.is_event || (mod_ast && (mod_ast.asyncs.indexOf(fname) >= 0));	
 }
 
-var buildin_functions = [];
+var builtin_functions = [];
 
 function fcall(ast, retParams, is_async, info){
 	var strs=[];
@@ -218,7 +242,7 @@ function fcall(ast, retParams, is_async, info){
 			}
 		}
 	}else{
-		if(buildin_functions.indexOf(qid[0]) >= 0){
+		if(builtin_functions.indexOf(qid[0]) >= 0){
 			name = PFUNC + qid[0];
 		}else{
 			var sym = symtbl.lookup(qid[0]);
@@ -285,8 +309,10 @@ function fcall(ast, retParams, is_async, info){
 		}
 	}
 
-	for(retParam of retParams){
-		strFcall = strFcall + ", " + retParam;
+	if(retParams){
+		for(retParam of retParams){
+			strFcall = strFcall + ", " + retParam;
+		}
 	}
 	strFcall += ") ";
 	strs.push(strFcall);
@@ -414,10 +440,10 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 	var strs = [];
 	var info = {};
 
+
 	var is_async_fcall = is_async_fn(ast_fcall.qid, info);
 
 	if(is_async_fcall){
-		var info = {};
 		var fcall_params = [];
 		if(ast_fcall.sync === 'await'){
 			if(info.is_event){
@@ -427,6 +453,7 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 			if(lvalue){
 				fcall_params = [ "&(" + lvalue + ")"];
 			}
+			info = {};
 			strs = fcall(ast_fcall, fcall_params, true, info);
 			for(i = 0; i< strs.length - 1;i++){
 				strbuf.push(strs[i] + ";");
@@ -434,13 +461,16 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 			strExpr = strs[strs.length - 1];//last element is the actual function call.				
 			label = get_next_label() + ": ";
 			strbuf.push(label + "_state = " + strExpr + ";");
-			var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return this->_state;} ";
+			var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return _this->_state;} ";
 			strbuf.push(stateCtrl);
 		}else{
 			if(info.is_event && lvalue){
-				strs.push(lvalue + "._state = 1;");
+				strbuf.push(lvalue + "->_state = 1;");
 			}else{
-				strs = fcall(ast_fcall, [], true, info);
+				fcall_params = get_func_info(ast_fcall.qid, func_info.RETS_NULL_ARRAY);
+
+				info = {};
+				strs = fcall(ast_fcall, fcall_params, true, info);
 				for(i = 0; i< strs.length;i++){
 					strbuf.push(strs[i] + ";");
 				}
@@ -469,7 +499,7 @@ function stmt_await_on_id(id_expr, lvalue, strbuf){
 		var fcall = "";
 		if(scoped_fname === 'event')
 		{
-			fcall = strExpr + "._state";
+			fcall = strExpr + "->_state";
 		}else
 		{
 			fcall = scoped_fname + "(" + strExpr;
@@ -483,7 +513,7 @@ function stmt_await_on_id(id_expr, lvalue, strbuf){
 		label = get_next_label() + ": ";
 		strbuf.push(label + "_state = " + fcall + ";");
 
-		var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return this->_state;} ";
+		var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return _this->_state;} ";
 		strbuf.push(stateCtrl);
 
 	}else
@@ -495,7 +525,7 @@ function stmt_await_on_id(id_expr, lvalue, strbuf){
 function stmt_signal(id_expr, strbuf){
 	var sym = symtbl.lookup(id_expr.id);
 	var strExpr = expr(id_expr);
-	strbuf.push(strExpr + "._state = 0;");
+	strbuf.push(strExpr + "->_state = 0;");
 }
 
 function stmt(ast,strbuf){
@@ -539,7 +569,7 @@ function stmt(ast,strbuf){
 			//TODO: tuple and array returns.
 			if(curr.is_async){
 				if(strRetExpr !== ""){
-					strbuf.push("*(_this->_ret0) = " + strRetExpr);
+					strbuf.push("if (_ret0 != NULL) *(_ret0) = " + strRetExpr);
 				}
 				strbuf.push("return _this->_state; ");
 			}else{
@@ -577,7 +607,7 @@ function stringify_type(ast){
 	}
 
 	if(!base && ast.future_qid){
-		var base = get_func_info(ast.future_qid, func_info.AREC_TYPE);
+		var base = get_func_info(ast.future_qid, func_info.AREC_TYPE) + "* ";
 	}
 
 	var dim="";
@@ -698,8 +728,10 @@ function fdef(ast,strbuf){
 		//TODO process tuple types.
 		retType = stringify_type(ast.type);
 		if(is_async){
-			returnParamTypes.push(retType);
-			hdr= hdr+"void ";
+			if(retType.base !== 'void'){
+				returnParamTypes.push(retType);
+			}
+			hdr= hdr+"int ";
 		}else{
 			var strRetType = retType.base + retType.dim;
 			hdr = hdr + strRetType + " ";//CHG: replaced ast.type.primitive with ReturnType
@@ -764,7 +796,7 @@ function fdef(ast,strbuf){
 	stmt(ast.body,body_strbuf);
 
 	if(is_async){
-		var activation_tbl = "__atbl = { "
+		var activation_tbl = "void * _atbl[] = { "
 		for(var i=0;i< curr.label_num;i++){
 			if(i > 0)
 				activation_tbl += ", ";
@@ -785,6 +817,10 @@ function fdef(ast,strbuf){
 
 	for(str of body_strbuf){
 		strbuf.push(str);
+	}
+
+	if(is_async){
+		strbuf.push("return _this->_state;");
 	}
 
     strbuf.push("}");
@@ -856,6 +892,7 @@ function boiler_plate(){
 	strglobals.push("********************************************************************************/");
 	strglobals.push("");
 	strglobals.push("struct _arec_event {int _state;};")
+	strglobals.push("#define NULL ((void *)0UL)")
 }
 
 function includes(cfg){
