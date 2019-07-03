@@ -30,7 +30,7 @@ int _test5_m(struct _arec__test5_m* _this, float*  _ret0)
 static const void * _atbl[] = { &&lstate_0, &&lstate_1 };
 int _state = _this->_state;
 _this->_state = 0;
-if (_state > 0 && _state < 1) goto *(_atbl[_state]);
+if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
  lstate_0:
 {
  lstate_1:
@@ -49,7 +49,7 @@ int _test5_main(struct _arec__test5_main* _this)
 static const void * _atbl[] = { &&lstate_0, &&lstate_1, &&lstate_2, &&lstate_3 };
 int _state = _this->_state;
 _this->_state = 0;
-if (_state > 0 && _state < 3) goto *(_atbl[_state]);
+if (_state > 0 && _state <= 3) goto *(_atbl[_state]);
  lstate_0:
 {
     _this->test5_main_v[0]=1;

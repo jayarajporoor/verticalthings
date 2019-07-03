@@ -821,7 +821,7 @@ function fdef(ast,strbuf){
 		strbuf.push("int _state = _this->_state;");
 		strbuf.push("_this->_state = 0;");
 
-		var jmp_cmd = "if (_state > 0 && _state < " + curr.label_num + ") goto *(_atbl[_state]);";
+		var jmp_cmd = "if (_state > 0 && _state <= " + curr.label_num + ") goto *(_atbl[_state]);";
 		
 		strbuf.push(jmp_cmd);
 		strbuf.push(get_label(0) + ":");

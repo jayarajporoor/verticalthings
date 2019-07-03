@@ -25,7 +25,7 @@ int _test2_m(struct _arec__test2_m* _this, float*  _ret0)
 static const void * _atbl[] = { &&lstate_0, &&lstate_1 };
 int _state = _this->_state;
 _this->_state = 0;
-if (_state > 0 && _state < 1) goto *(_atbl[_state]);
+if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
  lstate_0:
 {
     _this->test2_m_x=(_this->test2_m_y*2);
@@ -45,7 +45,7 @@ int _test2_main(struct _arec__test2_main* _this)
 static const void * _atbl[] = { &&lstate_0, &&lstate_1 };
 int _state = _this->_state;
 _this->_state = 0;
-if (_state > 0 && _state < 1) goto *(_atbl[_state]);
+if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
  lstate_0:
 {
     _this->_arec__test2_m._state = 0;
