@@ -459,8 +459,9 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 				strbuf.push(strs[i] + ";");
 			}
 			strExpr = strs[strs.length - 1];//last element is the actual function call.				
-			label = get_next_label() + ": ";
-			strbuf.push(label + "_state = " + strExpr + ";");
+			label = get_next_label() + ":";
+			strbuf.push(label);
+			strbuf.push("_state = " + strExpr + ";");
 			var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return _this->_state;} ";
 			strbuf.push(stateCtrl);
 		}else{
@@ -510,8 +511,9 @@ function stmt_await_on_id(id_expr, lvalue, strbuf){
 			fcall += ")";
 		}
 
-		label = get_next_label() + ": ";
-		strbuf.push(label + "_state = " + fcall + ";");
+		label = get_next_label() + ":";
+		strbuf.push(label);
+		strbuf.push("_state = " + fcall + ";");
 
 		var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return _this->_state;} ";
 		strbuf.push(stateCtrl);
@@ -569,8 +571,8 @@ function stmt(ast,strbuf){
 			//TODO: tuple and array returns.
 			if(curr.is_async){
 				if(strRetExpr !== ""){
-					var label = get_next_label() + ": ";
-					strbuf.push(  label);
+					var label = get_next_label() + ":";
+					strbuf.push(label);
 					strbuf.push("if (_ret0 == NULL){");
 					strbuf.push("_this->_state = "  + curr.label_num  + ";");
 					strbuf.push("}");
@@ -822,7 +824,7 @@ function fdef(ast,strbuf){
 		var jmp_cmd = "if (_state > 0 && _state < " + curr.label_num + ") goto *(_atbl[_state]);";
 		
 		strbuf.push(jmp_cmd);
-		strbuf.push(get_label(0) + ": ");
+		strbuf.push(get_label(0) + ":");
 	}
 
 	for(str of body_strbuf){

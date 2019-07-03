@@ -31,9 +31,9 @@ static const void * _atbl[] = { &&lstate_0, &&lstate_1 };
 int _state = _this->_state;
 _this->_state = 0;
 if (_state > 0 && _state < 1) goto *(_atbl[_state]);
-lstate_0: 
+lstate_0:
 {
-    lstate_1: 
+    lstate_1:
     if (_ret0 == NULL){
         _this->_state = 1;
     }
@@ -50,21 +50,24 @@ static const void * _atbl[] = { &&lstate_0, &&lstate_1, &&lstate_2, &&lstate_3 }
 int _state = _this->_state;
 _this->_state = 0;
 if (_state > 0 && _state < 3) goto *(_atbl[_state]);
-lstate_0: 
+lstate_0:
 {
     _this->test5_main_v[0]=1;
     _this->_arec__test5_m._state = 0;
     _this->_arec__test5_m.test5_m_y = 3;
-    lstate_1: _state = _test5_m( &(_this->_arec__test5_m), &(_this->test5_main_res)) ;
+    lstate_1:
+    _state = _test5_m( &(_this->_arec__test5_m), &(_this->test5_main_res)) ;
     if (_state > 0) {_this->_state = 1; return _this->_state;} 
     _this->_arec__test5_m._state = 0;
     _this->_arec__test5_m.test5_m_y = 4;
     _test5_m( &(_this->_arec__test5_m), ((float*) 0UL)) ;
     test5_f= &(_this->_arec__test5_m);
-    lstate_2: _state = _test5_m(test5_f, (&_this->test5_main_res) );
+    lstate_2:
+    _state = _test5_m(test5_f, (&_this->test5_main_res) );
     if (_state > 0) {_this->_state = 2; return _this->_state;} 
     test5_e->_state = 1;
-    lstate_3: _state = test5_e->_state;
+    lstate_3:
+    _state = test5_e->_state;
     if (_state > 0) {_this->_state = 3; return _this->_state;} 
 }
 return _this->_state;

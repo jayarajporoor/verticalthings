@@ -26,10 +26,10 @@ static const void * _atbl[] = { &&lstate_0, &&lstate_1 };
 int _state = _this->_state;
 _this->_state = 0;
 if (_state > 0 && _state < 1) goto *(_atbl[_state]);
-lstate_0: 
+lstate_0:
 {
     _this->test1_m_x=(_this->test1_m_y*2);
-    lstate_1: 
+    lstate_1:
     if (_ret0 == NULL){
         _this->_state = 1;
     }
@@ -46,11 +46,12 @@ static const void * _atbl[] = { &&lstate_0, &&lstate_1 };
 int _state = _this->_state;
 _this->_state = 0;
 if (_state > 0 && _state < 1) goto *(_atbl[_state]);
-lstate_0: 
+lstate_0:
 {
     _this->_arec__test1_m._state = 0;
     _this->_arec__test1_m.test1_m_y = 3;
-    lstate_1: _state = _test1_m( &(_this->_arec__test1_m), &(_this->test1_main_res)) ;
+    lstate_1:
+    _state = _test1_m( &(_this->_arec__test1_m), &(_this->test1_main_res)) ;
     if (_state > 0) {_this->_state = 1; return _this->_state;} 
 }
 return _this->_state;
