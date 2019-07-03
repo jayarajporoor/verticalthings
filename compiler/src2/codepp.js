@@ -8,6 +8,9 @@ function codepp(ast,ctx){
 	for(var i=0;i<code.length;i++){
 		var line = code[i];
 
+		if(line.endsWith(":")){
+			code[i] = " " + line;//label
+		}
 		if(line === "{" || line.endsWith("{")){
 			code[i] = current_indent + line;			
 			current_indent_depth++;
