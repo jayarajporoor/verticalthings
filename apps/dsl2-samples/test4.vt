@@ -21,9 +21,10 @@ void irq(){
 async void main(){
     float res;
 
+    facq = acq(3.0);
     while(1){
-        facq = acq(3.0);
-        //processing
         res = await facq;
+        facq = acq(3.0);
+        //processing the res while the next acq is happening
      }
 }

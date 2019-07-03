@@ -1,4 +1,6 @@
 
+future<m> f;
+
 async float m(float y){
     int x;
 
@@ -10,5 +12,7 @@ async float m(float y){
 async void main(){
     float res;
 
-    res = await m(3.0);
+    f = m(3.0);
+    
+    res  = await f;
 }

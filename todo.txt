@@ -1,5 +1,6 @@
 * Announce via the IDEAS lab and get 1 or 2 good students on the project.
 * Write a sample app, build and test on actual stm32 hardware.
+* Rigorous testing/test scripts.
 * Move some of the async/await logic from codegen to AST transform.
 * Build an actual app.
 * fixed multiple async/await cooperatively multitasked tasks.

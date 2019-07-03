@@ -62,15 +62,19 @@ _this->_state = 0;
 if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
  lstate_0:
 {
+    _this->_arec__test4_acq._state = 0;
+    _this->_arec__test4_acq.test4_acq_y = 3;
+    _test4_acq( &(_this->_arec__test4_acq), ((float*) 0UL)) ;
+    test4_facq= &(_this->_arec__test4_acq);
     while(1)
     {
+ lstate_1:
+        _state = _test4_acq(test4_facq, (&_this->test4_main_res) );
+        if (_state > 0) {_this->_state = 1; return _this->_state;} 
         _this->_arec__test4_acq._state = 0;
         _this->_arec__test4_acq.test4_acq_y = 3;
         _test4_acq( &(_this->_arec__test4_acq), ((float*) 0UL)) ;
         test4_facq= &(_this->_arec__test4_acq);
- lstate_1:
-        _state = _test4_acq(test4_facq, (&_this->test4_main_res) );
-        if (_state > 0) {_this->_state = 1; return _this->_state;} 
     }
 }
 return _this->_state;
