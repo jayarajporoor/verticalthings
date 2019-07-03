@@ -365,7 +365,7 @@ function expr(ast){
 		}else{
 			sym = symtbl.lookup(id);
 			if(sym && !sym.info.is_temp){
-				str = str + get_arec_qualified_name(sym, "_", PVAR);
+				str = str + get_arec_qualified_name(sym, "_", PVAR);			
 			}else{
 				str = str + id;//loop variables are not in symbol table now.
 				if(!sym){
@@ -764,7 +764,10 @@ function fdef(ast,strbuf){
 		curr.arec_decl.push("struct " + arec_name + "{");
 		curr.arec_decl.push("int _state = 0;");
 		for(var i in ast.params){
-			curr.arec_decl.push(params[i] + ";");		
+			curr.arec_decl.push(params[i] + ";");
+			var param_components = params[i].split(" ");		
+			var param_name = param_components[param_components.length-1].trim();
+			curr.arec_varnames.push(param_name);			
 		}
 		params = ["struct " + arec_name + "* _this"];
 	}

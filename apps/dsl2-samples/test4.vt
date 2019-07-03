@@ -1,0 +1,29 @@
+
+future<event> dma;
+future<acq> facq;
+
+async float acq(float y){
+    int x;
+
+    x = y * 2;
+    //start data acquisition 
+
+    dma = event();
+    await dma;
+
+    return x;
+}
+
+void irq(){
+    signal dma;
+}
+
+async void main(){
+    float res;
+
+    while(1){
+        facq = acq(3.0);
+        //processing
+        res = await facq;
+     }
+}

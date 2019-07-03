@@ -1,0 +1,28 @@
+
+future<m> f;
+
+future<event> e;
+
+async float m(int y){
+    int x;
+
+    return 3;
+}
+
+async void main(){
+    float[100] v;
+    float res;
+    v[0] = 1;
+    res = await m(3);
+    f = m(4);
+    res = await f;
+
+    e = event();
+
+    await e;
+}
+
+
+void irq(){
+    signal e;
+}
