@@ -30,14 +30,14 @@ static const void * _atbl[] = { &&lstate_0, &&lstate_1, &&lstate_2 };
 int _state = _this->_state;
 _this->_state = 0;
 if (_state > 0 && _state < 2) goto *(_atbl[_state]);
-lstate_0:
+ lstate_0:
 {
     _this->test4_acq_x=(_this->test4_acq_y*2);
     test4_dma->_state = 1;
-    lstate_1:
+ lstate_1:
     _state = test4_dma->_state;
     if (_state > 0) {_this->_state = 1; return _this->_state;} 
-    lstate_2:
+ lstate_2:
     if (_ret0 == NULL){
         _this->_state = 2;
     }
@@ -60,7 +60,7 @@ static const void * _atbl[] = { &&lstate_0, &&lstate_1 };
 int _state = _this->_state;
 _this->_state = 0;
 if (_state > 0 && _state < 1) goto *(_atbl[_state]);
-lstate_0:
+ lstate_0:
 {
     while(1)
     {
@@ -68,7 +68,7 @@ lstate_0:
         _this->_arec__test4_acq.test4_acq_y = 3;
         _test4_acq( &(_this->_arec__test4_acq), ((float*) 0UL)) ;
         test4_facq= &(_this->_arec__test4_acq);
-        lstate_1:
+ lstate_1:
         _state = _test4_acq(test4_facq, (&_this->test4_main_res) );
         if (_state > 0) {_this->_state = 1; return _this->_state;} 
     }

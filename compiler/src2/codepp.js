@@ -10,7 +10,7 @@ function codepp(ast,ctx){
 
 		if(line.endsWith(":")){
 			code[i] = " " + line;//label
-		}
+		}else
 		if(line === "{" || line.endsWith("{")){
 			code[i] = current_indent + line;			
 			current_indent_depth++;
