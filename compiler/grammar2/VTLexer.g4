@@ -114,6 +114,8 @@ INT: 'int';
 FLOAT: 'float';
 BOOLEAN: 'boolean';
 
+STATIC: 'static';
+
 I8: 'int8_t';
 U8: 'uint8_t';
 I16: 'int16_t';

@@ -43,7 +43,7 @@ initValue: expr | StringLiteral | arrayLiteral;
 varIdDef: Identifier (ASSIGN initValue)?;
 
 varDef
-    :  CONST? varType varIdDef (COMMA varIdDef)* SEMI
+    :  CONST? STATIC? varType varIdDef (COMMA varIdDef)* SEMI
     ;
 
 dimValue: (IntegerConstant|Identifier);

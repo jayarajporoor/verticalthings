@@ -8,3 +8,5 @@
 * RX Observable/Observer library on top of async/await tasks.
 * I/O effects and timed transition system.
 * Compiler managed heap modifications for async/await implementation.
+* MISC: local static vars - move outside activation record to global scope
+* Code gen: returning/receiving references to arrays.

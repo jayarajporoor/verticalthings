@@ -316,7 +316,6 @@ function fcall(ast, retParams, is_async, info){
 	}
 	strFcall += ") ";
 	strs.push(strFcall);
-
 	return strs;
 }
 
@@ -482,9 +481,9 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 			}
 		}
 	}else{
-		var strs = fcall(ast_fcall) + ";" ;
+		var strs = fcall(ast_fcall);
 		for(str of strs){
-			strbuf.push(str);
+			strbuf.push(str + ";");
 		}		
 	}	
 }
@@ -634,6 +633,12 @@ function vardef(ast)
 {	
 	var defs = [];
 	var s="";
+
+	if(typeof ast.type.is_static != 'undefined'){
+		if(ast.type.is_static === true)
+			s=s+"static ";
+	}
+
 	if(ast.type.dim && !ast.type.is_const){
 		//for RAM arrays we do our own memory allocation. However, for ring bufs we need to add a vardef for
 		//ring pos.
@@ -777,10 +782,14 @@ function fdef(ast,strbuf){
 	for(var i=0;i<returnParamTypes.length;i++){
 		var retType = returnParamTypes[i];
 		var base = retType.base;
+		var paramStr = "";
+		var retVarName = "_ret" + i;
 		if(retType.dim === ""){
-			base += "* ";//pointer
+			paramStr = base + "* " + retVarName;
+		}else{
+			paramStr = base + "(*" + retVarName + ")" + retType.dim;
 		}
-		params.push(base + " _ret" + i + retType.dim);
+		params.push(paramStr);
 	}
 
 	hdr = hdr+ params.join(", ");	
@@ -964,6 +973,7 @@ function code_gen(ast,ctx){
         curr.mod_ast = null;
         symtbl.exitNestedScope();
     }
+
 
     if(strglobals.length > 0){
     	//add defines to the beginning of code.

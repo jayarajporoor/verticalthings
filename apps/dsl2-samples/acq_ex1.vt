@@ -1,0 +1,47 @@
+
+future<event> spi_dma_done;
+future<acq> facq;
+
+const int BUFFERSIZE = 128;
+
+uint8_t[2][BUFFERSIZE] flip_bufs;
+uint16_t curr_buf = 0;
+
+async uint8_t[BUFFERSIZE] acq()
+{  
+    curr_buf = curr_buf ^ 1;
+
+    //start data acquisition 
+    if(HAL_SPI_TransmitReceive_DMA(&SpiHandle, NULL, flip_bufs[curr_buf], BUFFERSIZE) != HAL_OK)
+    {
+        /* Transfer error in transmission process */
+        Error_Handler();
+        return NULL;
+    }
+    spi_dma_done = event();
+    await spi_dma_done;
+
+    return flip_bufs[curr_buf];
+}
+
+void HAL_SPI_TxRxCpltCallback(SPI_HandleRef href)
+{
+    signal spi_dma_done;
+}
+
+void process(uint8_t[BUFFERSIZE] buf)
+{
+    //process...
+}
+
+async void main()
+{
+    uint8_ref_t buf;
+
+    facq = acq();
+    while(1){
+        buf = await facq;
+        facq = acq();
+        process(buf);
+     }
+}

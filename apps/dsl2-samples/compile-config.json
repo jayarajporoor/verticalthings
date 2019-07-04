@@ -1,0 +1,6 @@
+{
+	"codegen":{
+		"stdincludes" :[],
+		"pathincludes" :["../inc/vtdefs.h", "../inc/stm32_hal_ex1.h"]
+	}
+}

@@ -557,6 +557,8 @@ function astVarDef(def){
 
   ast.type.is_const = def.CONST() ? true : false;
 
+  ast.type.is_static = def.STATIC() ? true : false;
+
   for(var i=0;i<varIdDef.length;i++){
   	  var def = {id: getId(varIdDef[i])};
   	  var initValue = varIdDef[i].initValue();
