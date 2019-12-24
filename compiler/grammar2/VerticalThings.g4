@@ -68,10 +68,12 @@ primitiveType
     : type=(INT | FLOAT | BOOLEAN | VOID | I8 | U8 | I16 | U16 | I32 | U32)
     ;
 
-futureType: FUTURE LT qualIdentifier GT;
+futureType: FUTURE LT varType GT;
+
+chanType : (RCHAN | CHAN) LT Identifier GT;
 
 varType
-    :   (qualIdentifier | cppQualIdentifier | rangeType | primitiveType | futureType) dimensionSpec?
+    :   (qualIdentifier | cppQualIdentifier | rangeType | primitiveType | futureType | chanType) dimensionSpec? BAND?
     ;    
 
 varTypeList

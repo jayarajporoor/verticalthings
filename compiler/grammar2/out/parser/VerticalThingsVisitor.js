@@ -112,6 +112,11 @@ VerticalThingsVisitor.prototype.visitFutureType = function(ctx) {
 };
 
 
+// Visit a parse tree produced by VerticalThings#chanType.
+VerticalThingsVisitor.prototype.visitChanType = function(ctx) {
+};
+
+
 // Visit a parse tree produced by VerticalThings#varType.
 VerticalThingsVisitor.prototype.visitVarType = function(ctx) {
 };

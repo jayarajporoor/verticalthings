@@ -191,6 +191,15 @@ VerticalThingsListener.prototype.exitFutureType = function(ctx) {
 };
 
 
+// Enter a parse tree produced by VerticalThings#chanType.
+VerticalThingsListener.prototype.enterChanType = function(ctx) {
+};
+
+// Exit a parse tree produced by VerticalThings#chanType.
+VerticalThingsListener.prototype.exitChanType = function(ctx) {
+};
+
+
 // Enter a parse tree produced by VerticalThings#varType.
 VerticalThingsListener.prototype.enterVarType = function(ctx) {
 };

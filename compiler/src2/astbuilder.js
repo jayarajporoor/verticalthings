@@ -402,7 +402,14 @@ function astReturnType(returnType){
 
 function astFutureType(futureType){
 	var ast = {};
-	ast.future_qid = getIdList(futureType.qualIdentifier());
+	ast.future_type = astVarType(futureType.varType());
+	return ast;
+}
+
+function astChanType(chanType){
+	var ast = {};
+	ast.chan_type = chanType.RCHAN() ? "rchan" : "chan"
+	ast.id = getId(chanType);
 	return ast;
 }
 
@@ -413,6 +420,8 @@ function astVarType(varType){
 	var rangeType = varType.rangeType();
 	var primitiveType = varType.primitiveType();
 	var futureType = varType.futureType();
+	var chanType = varType.chanType();
+	var refFlag = vartype.BAND()
 
 	var ast = {};
 
@@ -433,11 +442,20 @@ function astVarType(varType){
 	}else
 	if(futureType){
 		ast = astFutureType(futureType);
+	}else
+	if(chanType){
+		ast = astChanType(chanType)
 	}
 
 	var dimensionSpec = varType.dimensionSpec();  
 	if(dimensionSpec){
 		ast.dim = getDimensionSpec(dimensionSpec);
+	}
+
+	if (refFlag){
+		ast.is_ref = true;
+	}else{
+		ast.is_ref = false;
 	}
 
 	ast.src = src_info(varType);

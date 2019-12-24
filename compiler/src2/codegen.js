@@ -4,6 +4,7 @@ var symtbl;
 var pipeline_next_state = {};
 var pipeline_states = [];
 var strglobals = [];
+var type_ids = {}
 
 var curr = {
 	is_async: false,
@@ -254,6 +255,10 @@ function fcall(ast, retParams, is_async, info){
 		}
 	}
 
+	if (info){
+		info.name = name
+	}
+
 	if(is_async){
 		var arec_name = "_arec_" + name;
 
@@ -465,7 +470,7 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 			strbuf.push(stateCtrl);
 		}else{
 			if(info.is_event && lvalue){
-				strbuf.push(lvalue + "->_state = 1;");
+				strbuf.push(lvalue + "._parec = (void*)1;");
 			}else{
 				fcall_params = get_func_info(ast_fcall.qid, func_info.RETS_NULL_ARRAY);
 
@@ -475,8 +480,11 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 					strbuf.push(strs[i] + ";");
 				}
 				if(lvalue){
-					var assignFuture = lvalue + "= &(_this->" + info.arec_name + ");";
-					strbuf.push(assignFuture);
+					//var assignFuture = lvalue + "= &(_this->" + info.arec_name + ");";
+					var assignArecPtr = lvalue + "._parec = &(_this->" + info.arec_name + ");";
+					var assignFnPtr = lvalue + "._pfn = (int (*)(void *, void *) )&" + info.name + ";"
+					strbuf.push(assignArecPtr);
+					strbuf.push(assignFnPtr);
 				}
 			}
 		}
@@ -492,41 +500,38 @@ function stmt_await_on_id(id_expr, lvalue, strbuf){
 	var sym = symtbl.lookup(id_expr.id);
 	var strExpr = expr(id_expr);
 	//var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);
-	var fqid = sym.info.type.future_qid;
-	if(fqid)
+	//var fqid = sym.info.type.future_qid;
+	if(strExpr)
 	{
-		var scoped_fname = get_func_info(fqid, func_info.FUNC_NAME);
 		var fcall = "";
-		if(scoped_fname === 'event')
+		if(sym.info.type.future_type === 'event')
 		{
-			fcall = strExpr + "->_state";
+			fcall = "(int) " + strExpr + "._parec";
 		}else
 		{
-			fcall = scoped_fname + "(" + strExpr;
-			if(lvalue)
-			{
+			fcall = strExpr + "._pfn(" + strExpr + "._parec" 
+			if (lvalue){
 				fcall += ", (&" + lvalue + ") ";
 			}
+
 			fcall += ")";
 		}
-
 		label = get_next_label() + ":";
 		strbuf.push(label);
 		strbuf.push("_state = " + fcall + ";");
-
 		var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return _this->_state;} ";
 		strbuf.push(stateCtrl);
 
 	}else
 	{
-		console.log("ERROR: Couldn't find the future type for the variable " + id_expr.id);
+		console.log("ERROR: Couldn't find the future variable " + id_expr.id);
 	}	
 }
 
 function stmt_signal(id_expr, strbuf){
 	var sym = symtbl.lookup(id_expr.id);
 	var strExpr = expr(id_expr);
-	strbuf.push(strExpr + "->_state = 0;");
+	strbuf.push(strExpr + "._parec = (void *) 0;");
 }
 
 function stmt(ast,strbuf){
@@ -614,8 +619,9 @@ function stringify_type(ast){
 		base = ast.qidCpp.join("::");
 	}
 
-	if(!base && ast.future_qid){
-		var base = get_func_info(ast.future_qid, func_info.AREC_TYPE) + "* ";
+	if(!base && ast.future_type){
+		//OLD: var base = get_func_info(ast.future_qid, func_info.AREC_TYPE) + "* ";
+		var base = "struct _future ";
 	}
 
 	var dim="";
@@ -623,8 +629,22 @@ function stringify_type(ast){
 		for(var i in ast.dim.dim){
 			dim=dim+"["+expr(ast.dim.dim[i])+"]";
 		}
-	}	
-	var astr = {base: base, dim: dim, is_ring: ast.dim && ast.dim.is_ring};	
+	}
+	if (ast.is_ref) {
+		if (dim != ""){
+			type_id = base + "_" + dim.replace("[", "_").replace("]", "")
+			if !(type_ids[type_id]) {
+				type_ids[type_id] = true
+				strglobals.push("typedef " + type_id + " " + type.base + type.dim + ";")
+			}
+			base = type_id + "&" ;
+			dim = "";
+		}else{
+			base = base + "&";
+		}
+	}
+
+	var astr = {base: base, dim: dim, is_ring: ast.dim && ast.dim.is_ring, is_ref: ast.is_ref};	
 
 	return astr;
 }
@@ -662,8 +682,10 @@ function vardef(ast)
 		if(ast.type.is_const === true)
 			s=s+"const ";
 	}
-	var type = stringify_type(ast.type);
+	var type = stringify_type(ast.type);	
+
 	s=s+type.base+" ";
+
 	// console.log(s);
 	var temp=[];
 	for(var i=0;i<ast.defs.length;i++){
@@ -914,6 +936,7 @@ function boiler_plate(){
 	strglobals.push("");
 	strglobals.push("struct _arec_event {volatile int _state;};")
 	strglobals.push("#define NULL ((void *)0UL)")
+	strglobals.push("struct _future {void *_parec; int (*_pfn)(void *, void *);}; ")
 }
 
 function includes(cfg){

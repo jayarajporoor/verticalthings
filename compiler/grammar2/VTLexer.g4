@@ -11,6 +11,10 @@ FUTURE: 'future';
 
 USING: 'using' ;
 
+RCHAN: 'rchan';
+
+CHAN: 'chan';
+
 MODULE
     :   'module'
     ;
