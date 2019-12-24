@@ -409,6 +409,7 @@ function astFutureType(futureType){
 function astChanType(chanType){
 	var ast = {};
 	ast.chan_type = chanType.RCHAN() ? "rchan" : "chan"
+	ast.base = "int";
 	ast.id = getId(chanType);
 	return ast;
 }

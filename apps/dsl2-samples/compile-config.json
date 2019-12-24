@@ -2,5 +2,9 @@
 	"codegen":{
 		"stdincludes" :[],
 		"pathincludes" :["../inc/vtdefs.h", "../inc/stm32_hal_ex1.h"]
+	},
+	"channels": {
+		"spi0" : 0,
+		"spi1" : 1
 	}
 }

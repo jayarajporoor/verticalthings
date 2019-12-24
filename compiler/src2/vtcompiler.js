@@ -174,6 +174,7 @@ function compile(argv)
 	var srcpaths = [];
 	var printAst = false;
 	var printSymtbl = false;
+	var entry = null;
 
 	var ast_transforms = [];
 	var code_path = null;
@@ -212,6 +213,16 @@ function compile(argv)
 
 	for(var i=0;i<argv.length;i++){
 		switch(argv[i]){
+			case "-entry":
+				if(argv[i+1]){
+					entry = argv[i+1];
+					if (i + 2 < argv.length && argv[i+1].startsWith("-") ){
+						i++;
+					}
+				}else{
+					code_path = "";
+				}
+			break;
 			case "-ast" :
 				printAst = true;
 			break;
@@ -305,6 +316,8 @@ function compile(argv)
 		var config = JSON.parse(fs.readFileSync(config_paths[i]));
 		transform_ctx.config = Object.assign(transform_ctx.config, config);
 	}
+
+	transform_ctx.config.entry = entry;
 
 	for(var i=0;i<ast_transforms.length;i++){
 		var xmod = require(ast_transforms[i]);

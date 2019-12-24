@@ -4,7 +4,8 @@ var symtbl;
 var pipeline_next_state = {};
 var pipeline_states = [];
 var strglobals = [];
-var type_ids = {}
+var type_ids = {};
+var main_channels = [];
 
 var curr = {
 	is_async: false,
@@ -644,7 +645,11 @@ function stringify_type(ast){
 		}
 	}
 
-	var astr = {base: base, dim: dim, is_ring: ast.dim && ast.dim.is_ring, is_ref: ast.is_ref};	
+	var chan = null;
+	if ast.chan_type {
+		chan = ast.id;
+	}
+	var astr = {base: base, dim: dim, is_ring: ast.dim && ast.dim.is_ring, is_ref: ast.is_ref, chan: chan};	
 
 	return astr;
 }
@@ -707,7 +712,7 @@ function vardef(ast)
 	return defs;
 }
 
-function fparam(ast, scoped_fname){
+function fparam(ast, scoped_fname, is_main=false){
 	var s="";
 	if(typeof ast.type.is_const != 'undefined')
 	{
@@ -729,6 +734,10 @@ function fparam(ast, scoped_fname){
 		var ring_index = scoped_fname ? scoped_fname + "_" + ast.id : get_current_scoped_name("__pos_" + ast.id, PVAR);
 		var str_ringpos = "int " + ring_index;		
 		s = s + ", " + str_ringpos;		
+	}
+
+	if (is_main && type.chan) {
+		main_channels.push( {chan: chan, param: ast.id})
 	}
 
 	return s;
@@ -785,8 +794,12 @@ function fdef(ast,strbuf){
 		curr.is_async = true;
 	}
 
+	is_main = false;
+	if (ast.id == "main"){
+		is_main = true;
+	}
 	for(var i in ast.params){
-		params.push(fparam(ast.params[i]));
+		params.push(fparam(ast.params[i], null, is_main));
 	}
 
 	if(is_async){	
@@ -1002,6 +1015,32 @@ function code_gen(ast,ctx){
     	//add defines to the beginning of code.
 		var splice_args = [0, 0].concat(strglobals);
 		Array.prototype.splice.apply(code, splice_args);    
+	}
+
+	if (ctx.config && ctx.config.entry){
+		if !ctx.config.channels {
+			console.log("ERROR: Channel definitions not found in the config file.")
+		}
+		module_main = "_" + ctx.config.entry + "_main";
+		code.push("/*Entry point - the 'C' main function*/");
+		code.push("_arec__" + module_main + " _arec_main;")
+		code.push("int main(){");
+		code.push("int status = -1;");
+		for chan_info in main_channels{
+			if ctx.config.channels && ctx.config.channels[chan_info.chan] {
+				chan_num = ctx.config.channels[chan_info.chan]
+			}else{
+				console.log("ERROR: Undefined channel used as parameter to main function " + chan_info.chan)
+			}
+		}
+				main_channels.push( {chan: chan, param: ast.id})
+
+		code.push("while (status != 0){")
+		code.push("status = " + module_main + "(&_arec_main);");
+		code.push("}")
+		code.push("while (true);")
+		code.push("return 0;");
+		code.push("}");
 	}
 
 	curr.toplevel_ast = null;

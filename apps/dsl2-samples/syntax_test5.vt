@@ -2,14 +2,13 @@
 future<event> dma;
 future<float> facq;
 
-async float acq(float y){
+async float acq(float y, chan<x> z){
     int x;
 
     x = y * 2;
     //start data acquisition 
 
-    dma = event();
-    await dma;
+    HAL_start(z);
 
     return x;
 }
@@ -24,7 +23,7 @@ async void main(chan<x> y){
     facq = acq(3.0);
     while(1){
         res = await facq;
-        facq = acq(3.0);
+        facq = acq(3.0, y);
         //processing the res while the next acq is happening
      }
 }
