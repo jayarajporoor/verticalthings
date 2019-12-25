@@ -14,7 +14,8 @@ var curr = {
 	label_num: 0,
 	toplevel_ast : null,
 	mod_ast : null,
-	allocated_arec_names : []
+	allocated_arec_names : [],
+	scoped_fname = null
 };//current context - must be explicitly cleared appropriately.
 
 const PFUNC = "_";
@@ -420,6 +421,23 @@ function expr(ast){
 		str = strs[0];
 	}else if(typeof ast.sconst !== 'undefined'){
 		str = ast.sconst ;
+	}else if (ast.texpr){
+		var first = true;
+		str = curr.ret_tuple_type + "("
+		for tentry in ast.texpr{
+			estr = expr(tentry);
+			if !first {
+				str = str + ", ";
+			}
+			str = str + estr;
+		}
+		str = str + ") ";
+	}else if(ast.tid){
+		id_list = [];
+		for e_tid in ast.tid{
+			id_list.push( expr(e_tid) );
+		}
+		str = id_list;
 	}
 
 
@@ -455,11 +473,21 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 				console.log("ERROR: Cannot await on event() call");
 				return;
 			}
-			if(lvalue){
-				fcall_params = [ "&(" + lvalue + ")"];
-			}
 			info = {};
 			strs = fcall(ast_fcall, fcall_params, true, info);
+			retvar = null;			
+			lvalue_tuple = null;
+			if (lvalue){
+				if Array.isArray(lvalue){
+					lvalue_tuple = lvalue;
+					ret_var = "_ret" + curr.retid;
+					strbuf.push("struct " + info.name + "_ret " ret_var + ";");
+					curr.ret_id += 1;
+					lvalue = ret_var;
+				}
+
+				fcall_params = [ "&(" + lvalue + ")"];
+			}
 			for(i = 0; i< strs.length - 1;i++){
 				strbuf.push(strs[i] + ";");
 			}
@@ -467,6 +495,12 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 			label = get_next_label() + ":";
 			strbuf.push(label);
 			strbuf.push("_state = " + strExpr + ";");
+			if retvar {
+				int i = 0;
+				for e_lvalue in lvalue_tuple {
+					strbuf.push(retvar + ".r" + i + "=" + e_lvalue + ";");
+				}
+			}
 			var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return _this->_state;} ";
 			strbuf.push(stateCtrl);
 		}else{
@@ -625,6 +659,30 @@ function stringify_type(ast){
 		var base = "struct _future ";
 	}
 
+	if (curr.ret_tuple_type && ast.ttype){
+		tuple_struct = "struct " + curr.ret_tuple_name + "{";
+		var i =0;
+		constr =  curr.ret_tuple_name + "(";
+		constr_params = "";
+		for tentry in ast.ttype{
+			s_tentry = stringify_type(tentry);
+			tstr = s_tentry.base + " r" + i + " " + s_tentry.dim ;
+			pstr = s_tentry.base + " p" + i + " " + s_tentry.dim ;
+			tuple_struct += ( tstr + "; ") ;
+			if i > 0{
+				constr += ", ";
+				constr_params += ", ";
+			}
+			constr += pstr;
+			constr_params += " r" + i + "(p" + i + ")"
+			i += 1;
+		}
+		constr += ")";
+		tuple_struct = tuple_struct + constr + ":" + constr_params + "{}; }";
+		strglobals.push(tuple_struct);		
+		base  = curr.ret_tuple_type;
+	}
+
 	var dim="";
 	if(typeof ast.dim != 'undefined'){
 		for(var i in ast.dim.dim){
@@ -765,6 +823,10 @@ function fdef(ast,strbuf){
 		strglobals.push("typedef " + fptr[fptr.length - 1] + ";");
 	}
 
+	var scoped_fname = get_current_scoped_name("", PFUNC);
+	
+	curr.ret_tuple_type = "struct " + scoped_fname + "_ret";
+
 	var is_async = ast.is_async;
 
 	var hdr="";
@@ -784,7 +846,6 @@ function fdef(ast,strbuf){
 	}else{
 		hdr= hdr+"void ";
 	}
-	var scoped_fname = get_current_scoped_name("", PFUNC);
 	var arec_name = "_arec_" + scoped_fname;
 
 	hdr = hdr + scoped_fname + "(";//Note:we're already in function scope - so no need to add fname
@@ -894,6 +955,7 @@ function fdef(ast,strbuf){
     curr.arec_decl = [];
     curr.label_num = 0;
     curr.allocated_arec_names = [];
+    curr.ret_tuple_type = null;
 }
 
 function str_parray(elemtype, name, dimstr){
