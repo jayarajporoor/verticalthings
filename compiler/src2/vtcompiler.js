@@ -299,6 +299,8 @@ function compile(argv)
 		ast.module_names.push(module_name);
 	}
 
+
+
 /*	if(ast.pipeline){
 		ast.pipeline.srcpath = srcpath;
 	}*/

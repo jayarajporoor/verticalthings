@@ -1,0 +1,1 @@
+async chan<x> HAL_io_completion(rchan<x> io){}

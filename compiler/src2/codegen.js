@@ -15,7 +15,8 @@ var curr = {
 	toplevel_ast : null,
 	mod_ast : null,
 	allocated_arec_names : [],
-	ret_tuple_name : null
+	ret_tuple_name : null,
+	mod_async: null
 };//current context - must be explicitly cleared appropriately.
 
 const PFUNC = "_";
@@ -77,7 +78,11 @@ function get_func_info(qid, info_req){
 		scoped_fname = PFUNC + qid[0] + "_" + qid[1];
 		var_scope_name = PVAR + qid[0] + "_" + qid[1];
 	}else{
-		mod_ast = curr.mod_ast;
+		if (curr.mod_async){
+			mod_ast = curr.mod_async;
+		}else{
+			mod_ast = curr.mod_ast;
+		}
 		fname = qid[0];		
 		if(fname === 'event'){
 			scoped_fname =  fname;
@@ -200,9 +205,9 @@ function get_func_info(qid, info_req){
 }
 
 
-function is_async_fn(qid, info){
+function mod_async_fn(qid, info){
 	if(!qid)
-		return false;
+		return null;
 	var mod_ast = null;
 	var fname = "";
 
@@ -211,12 +216,31 @@ function is_async_fn(qid, info){
 		fname = qid[1];
 	}else{
 		mod_ast = curr.mod_ast;
-		fname = qid[0];				
+		fname = qid[0];						
 	}
+	mod_async = null;	
 	if(fname === 'event'){
 		info.is_event = true;
+		mod_async = mod_ast;
 	}
-	return info.is_event || (mod_ast && (mod_ast.asyncs.indexOf(fname) >= 0));	
+	
+	is_async = (mod_ast && (mod_ast.asyncs.indexOf(fname) >= 0));
+	if(is_async)
+	{
+		mod_async = mod_ast;
+	}
+	
+	if(!is_async && qid.length == 1){
+		for (use of mod_ast.uses){
+			mod_ast = curr.toplevel_ast.modules[use.name];
+			is_async = (mod_ast && (mod_ast.asyncs.indexOf(fname) >= 0));
+			if (is_async){
+				mod_async = mod_ast;
+				break;
+			}
+		}
+	}
+	return mod_async;	
 }
 
 var builtin_functions = [];
@@ -234,7 +258,7 @@ function fcall(ast, retParams, is_async, info){
 		if(str_amethod){
 			return str_amethod;
 		}else{
-			var sym = symtbl.lookup(qid[0]);
+			var sym = symtbl.lookup(qid[0], null, false, curr.mod_ast.uses);
 			if(sym){
 				name = ast_util.get_scoped_name(sym, "_", PVAR);
 				for(var j=1;j<qid.length;j++){
@@ -248,7 +272,7 @@ function fcall(ast, retParams, is_async, info){
 		if(builtin_functions.indexOf(qid[0]) >= 0){
 			name = PFUNC + qid[0];
 		}else{
-			var sym = symtbl.lookup(qid[0]);
+			var sym = symtbl.lookup(qid[0], null, false, curr.mod_ast.uses);
 			if(sym){
 				name =  ast_util.get_scoped_name(sym, "_", PFUNC);
 			}else{
@@ -464,9 +488,10 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 	var info = {};
 
 
-	var is_async_fcall = is_async_fn(ast_fcall.qid, info);
+	var mod_async = mod_async_fn(ast_fcall.qid, info);
+	curr.mod_async = mod_async;
 
-	if(is_async_fcall){
+	if(mod_async){
 		var fcall_params = [];
 		if(ast_fcall.sync === 'await'){
 			if(info.is_event){
@@ -530,6 +555,7 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 			strbuf.push(str + ";");
 		}		
 	}	
+	curr.mod_async = null;
 }
 
 function stmt_await_on_id(id_expr, lvalue, strbuf){
@@ -1054,10 +1080,12 @@ function code_gen(ast,ctx){
         symtbl.enterNestedScope(mod_name);    	
         var mod_ast = ast.modules[mod_name];
         curr.mod_ast = mod_ast;
-	
-        for(var i=0;i<mod_ast.fdefs.length;i++){
-            fdef(mod_ast.fdefs[i], code);
-        }
+		
+		if (mod_name != "sys"){
+	        for(var i=0;i<mod_ast.fdefs.length;i++){
+	            fdef(mod_ast.fdefs[i], code);
+	        }
+    	}
 
 		strglobals.push("/*Module vars for " + mod_name + "*/");
 		for(var i =0;i<mod_ast.vars.length;i++){
@@ -1091,7 +1119,8 @@ function code_gen(ast,ctx){
 		code.push("int status = -1;");
 		for (chan_info of main_channels) {
 			if (ctx.config.channels && typeof(ctx.config.channels[chan_info.chan]) != 'undefined') {
-				chan_num = ctx.config.channels[chan_info.chan]
+				chan_num = ctx.config.channels[chan_info.chan];
+				code.push("_arec_main." + module_main + "_" + chan_info.chan + "=" + chan_num + ";");
 			}else{
 				console.log("ERROR: Undefined channel used as parameter to main function " + chan_info.chan)
 			}

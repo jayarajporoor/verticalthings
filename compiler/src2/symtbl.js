@@ -10,8 +10,11 @@ class SymbolTable{
   }
   
 
-  lookup(name, kind, non_scoped){//kind = 'vardef', 'fdef'
+  lookup(name, kind, non_scoped, uses){//kind = 'vardef', 'fdef'
   	var scope = non_scoped ? this : this.current_scope;
+    var scope_chain_mode = true;
+    var uses_idx = 0;
+    var root_scope = null;
   	do{
   		var sym = scope.symbols[name];
   		if(sym)
@@ -23,7 +26,25 @@ class SymbolTable{
           default: return sym; 
         }
   		}
-  		scope = scope.parent;
+      
+      if (scope_chain_mode){
+        if (!scope.parent){
+          scope_chain_mode = false;
+          root_scope = scope;
+        }
+        scope = scope.parent;
+      }
+
+      if (!scope_chain_mode && uses){
+          scope = null;
+          while (uses_idx < uses.length && !scope) {
+            var use_scope_name = uses[uses_idx].name;
+
+            scope = root_scope.scopes[use_scope_name];
+            uses_idx++;
+          }
+      }
+
   	}while(scope);
   	
   	return null;

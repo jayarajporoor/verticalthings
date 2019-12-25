@@ -1,14 +1,19 @@
+using sys;
 
 future<event> dma;
 future<float> facq;
 
-async float acq(float y, chan<spi0> z){
+async float acq(float y, chan<spi0> comm){
     int x;
+    int status;
+    rchan<spi0> rcomm;
 
     x = y * 2;
     //start data acquisition 
 
-    HAL_start(z);
+    rcomm = HAL_start(comm);
+
+    status = await HAL_io_completion(rcomm);
 
     return x;
 }
@@ -17,13 +22,13 @@ void irq(){
     signal dma;
 }
 
-async void main(chan<spi0> y){
+async void main(chan<spi0> spi){
     float res;
 
-    facq = acq(3.0);
+    facq = acq(3.0, spi);
     while(1){
         res = await facq;
-        facq = acq(3.0, y);
+        facq = acq(3.0, spi);
         //processing the res while the next acq is happening
      }
 }
