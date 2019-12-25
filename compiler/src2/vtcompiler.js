@@ -216,11 +216,7 @@ function compile(argv)
 			case "-entry":
 				if(argv[i+1]){
 					entry = argv[i+1];
-					if (i + 2 < argv.length && argv[i+1].startsWith("-") ){
-						i++;
-					}
-				}else{
-					code_path = "";
+					i++;
 				}
 			break;
 			case "-ast" :

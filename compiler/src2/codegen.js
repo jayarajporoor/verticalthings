@@ -15,7 +15,7 @@ var curr = {
 	toplevel_ast : null,
 	mod_ast : null,
 	allocated_arec_names : [],
-	scoped_fname = null
+	ret_tuple_name : null
 };//current context - must be explicitly cleared appropriately.
 
 const PFUNC = "_";
@@ -423,10 +423,10 @@ function expr(ast){
 		str = ast.sconst ;
 	}else if (ast.texpr){
 		var first = true;
-		str = curr.ret_tuple_type + "("
-		for tentry in ast.texpr{
+		str = curr.ret_tuple_name + "(";
+		for (tentry of ast.texpr) {
 			estr = expr(tentry);
-			if !first {
+			if (!first) {
 				str = str + ", ";
 			}
 			str = str + estr;
@@ -434,7 +434,7 @@ function expr(ast){
 		str = str + ") ";
 	}else if(ast.tid){
 		id_list = [];
-		for e_tid in ast.tid{
+		for (e_tid of ast.tid) {
 			id_list.push( expr(e_tid) );
 		}
 		str = id_list;
@@ -478,10 +478,10 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 			retvar = null;			
 			lvalue_tuple = null;
 			if (lvalue){
-				if Array.isArray(lvalue){
+				if (Array.isArray(lvalue) ) {
 					lvalue_tuple = lvalue;
 					ret_var = "_ret" + curr.retid;
-					strbuf.push("struct " + info.name + "_ret " ret_var + ";");
+					strbuf.push("struct " + info.name + "_ret " + ret_var + ";");
 					curr.ret_id += 1;
 					lvalue = ret_var;
 				}
@@ -495,10 +495,11 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 			label = get_next_label() + ":";
 			strbuf.push(label);
 			strbuf.push("_state = " + strExpr + ";");
-			if retvar {
-				int i = 0;
-				for e_lvalue in lvalue_tuple {
+			if (retvar) {
+				var i = 0;
+				for (e_lvalue of lvalue_tuple) {
 					strbuf.push(retvar + ".r" + i + "=" + e_lvalue + ";");
+					i += 1;
 				}
 			}
 			var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return _this->_state;} ";
@@ -659,17 +660,17 @@ function stringify_type(ast){
 		var base = "struct _future ";
 	}
 
-	if (curr.ret_tuple_type && ast.ttype){
+	if (curr.ret_tuple_name && ast.ttype){
 		tuple_struct = "struct " + curr.ret_tuple_name + "{";
 		var i =0;
 		constr =  curr.ret_tuple_name + "(";
 		constr_params = "";
-		for tentry in ast.ttype{
+		for (tentry of ast.ttype) {
 			s_tentry = stringify_type(tentry);
 			tstr = s_tentry.base + " r" + i + " " + s_tentry.dim ;
 			pstr = s_tentry.base + " p" + i + " " + s_tentry.dim ;
 			tuple_struct += ( tstr + "; ") ;
-			if i > 0{
+			if (i > 0) {
 				constr += ", ";
 				constr_params += ", ";
 			}
@@ -680,7 +681,7 @@ function stringify_type(ast){
 		constr += ")";
 		tuple_struct = tuple_struct + constr + ":" + constr_params + "{}; }";
 		strglobals.push(tuple_struct);		
-		base  = curr.ret_tuple_type;
+		base  = "struct " + curr.ret_tuple_name;
 	}
 
 	var dim="";
@@ -692,7 +693,7 @@ function stringify_type(ast){
 	if (ast.is_ref) {
 		if (dim != ""){
 			type_id = base + "_" + dim.replace("[", "_").replace("]", "")
-			if !(type_ids[type_id]) {
+			if (!(type_ids[type_id]) ) {
 				type_ids[type_id] = true
 				strglobals.push("typedef " + type_id + " " + type.base + type.dim + ";")
 			}
@@ -704,7 +705,7 @@ function stringify_type(ast){
 	}
 
 	var chan = null;
-	if ast.chan_type {
+	if (ast.chan_type) {
 		chan = ast.id;
 	}
 	var astr = {base: base, dim: dim, is_ring: ast.dim && ast.dim.is_ring, is_ref: ast.is_ref, chan: chan};	
@@ -795,7 +796,7 @@ function fparam(ast, scoped_fname, is_main=false){
 	}
 
 	if (is_main && type.chan) {
-		main_channels.push( {chan: chan, param: ast.id})
+		main_channels.push( {chan: type.chan, param: ast.id})
 	}
 
 	return s;
@@ -825,7 +826,7 @@ function fdef(ast,strbuf){
 
 	var scoped_fname = get_current_scoped_name("", PFUNC);
 	
-	curr.ret_tuple_type = "struct " + scoped_fname + "_ret";
+	curr.ret_tuple_name = scoped_fname + "_ret";
 
 	var is_async = ast.is_async;
 
@@ -955,7 +956,7 @@ function fdef(ast,strbuf){
     curr.arec_decl = [];
     curr.label_num = 0;
     curr.allocated_arec_names = [];
-    curr.ret_tuple_type = null;
+    curr.ret_tuple_name = null;
 }
 
 function str_parray(elemtype, name, dimstr){
@@ -1080,7 +1081,7 @@ function code_gen(ast,ctx){
 	}
 
 	if (ctx.config && ctx.config.entry){
-		if !ctx.config.channels {
+		if (!ctx.config.channels) {
 			console.log("ERROR: Channel definitions not found in the config file.")
 		}
 		module_main = "_" + ctx.config.entry + "_main";
@@ -1088,14 +1089,13 @@ function code_gen(ast,ctx){
 		code.push("_arec__" + module_main + " _arec_main;")
 		code.push("int main(){");
 		code.push("int status = -1;");
-		for chan_info in main_channels{
-			if ctx.config.channels && ctx.config.channels[chan_info.chan] {
+		for (chan_info of main_channels) {
+			if (ctx.config.channels && typeof(ctx.config.channels[chan_info.chan]) != 'undefined') {
 				chan_num = ctx.config.channels[chan_info.chan]
 			}else{
 				console.log("ERROR: Undefined channel used as parameter to main function " + chan_info.chan)
 			}
 		}
-				main_channels.push( {chan: chan, param: ast.id})
 
 		code.push("while (status != 0){")
 		code.push("status = " + module_main + "(&_arec_main);");

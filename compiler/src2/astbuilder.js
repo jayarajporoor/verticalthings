@@ -422,7 +422,7 @@ function astVarType(varType){
 	var primitiveType = varType.primitiveType();
 	var futureType = varType.futureType();
 	var chanType = varType.chanType();
-	var refFlag = vartype.BAND()
+	var refFlag = varType.BAND()
 
 	var ast = {};
 

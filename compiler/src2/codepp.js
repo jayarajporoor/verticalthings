@@ -1,5 +1,6 @@
 function codepp(ast,ctx){
 	var code = ctx.code;
+
 	if(!code) return;
 
 	var indent = "    ";
