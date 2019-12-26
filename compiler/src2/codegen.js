@@ -17,7 +17,10 @@ var curr = {
 	mod_ast : null,
 	allocated_arec_names : [],
 	ret_tuple_name : null,
-	mod_async: null
+	mod_async: null,
+	hdrbuf : null,
+	tuple_defs: {},
+	tuple_locals: {}
 };//current context - must be explicitly cleared appropriately.
 
 const PFUNC = "_";
@@ -64,7 +67,8 @@ const func_info = {
 	AREC_NAME: 3,
 	PARAM_NAMES: 4,
 	VARSCOPE_NAME: 5,
-	RETS_NULL_ARRAY: 6	
+	RETS_NULL_ARRAY: 6,
+	F_AST: 7
 };
 
 
@@ -125,6 +129,10 @@ function get_func_info(qid, info_req){
 	}
 	if(!ast){
 		return null;
+	}
+
+	if(info_req == func_info.F_AST){
+		return ast;
 	}
 
 	if(info_req == func_info.RETS_NULL_ARRAY){
@@ -370,6 +378,10 @@ function expr(ast){
 	// console.log(ast);
 	var str="";
 	var id = ast.id || (ast.qid && ast.qid[0]);	
+	
+	if(ast.tid){
+		str = ast.tid;
+	}else	
 	if(typeof ast.op != 'undefined'){
 		// console.log(ast);
 		str = "("+expr(ast.lexpr) + ast.op + expr(ast.rexpr)+")";
@@ -453,22 +465,22 @@ function expr(ast){
 	}else if (ast.texpr){
 		var first = true;
 		str = curr.ret_tuple_name + "(";
+		var i = 0;
 		for (tentry of ast.texpr) {
 			estr = expr(tentry);
+			etype = curr.ret_tuple_types[i];
+			if (etype.indexOf("*") >= 0){
+				estr = "&(" + estr + ")";
+			}
 			if (!first) {
 				str = str + ", ";
 			}
+			first = false;
 			str = str + estr;
+			i++;
 		}
 		str = str + ") ";
-	}else if(ast.tid){
-		id_list = [];
-		for (e_tid of ast.tid) {
-			id_list.push( expr(e_tid) );
-		}
-		str = id_list;
 	}
-
 
 	if(ast.address_of){
 		str = "&(" + str + ")";
@@ -492,7 +504,6 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 	var strs = [];
 	var info = {};
 
-
 	var mod_async = mod_async_fn(ast_fcall.qid, info);
 	curr.mod_async = mod_async;
 
@@ -503,21 +514,25 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 				console.log("ERROR: Cannot await on event() call");
 				return;
 			}
-			info = {};
-			fcall(ast_fcall, null, true, info, true);
+
 			tuple_tmp_var = null;			
 			lvalue_tuple = null;
 			if (lvalue){
 				if (Array.isArray(lvalue) ) {
+					f_ast = get_func_info(ast_fcall.qid, func_info.F_AST);
+					tuple_name = get_tuple_name(f_ast.type.ttype);
+					tuple_types = get_tuple_ref_types(f_ast.type.ttype);
+					tuple_tmp_var = tuple_name + "_ret";
+					if (!curr.tuple_locals[tuple_name]){
+						curr.hdrbuf.push("struct " + tuple_name + " " + tuple_tmp_var + ";");						
+					}
 					lvalue_tuple = lvalue;
-					tuple_tmp_var = "_ret" + curr.retid;
-					strbuf.push("struct " + info.name + "_ret " + tuple_tmp_var + ";");
-					curr.ret_id += 1;
 					lvalue = tuple_tmp_var;
 				}
 
 				fcall_params = [ "&(" + lvalue + ")"];
 			}
+			info = {};			
 			strs = fcall(ast_fcall, fcall_params, true, info, false);
 			for(i = 0; i< strs.length - 1;i++){
 				strbuf.push(strs[i] + ";");
@@ -529,7 +544,13 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 			if (tuple_tmp_var) {
 				var i = 0;
 				for (e_lvalue of lvalue_tuple) {
-					strbuf.push(retvar + ".r" + i + "=" + e_lvalue + ";");
+					elem_ref_type = tuple_types[i];
+					var_name = tuple_tmp_var + ".r" + i;
+					if(elem_ref_type.indexOf("*") >= 0){
+						elem_ref_type = elem_ref_type.replace("*", "&");
+						var_name = "(*" + var_name + ")";
+					}
+					strbuf.push(elem_ref_type + " " + e_lvalue + " = " + var_name + ";");
 					i += 1;
 				}
 			}
@@ -572,6 +593,21 @@ function stmt_await_on_id(id_expr, lvalue, strbuf){
 	if(strExpr)
 	{
 		var fcall = "";
+
+		var tuple_name = null;
+		var tuple_types = null;
+		var tuple_tmp_var = null;
+		if (lvalue && Array.isArray(lvalue) ) {
+			tuple_name = get_tuple_name(sym.info.type.future_type.ttype);
+			tuple_types = get_tuple_ref_types(sym.info.type.future_type.ttype);
+			tuple_tmp_var = tuple_name + "_ret";
+			if (!curr.tuple_locals[tuple_name]){
+				curr.hdrbuf.push("struct " + tuple_name + " " + tuple_tmp_var + ";");						
+			}
+			lvalue_tuple = lvalue;
+			lvalue = tuple_tmp_var;
+		}
+
 		if(sym.info.type.future_type === 'event')
 		{
 			fcall = "(int) " + strExpr + "._parec";
@@ -584,9 +620,23 @@ function stmt_await_on_id(id_expr, lvalue, strbuf){
 
 			fcall += ")";
 		}
-		label = get_next_label() + ":";
+
+		label = get_next_label() + ":";		
 		strbuf.push(label);
 		strbuf.push("_state = " + fcall + ";");
+		if (tuple_tmp_var) {
+			var i = 0;
+			for (e_lvalue of lvalue_tuple) {
+				elem_ref_type = tuple_types[i];
+				e_line = "";
+				if (elem_ref_type.indexOf("*") >= 0)
+					e_line = elem_ref_type.replace("*", "&") + " " + e_lvalue + " = *(" + tuple_tmp_var + ".r" + i + ");"
+				else
+					e_line = elem_ref_type + " " + e_lvalue + " = " + tuple_tmp_var + ".r" + i + ";"
+				strbuf.push(e_line);
+				i += 1;
+			}
+		}		
 		var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return _this->_state;} ";
 		strbuf.push(stateCtrl);
 
@@ -608,7 +658,6 @@ function stmt(ast,strbuf){
 			var ast_fcall = ast.expr.fcall;
 			var strExpr = "";
 			var lvalue = expr(ast);
-
 			if(ast_fcall){
 				stmt_fcall(ast_fcall, strbuf, lvalue);
 			}else
@@ -640,7 +689,7 @@ function stmt(ast,strbuf){
 			break;
 		case "return":
 			var strRetExpr = expr(ast.expr);
-			//TODO: tuple and array returns.
+			
 			if(curr.is_async){
 				if(strRetExpr !== ""){
 					var label = get_next_label() + ":";
@@ -673,7 +722,35 @@ function stmt(ast,strbuf){
 
 }
 
-function stringify_type(ast){
+function get_tuple_name(ttype){
+	var tuple_name = "_t_";
+	for (tentry of ttype) {
+		var s_tentry = stringify_type(tentry);
+		if (tuple_name != ""){
+			tuple_name += "_";
+		}
+		tuple_name += s_tentry.base.replace("*","");//remove the reference symbol.
+		if (s_tentry.dim != ""){
+			tuple_name += "_" + s_tentry.dim.replace("[", "_").replace("]", "");
+		}
+	}
+	return tuple_name;
+}
+
+function get_tuple_ref_types(ttype){
+	var tuple_types = [];
+	for (tentry of ttype) {		
+		var s_tentry = stringify_type(tentry);
+		var type_name = s_tentry.base;
+		if (type_name.indexOf("*") < 0){
+			type_name += "& ";
+		}
+		tuple_types.push(type_name);
+	}
+	return tuple_types;
+}
+
+function stringify_type(ast, info=null){
 	// console.log(ast);
 	var base=ast.primitive;
 
@@ -692,28 +769,49 @@ function stringify_type(ast){
 		var base = "struct _future ";
 	}
 
-	if (curr.ret_tuple_name && ast.ttype){
-		tuple_struct = "struct " + curr.ret_tuple_name + "{";
+	var tuple_name, name, constr, constr_params, tuple_struct;
+	if (ast.ttype){
 		var i =0;
-		constr =  curr.ret_tuple_name + "(";
+		tuple_name = get_tuple_name(ast.ttype);		
+		name = tuple_name;
+		constr =  tuple_name + "(";
+		var d_constr = tuple_name + "() : ";
+		var assign_op = "void operator = (const " + tuple_name + "& _obj) {";
 		constr_params = "";
+		tuple_struct = "";
+
+		tuple_types = [];
 		for (tentry of ast.ttype) {
 			s_tentry = stringify_type(tentry);
+			tuple_types.push(s_tentry.base);
 			tstr = s_tentry.base + " r" + i + " " + s_tentry.dim ;
 			pstr = s_tentry.base + " p" + i + " " + s_tentry.dim ;
 			tuple_struct += ( tstr + "; ") ;
 			if (i > 0) {
 				constr += ", ";
 				constr_params += ", ";
+				d_constr += ", ";
 			}
 			constr += pstr;
-			constr_params += " r" + i + "(p" + i + ")"
+			constr_params += " r" + i + "(p" + i + ")";
+			d_constr += " r" + i + "( ("  + s_tentry.base + ") 0 )";
+			//d_constr += " r" + i + "( *( ("  + s_tentry.base.replace("*","") + "*) 0UL ) )";
+			assign_op += "r" + i + "= _obj.r" + i + "; ";
 			i += 1;
 		}
+		if(info){
+			info.tuple_types = tuple_types;
+		}
 		constr += ")";
-		tuple_struct = tuple_struct + constr + ":" + constr_params + "{}; }";
-		strglobals.push(tuple_struct);		
-		base  = "struct " + curr.ret_tuple_name;
+		assign_op += "}; ";
+		d_constr += "{};"
+		tuple_struct = "struct " + tuple_name + "{" + tuple_struct + d_constr + " " + assign_op + " " + constr + ":" + constr_params + "{}; };";
+		if (!curr.tuple_defs[tuple_name]){
+			strglobals.push(tuple_struct);		
+			curr.tuple_defs[tuple_name] = true;
+		}
+		base  = "struct " + tuple_name;
+		dim = "";
 	}
 
 	var dim="";
@@ -724,12 +822,16 @@ function stringify_type(ast){
 	}
 	if (ast.is_ref) {
 		if (dim != ""){
-			type_id = base + "_" + dim.replace("[", "_").replace("]", "")
+			type_id = "_" + base + "_" + dim.replace("[", "_").replace("]", "")
 			if (!(type_ids[type_id]) ) {
-				type_ids[type_id] = true
-				strglobals.push("typedef " + type_id + " " + type.base + type.dim + ";")
+				type_ids[type_id] = true;
+				if (dim != ""){
+					strglobals.push("typedef " + base + " " + type_id + dim + ";");
+				}else{
+					strglobals.push("typedef " + base + " " + type_id + ";");
+				}
 			}
-			base = type_id + "&" ;
+			base = type_id + "*" ;
 			dim = "";
 		}else{
 			base = base + "&";
@@ -740,7 +842,7 @@ function stringify_type(ast){
 	if (ast.chan_type) {
 		chan = ast.id;
 	}
-	var astr = {base: base, dim: dim, is_ring: ast.dim && ast.dim.is_ring, is_ref: ast.is_ref, chan: chan};	
+	var astr = {base: base, dim: dim, is_ring: ast.dim && ast.dim.is_ring, is_ref: ast.is_ref, chan: chan, name: name};	
 
 	return astr;
 }
@@ -846,7 +948,7 @@ function get_next_label(){
 
 function fdef(ast,strbuf){
 
-    symtbl.enterNestedScope(ast.id);
+    symtbl.enterNestedScope(ast.id);  
 
 	var fptr = get_func_info([ast.id], func_info.PTR_TYPE);
 	if(fptr){		
@@ -858,7 +960,7 @@ function fdef(ast,strbuf){
 
 	var scoped_fname = get_current_scoped_name("", PFUNC);
 	
-	curr.ret_tuple_name = scoped_fname + "_ret";
+	curr.ret_tuple_name = null;
 
 	var is_async = ast.is_async;
 
@@ -866,7 +968,15 @@ function fdef(ast,strbuf){
 	var returnParamTypes = [];
 	if(typeof ast.type != 'undefined'){
 		//TODO process tuple types.
-		retType = stringify_type(ast.type);
+		tuple_info = {};
+		retType = stringify_type(ast.type, tuple_info);
+		if (ast.type.ttype){
+			curr.ret_tuple_name = retType.name;
+			curr.ret_tuple_types = tuple_info.tuple_types;
+		}else{
+			curr.ret_tuple_name = null;
+			curr.ret_tuple_types = null;
+		}
 		if(is_async){
 			if(retType.base !== 'void'){
 				returnParamTypes.push(retType);
@@ -941,9 +1051,14 @@ function fdef(ast,strbuf){
 		}
 	}
 
+	curr.hdrbuf = strbuf;
+	curr.tuple_locals = {};
+
 	var body_strbuf = [];
 
 	stmt(ast.body,body_strbuf);
+
+	curr.hdrbuf = null;
 
 	if(is_async){
 		var activation_tbl = "static const void * _atbl[] = { "

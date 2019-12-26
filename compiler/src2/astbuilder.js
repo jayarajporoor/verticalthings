@@ -293,7 +293,8 @@ function getSyncExprAst(expr){
 
 function getTupleExprAst(expr){
 	var ast = {src: src_info(expr)};
-	ast.texpr = getActualParams(expr.tupleExpr().actualParams());
+	ast.texpr = getActualParams(expr.actualParams());
+	return ast;
 }
 
 function getToplevelExprAst(expr){
@@ -394,9 +395,7 @@ function astTupleType(ttype){
 
 function astReturnType(returnType){
 	var varType = returnType.varType();
-	var tupleType = returnType.tupleType();
-
-	return varType ? astVarType(varType) : astTupleType(tupleType);
+	return astVarType(varType);
 }
 
 
@@ -423,6 +422,8 @@ function astVarType(varType){
 	var futureType = varType.futureType();
 	var chanType = varType.chanType();
 	var refFlag = varType.BAND()
+	var tupleType = varType.tupleType();
+
 
 	var ast = {};
 
@@ -446,6 +447,9 @@ function astVarType(varType){
 	}else
 	if(chanType){
 		ast = astChanType(chanType)
+	}else
+	if(tupleType){
+		ast = astTupleType(tupleType);
 	}
 
 	var dimensionSpec = varType.dimensionSpec();  

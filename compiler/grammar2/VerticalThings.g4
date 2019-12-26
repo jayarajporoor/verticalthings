@@ -73,7 +73,7 @@ futureType: FUTURE LT varType GT;
 chanType : (RCHAN | CHAN) LT Identifier GT;
 
 varType
-    :   (qualIdentifier | cppQualIdentifier | rangeType | primitiveType | futureType | chanType) dimensionSpec? BAND?
+    :   (qualIdentifier | cppQualIdentifier | rangeType | primitiveType | futureType | chanType | tupleType) dimensionSpec? BAND?
     ;    
 
 varTypeList
@@ -82,7 +82,7 @@ varTypeList
 
 tupleType : LP varTypeList RP;
 
-returnType : varType | tupleType;
+returnType : varType;
 
 formalParam
     :   CONST? varType Identifier

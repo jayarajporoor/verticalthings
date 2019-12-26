@@ -17,8 +17,10 @@ struct _arec__sys_HAL_start;
 typedef int (*_t__sys_HAL_start) (int sys_HAL_start_io);
 /*Module vars for sys*/
 /*End of module vars for sys*/
+typedef float _float__100[100];
+struct _t__int__float__100{int r0 ; _float__100* r1 ; _t__int__float__100() :  r0( (int) 0 ),  r1( (_float__100*) 0 ){}; void operator = (const _t__int__float__100& _obj) {r0= _obj.r0; r1= _obj.r1; };  _t__int__float__100(int p0 , _float__100* p1 ): r0(p0),  r1(p1){}; };
 struct _arec__syntax_test5_acq;
-typedef void (*_t__syntax_test5_acq) (struct _arec__syntax_test5_acq* _this, float*  _ret0);
+typedef void (*_t__syntax_test5_acq) (struct _arec__syntax_test5_acq* _this, struct _t__int__float__100*  _ret0);
 struct _arec__syntax_test5_acq{
     int _state = 0;
     float syntax_test5_acq_y;
@@ -38,7 +40,6 @@ typedef void (*_t__syntax_test5_main) (struct _arec__syntax_test5_main* _this, v
 struct _arec__syntax_test5_main{
     int _state = 0;
     int syntax_test5_main_spi;
-    float syntax_test5_main_res;
     union _inner_arecs {
         struct _arec__syntax_test5_acq _arec__syntax_test5_acq;
     _inner_arecs(){};
@@ -48,6 +49,7 @@ _arecs;
 /*Module vars for syntax_test5*/
 struct _future  syntax_test5_dma;
 struct _future  syntax_test5_facq;
+float syntax_test5_buf[2][100];
 /*End of module vars for syntax_test5*/
 int _sys_HAL_io_completion(struct _arec__sys_HAL_io_completion* _this, int* _ret0)
 {
@@ -65,7 +67,7 @@ int _sys_HAL_start(int sys_HAL_start_io)
     {
     }
 }
-int _syntax_test5_acq(struct _arec__syntax_test5_acq* _this, float* _ret0)
+int _syntax_test5_acq(struct _arec__syntax_test5_acq* _this, struct _t__int__float__100* _ret0)
 {
 static const void * _atbl[] = { &&lstate_0, &&lstate_1, &&lstate_2 };
 int _state = _this->_state;
@@ -85,7 +87,7 @@ if (_state > 0 && _state <= 2) goto *(_atbl[_state]);
         _this->_state = 2;
     }
     else{
-        *(_ret0) = _this->syntax_test5_acq_x;
+        *(_ret0) = _t__int__float__100(_this->syntax_test5_acq_comm, &(syntax_test5_buf[0])) ;
     }
     return _this->_state; 
 }
@@ -99,6 +101,7 @@ void _syntax_test5_irq()
 }
 int _syntax_test5_main(struct _arec__syntax_test5_main* _this)
 {
+    struct _t__int__float__100 _t__int__float__100_ret;
 static const void * _atbl[] = { &&lstate_0, &&lstate_1 };
 int _state = _this->_state;
 _this->_state = 0;
@@ -108,18 +111,20 @@ if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
     _this->_arecs._arec__syntax_test5_acq._state = 0;
     _this->_arecs._arec__syntax_test5_acq.syntax_test5_acq_y = 3;
     _this->_arecs._arec__syntax_test5_acq.syntax_test5_acq_comm = _this->syntax_test5_main_spi;
-    _syntax_test5_acq( &(_this->_arecs._arec__syntax_test5_acq), ((float*) 0UL)) ;
+    _syntax_test5_acq( &(_this->_arecs._arec__syntax_test5_acq), ((struct _t__int__float__100*) 0UL)) ;
     syntax_test5_facq._parec = &(_this->_arecs._arec__syntax_test5_acq);
     syntax_test5_facq._pfn = (int (*)(void *, void *) )&_syntax_test5_acq;
     while(1)
     {
  lstate_1:
-        _state = syntax_test5_facq._pfn(syntax_test5_facq._parec, (&_this->syntax_test5_main_res) );
+        _state = syntax_test5_facq._pfn(syntax_test5_facq._parec, (&_t__int__float__100_ret) );
+        int&  res_chan = _t__int__float__100_ret.r0;
+        _float__100& res_buf = *(_t__int__float__100_ret.r1);
         if (_state > 0) {_this->_state = 1; return _this->_state;} 
         _this->_arecs._arec__syntax_test5_acq._state = 0;
         _this->_arecs._arec__syntax_test5_acq.syntax_test5_acq_y = 3;
         _this->_arecs._arec__syntax_test5_acq.syntax_test5_acq_comm = _this->syntax_test5_main_spi;
-        _syntax_test5_acq( &(_this->_arecs._arec__syntax_test5_acq), ((float*) 0UL)) ;
+        _syntax_test5_acq( &(_this->_arecs._arec__syntax_test5_acq), ((struct _t__int__float__100*) 0UL)) ;
         syntax_test5_facq._parec = &(_this->_arecs._arec__syntax_test5_acq);
         syntax_test5_facq._pfn = (int (*)(void *, void *) )&_syntax_test5_acq;
     }
