@@ -7,14 +7,6 @@ struct _arec_event {volatile int _state;};
 struct _future {void *_parec; int (*_pfn)(void *, void *);}; 
 #include "../inc/vtdefs.h"
 #include "../inc/stm32_hal_ex1.h"
-struct _arec__sys_HAL_io_completion;
-typedef void (*_t__sys_HAL_io_completion) (struct _arec__sys_HAL_io_completion* _this, int*  _ret0);
-struct _arec__sys_HAL_io_completion{
-    int _state = 0;
-    int sys_HAL_io_completion_io;
-};
-struct _arec__sys_HAL_start;
-typedef int (*_t__sys_HAL_start) (int sys_HAL_start_io);
 /*Module vars for sys*/
 /*End of module vars for sys*/
 struct _arec__syntax_test5_acq;
@@ -24,12 +16,12 @@ struct _arec__syntax_test5_acq{
     float syntax_test5_acq_y;
     int syntax_test5_acq_comm;
     int syntax_test5_acq_x;
+    int syntax_test5_acq_status;
     int syntax_test5_acq_rcomm;
-    union _inner_arecs {
+    union {
         struct _arec__sys_HAL_io_completion _arec__sys_HAL_io_completion;
-    _inner_arecs(){};
-}
-_arecs;
+    }
+    _arecs;
 };
 struct _arec__syntax_test5_irq;
 typedef void (*_t__syntax_test5_irq) ();
@@ -39,32 +31,15 @@ struct _arec__syntax_test5_main{
     int _state = 0;
     int syntax_test5_main_spi;
     float syntax_test5_main_res;
-    union _inner_arecs {
+    union {
         struct _arec__syntax_test5_acq _arec__syntax_test5_acq;
-    _inner_arecs(){};
-}
-_arecs;
+    }
+    _arecs;
 };
 /*Module vars for syntax_test5*/
 struct _future  syntax_test5_dma;
 struct _future  syntax_test5_facq;
 /*End of module vars for syntax_test5*/
-int _sys_HAL_io_completion(struct _arec__sys_HAL_io_completion* _this, int* _ret0)
-{
-static const void * _atbl[] = { &&lstate_0 };
-int _state = _this->_state;
-_this->_state = 0;
-if (_state > 0 && _state <= 0) goto *(_atbl[_state]);
- lstate_0:
-{
-}
-return _this->_state;
-}
-int _sys_HAL_start(int sys_HAL_start_io)
-{
-    {
-    }
-}
 int _syntax_test5_acq(struct _arec__syntax_test5_acq* _this, float* _ret0)
 {
 static const void * _atbl[] = { &&lstate_0, &&lstate_1, &&lstate_2 };
@@ -74,11 +49,11 @@ if (_state > 0 && _state <= 2) goto *(_atbl[_state]);
  lstate_0:
 {
     _this->syntax_test5_acq_x=(_this->syntax_test5_acq_y*2);
-    _sys_HAL_start(_this->syntax_test5_acq_comm) ;
+    HAL_start(_this->syntax_test5_acq_comm) ;
     _this->_arecs._arec__sys_HAL_io_completion._state = 0;
     _this->_arecs._arec__sys_HAL_io_completion.sys_HAL_io_completion_io = _this->syntax_test5_acq_rcomm;
  lstate_1:
-    _state = _sys_HAL_io_completion( &(_this->_arecs._arec__sys_HAL_io_completion), &(_this->syntax_test5_acq_comm)) ;
+    _state = _sys_HAL_io_completion( &(_this->_arecs._arec__sys_HAL_io_completion)) ;
     if (_state > 0) {_this->_state = 1; return _this->_state;} 
  lstate_2:
     if (_ret0 == NULL){
@@ -127,10 +102,10 @@ if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
 return _this->_state;
 }
 /*Entry point - the 'C' main function*/
-struct _arec__syntax_test5_main _arec_main;
+_arec___syntax_test5_main _arec_main;
 int main(){
     int status = -1;
-    _arec_main.syntax_test5_main_spi=0;
+    _arec_main._syntax_test5_main_spi0=0;
     while (status != 0){
         status = _syntax_test5_main(&_arec_main);
     }

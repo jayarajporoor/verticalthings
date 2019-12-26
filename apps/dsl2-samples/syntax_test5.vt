@@ -5,7 +5,6 @@ future<float> facq;
 
 async float acq(float y, chan<spi0> comm){
     int x;
-    int status;
     rchan<spi0> rcomm;
 
     x = y * 2;
@@ -13,7 +12,7 @@ async float acq(float y, chan<spi0> comm){
 
     rcomm = HAL_start(comm);
 
-    status = await HAL_io_completion(rcomm);
+    comm  = await HAL_io_completion(rcomm);
 
     return x;
 }

@@ -11,6 +11,7 @@ var curr = {
 	is_async: false,
 	arec_varnames : [],
 	arec_decl : [],
+	inner_arec_decl : [],
 	label_num: 0,
 	toplevel_ast : null,
 	mod_ast : null,
@@ -245,7 +246,7 @@ function mod_async_fn(qid, info){
 
 var builtin_functions = [];
 
-function fcall(ast, retParams, is_async, info){
+function fcall(ast, retParams, is_async, info, name_only=false){
 	var strs=[];
 	var strFcall = "";
 	var qid = ast.qid || ast.qidCpp;
@@ -285,6 +286,10 @@ function fcall(ast, retParams, is_async, info){
 		info.name = name
 	}
 
+	if(name_only){
+		return null;
+	}
+
 	if(is_async){
 		var arec_name = "_arec_" + name;
 
@@ -294,11 +299,11 @@ function fcall(ast, retParams, is_async, info){
 			info.arec_name = arec_name;
 		}
 
-		strs.push("_this->" + arec_name + "._state = 0");
+		strs.push("_this->_arecs." + arec_name + "._state = 0");
 		for(var i=0;i<ast.params.length;i++){
 			var param = ast.params[i];
 			var param_name  = scoped_param_names[i];
-			var param_str = "_this->" + arec_name + "." + param_name + " = " + expr(param);
+			var param_str = "_this->_arecs." + arec_name + "." + param_name + " = " + expr(param);
 			strs.push(param_str);
 			var paramid = param.expr.id || (param.expr.qid && param.expr.qid[0]);
 			var param_sym = paramid && symtbl.lookup(paramid);
@@ -308,15 +313,15 @@ function fcall(ast, retParams, is_async, info){
 					var resolv = ast_util.resolve_matrix_expr(param.expr, symtbl);
 					if(resolv.dim.length > 0){	
 						var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);				
-						strs.push("_this->" + arec_name + "." + scoped_name + " = " + 	get_arec_qualified_name(sym, "_", PVAR) );
+						strs.push("_this->_arecs." + arec_name + "." + scoped_name + " = " + 	get_arec_qualified_name(sym, "_", PVAR) );
 					}
 				}
 			}
 		}
 
-		strFcall = name + "( &(_this->" + arec_name + ")";
+		strFcall = name + "( &(_this->_arecs." + arec_name + ")";
 		if(curr.allocated_arec_names.indexOf(arec_name) < 0){
-			curr.arec_decl.push("struct " + arec_name + " " + arec_name + ";")
+			curr.inner_arec_decl.push("struct " + arec_name + " " + arec_name + ";")
 			curr.allocated_arec_names.push(arec_name);
 		}
 	}else{
@@ -499,20 +504,21 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 				return;
 			}
 			info = {};
-			strs = fcall(ast_fcall, fcall_params, true, info);
-			retvar = null;			
+			fcall(ast_fcall, null, true, info, true);
+			tuple_tmp_var = null;			
 			lvalue_tuple = null;
 			if (lvalue){
 				if (Array.isArray(lvalue) ) {
 					lvalue_tuple = lvalue;
-					ret_var = "_ret" + curr.retid;
-					strbuf.push("struct " + info.name + "_ret " + ret_var + ";");
+					tuple_tmp_var = "_ret" + curr.retid;
+					strbuf.push("struct " + info.name + "_ret " + tuple_tmp_var + ";");
 					curr.ret_id += 1;
-					lvalue = ret_var;
+					lvalue = tuple_tmp_var;
 				}
 
 				fcall_params = [ "&(" + lvalue + ")"];
 			}
+			strs = fcall(ast_fcall, fcall_params, true, info, false);
 			for(i = 0; i< strs.length - 1;i++){
 				strbuf.push(strs[i] + ";");
 			}
@@ -520,7 +526,7 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 			label = get_next_label() + ":";
 			strbuf.push(label);
 			strbuf.push("_state = " + strExpr + ";");
-			if (retvar) {
+			if (tuple_tmp_var) {
 				var i = 0;
 				for (e_lvalue of lvalue_tuple) {
 					strbuf.push(retvar + ".r" + i + "=" + e_lvalue + ";");
@@ -542,7 +548,7 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 				}
 				if(lvalue){
 					//var assignFuture = lvalue + "= &(_this->" + info.arec_name + ");";
-					var assignArecPtr = lvalue + "._parec = &(_this->" + info.arec_name + ");";
+					var assignArecPtr = lvalue + "._parec = &(_this->_arecs." + info.arec_name + ");";
 					var assignFnPtr = lvalue + "._pfn = (int (*)(void *, void *) )&" + info.name + ";"
 					strbuf.push(assignArecPtr);
 					strbuf.push(assignFnPtr);
@@ -971,15 +977,26 @@ function fdef(ast,strbuf){
     symtbl.exitNestedScope();
 
 	if(is_async){
-		curr.arec_decl.push("};");
+		//curr.arec_decl.push("};");
 		for(var arec_decl_line of curr.arec_decl){
 			strglobals.push(arec_decl_line);			
 		}
+		if (curr.inner_arec_decl.length > 0){
+			strglobals.push("union _inner_arecs {");
+			for (var inner_arec_line of curr.inner_arec_decl){
+				strglobals.push(inner_arec_line);
+			}
+			strglobals.push("_inner_arecs(){};");
+			strglobals.push("}");
+			strglobals.push("_arecs;");			
+		}
+		strglobals.push("};");
 	}
 
     curr.is_async = false;
     curr.arec_varnames = [];
     curr.arec_decl = [];
+    curr.inner_arec_decl = [];
     curr.label_num = 0;
     curr.allocated_arec_names = [];
     curr.ret_tuple_name = null;
@@ -1081,11 +1098,11 @@ function code_gen(ast,ctx){
         var mod_ast = ast.modules[mod_name];
         curr.mod_ast = mod_ast;
 		
-		if (mod_name != "sys"){
-	        for(var i=0;i<mod_ast.fdefs.length;i++){
-	            fdef(mod_ast.fdefs[i], code);
-	        }
-    	}
+//		if (mod_name != "sys"){
+        for(var i=0;i<mod_ast.fdefs.length;i++){
+            fdef(mod_ast.fdefs[i], code);
+        }
+//    	}
 
 		strglobals.push("/*Module vars for " + mod_name + "*/");
 		for(var i =0;i<mod_ast.vars.length;i++){
@@ -1112,22 +1129,22 @@ function code_gen(ast,ctx){
 		if (!ctx.config.channels) {
 			console.log("ERROR: Channel definitions not found in the config file.")
 		}
-		module_main = "_" + ctx.config.entry + "_main";
+		module_main = ctx.config.entry + "_main";
 		code.push("/*Entry point - the 'C' main function*/");
-		code.push("_arec__" + module_main + " _arec_main;")
+		code.push("struct _arec__" + module_main + " _arec_main;")
 		code.push("int main(){");
 		code.push("int status = -1;");
 		for (chan_info of main_channels) {
 			if (ctx.config.channels && typeof(ctx.config.channels[chan_info.chan]) != 'undefined') {
 				chan_num = ctx.config.channels[chan_info.chan];
-				code.push("_arec_main." + module_main + "_" + chan_info.chan + "=" + chan_num + ";");
+				code.push("_arec_main." + module_main + "_" + chan_info.param + "=" + chan_num + ";");
 			}else{
 				console.log("ERROR: Undefined channel used as parameter to main function " + chan_info.chan)
 			}
 		}
 
 		code.push("while (status != 0){")
-		code.push("status = " + module_main + "(&_arec_main);");
+		code.push("status = " + "_" + module_main + "(&_arec_main);");
 		code.push("}")
 		code.push("while (true);")
 		code.push("return 0;");
