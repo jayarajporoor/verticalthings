@@ -1,0 +1,43 @@
+using sys;
+
+future<event> dma;
+future<(rchan<spi0>, float[100]&)> facq;
+
+float[2][100] buf;
+
+async (rchan<spi0>, float[100]&) acq(float y, chan<spi0> comm){
+    int x;
+    rchan<spi0> rcomm;
+
+    x = y * 2;
+    //start data acquisition 
+
+    rcomm = HAL_start(comm);
+
+    comm  = await HAL_io_completion(rcomm);
+
+    return (comm, buf[0]);
+}
+
+void irq(){
+    signal dma;
+}
+
+void process(float[100] & buf){
+    int i;
+    while(i < 100){
+        buf[i] = buf[i] + 1;
+        i = i + 1;
+    }    
+}
+
+async void main(chan<spi0> spi){   
+
+    facq = acq(3.0, spi);
+    while(1){
+        (res_chan, res_buf) = await facq;
+        process(res_buf);
+        facq = acq(3.0, spi);
+        //processing the res while the next acq is happening
+     }
+}

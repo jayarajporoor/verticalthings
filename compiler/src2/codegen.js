@@ -550,7 +550,15 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 						elem_ref_type = elem_ref_type.replace("*", "&");
 						var_name = "(*" + var_name + ")";
 					}
-					strbuf.push(elem_ref_type + " " + e_lvalue + " = " + var_name + ";");
+					elem_type = elem_ref_type.replace("&", "");
+			  		var sym = symtbl.addSymbolToCurrentScope(e_lvalue, { type: {primitive: elem_type, is_const: false}
+			  			                 , src: {note: "Generated"}
+			  			                 , value: null
+			  			                 , is_dim: false
+			  			                 } );
+					var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);
+
+					strbuf.push(elem_ref_type + " " + scoped_name + " = " + var_name + ";");
 					i += 1;
 				}
 			}
@@ -629,12 +637,23 @@ function stmt_await_on_id(id_expr, lvalue, strbuf){
 			for (e_lvalue of lvalue_tuple) {
 				elem_ref_type = tuple_types[i];
 				e_line = "";
-				if (elem_ref_type.indexOf("*") >= 0)
-					e_line = elem_ref_type.replace("*", "&") + " " + e_lvalue + " = *(" + tuple_tmp_var + ".r" + i + ");"
+				if (elem_ref_type.indexOf("*") >= 0){
+					elem_ref_type = elem_ref_type.replace("*", "&");
+					e_line =  "*(" + tuple_tmp_var + ".r" + i + ");";
+				}
 				else
-					e_line = elem_ref_type + " " + e_lvalue + " = " + tuple_tmp_var + ".r" + i + ";"
+					e_line = tuple_tmp_var + ".r" + i + ";";
+				elem_type = elem_ref_type.replace("&", "");
+		  		var sym = symtbl.addSymbolToCurrentScope(e_lvalue, { type: {primitive: elem_type, is_const: false}
+		  			                 , src: {note: "Generated"}
+		  			                 , value: null
+		  			                 , is_dim: false
+		  			                 } );
+				var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);				
+				e_line = elem_ref_type + " " + scoped_name + " = " + e_line;
 				strbuf.push(e_line);
 				i += 1;
+
 			}
 		}		
 		var stateCtrl = "if (_state > 0) {_this->_state = " + curr.label_num + "; return _this->_state;} ";
@@ -724,8 +743,9 @@ function stmt(ast,strbuf){
 
 function get_tuple_name(ttype){
 	var tuple_name = "_t_";
+	var info = {tuple: true}
 	for (tentry of ttype) {
-		var s_tentry = stringify_type(tentry);
+		var s_tentry = stringify_type(tentry, info);
 		if (tuple_name != ""){
 			tuple_name += "_";
 		}
@@ -739,8 +759,9 @@ function get_tuple_name(ttype){
 
 function get_tuple_ref_types(ttype){
 	var tuple_types = [];
+	var info = {tuple: true}
 	for (tentry of ttype) {		
-		var s_tentry = stringify_type(tentry);
+		var s_tentry = stringify_type(tentry, info);
 		var type_name = s_tentry.base;
 		if (type_name.indexOf("*") < 0){
 			type_name += "& ";
@@ -781,8 +802,9 @@ function stringify_type(ast, info=null){
 		tuple_struct = "";
 
 		tuple_types = [];
+		var tinfo = {tuple:true};
 		for (tentry of ast.ttype) {
-			s_tentry = stringify_type(tentry);
+			s_tentry = stringify_type(tentry, tinfo);
 			tuple_types.push(s_tentry.base);
 			tstr = s_tentry.base + " r" + i + " " + s_tentry.dim ;
 			pstr = s_tentry.base + " p" + i + " " + s_tentry.dim ;
@@ -831,7 +853,11 @@ function stringify_type(ast, info=null){
 					strglobals.push("typedef " + base + " " + type_id + ";");
 				}
 			}
-			base = type_id + "*" ;
+			if(info && info.tuple){
+				base = type_id + "*" ;
+			}else{
+				base = type_id + "&";
+			}
 			dim = "";
 		}else{
 			base = base + "&";
