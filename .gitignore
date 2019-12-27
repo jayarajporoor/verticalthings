@@ -18,6 +18,7 @@
 *.tar.gz
 *.rar
 *.o
+*.out
 *.obj
 *.exe
 *.elf
