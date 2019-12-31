@@ -1,0 +1,132 @@
+FastRNNParams fastrnnParams0;
+FastRNNParams fastrnnParams1;
+FCParams fcParams;
+const_char_arr [13] labelInvArr = {"Noise", "go","no","on","up","bed","cat","dog","off","one","six","two","yes"};
+
+int VOTE_WIN_LEN = 10;
+int VOTE_MAJORITY = 5;
+int NUM_LABELS = 13;
+FIFOCircularQ votingQ;
+static int[VOTE_WIN_LEN] votingContainer;
+static int[NUM_LABELS] votingFrequence;
+
+int TRANSFER_BUFFER_MAX_LEN = 128;
+static AudioClass& Audio = AudioClass::getInstance();
+int AUDIO_CHUNK_SIZE = 512;
+char[AUDIO_CHUNK_SIZE] readBuffer;
+static int transfer_buffer_curr_len = 0;
+static int16_t[TRANSFER_BUFFER_MAX_LEN] transfer_buffer;
+
+void recordCallback(){
+    int length = Audio.readFromRecordBuffer(readBuffer, AUDIO_CHUNK_SIZE);
+    int i=0;
+    length = length/2;
+    length = length - (length%2);
+    length = length/2;
+    if (length > TRANSFER_BUFFER_MAX_LEN){
+        error("Transfer buffer too small");
+    }
+
+    //can't have the variable tempAudio as to declare the variable we need
+    //int16_t* in the code which causes parse errors
+
+    if (transfer_buffer_curr_len != 0){
+        Serial.printf("Error: Transfer buffer not empty. %d dropped\n", length);
+    }
+    else{
+        //using conditionals as "return;" is not supported in vt
+        while (i < length){
+            transfer_buffer[i] = get_element(readBuffer, 2*i);
+            i = i + 1;
+        }
+        transfer_buffer_curr_len = length;
+    }
+}
+
+void init_record(){
+    Audio.format(16000U, 16U);
+}
+
+void start_record(){
+    Audio.startRecord(recordCallback);
+}
+
+void prediction_callback(float_pointer vec, int len){
+    int arg = argmax(vec, len);
+    int oldarg = to_int(q_oldest(&votingQ));
+    char[20] str;
+    if (oldarg >= NUM_LABELS || oldarg < 0){
+        oldarg = 0;
+    }
+    votingFrequence[arg]=votingFrequence[arg]+1;
+    votingFrequence[oldarg]=votingFrequence[oldarg]-1;
+    q_force_enqueue(&votingQ, &arg);
+    if (votingFrequence[arg] >= VOTE_MAJORITY){
+        sprintf(str, "Pred: %s (%d)", labelInvArr[arg], arg);
+        Screen.print(str, false);
+    }
+}
+
+void setup(){
+    uint16_t ret;
+    q_init(&votingQ, votingContainer, VOTE_WIN_LEN, cb_write_int, cb_read_int);
+    votingFrequence[0] = 5;
+    Serial.begin(115200);
+    Screen.init();
+    delay(500);
+    initFastRNN0();
+    initFastRNN1();
+    initFC();
+    delay(500);
+    Screen.clean();
+    ret = sfastrnn2p_init(&fastrnnParams0, &fastrnnParams1, &fcParams, prediction_callback);
+    Serial.printf("Return code: %d (init)\n", ret);
+    if (ret != 0){
+        error("Shallow FastRNN initialization failed (code %d)", ret);
+    }
+    if (ret != 0){
+        while (1){}
+    }
+    init_record();
+    delay(500);
+    Serial.println();
+    Serial.println("Ready");
+    Screen.print(0, "Ready");
+    delay(500);
+    start_record();
+}
+
+void loop(){
+    //in the c++ code "ret" is defined as "unsigned", here we are defining it as
+    //follows as "unsigned" is not supported in vt.
+    uint16_t ret;
+    static int count;
+    while (1){
+        if (transfer_buffer_curr_len == 0){
+            //include problem fix it later.
+            //rtos::wait_ms(5);
+        }
+        else{
+            //using conditionals as "continue" is not supported by vt
+            ret = sfastrnn2p_add_new_samples(transfer_buffer, transfer_buffer_curr_len);
+            if (ret != 0){
+                Serial.printf("Error pushing to interface %d\n", ret);
+            }
+            count = 0;
+            count = count + transfer_buffer_curr_len;
+            if (count % (128000) == 0){
+                Serial.printf("Pushed %d seconds\n", (count/16000));
+            }
+            transfer_buffer_curr_len = 0;
+        }
+    }
+}
+
+void printStr(char_pointer a){
+    Serial.println(a);
+}
+
+async void main(){
+    setup();
+    loop();
+}

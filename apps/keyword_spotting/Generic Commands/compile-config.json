@@ -1,0 +1,17 @@
+{
+  "codegen":{
+    "stdincludes" :[],
+    "pathincludes" :["{EDGEML_PATH}/Applications/KeywordSpotting/MXChip-SRNN/src/lib/utils/circularq.h",
+      "{EDGEML_PATH}/Applications/KeywordSpotting/MXChip-SRNN/src/models/model.h",
+      "{EDGEML_PATH}/Applications/KeywordSpotting/MXChip-SRNN/src/lib/sfastrnn_pipeline/sfastrnnpipeline.h",
+      "inc/hot_fixes.h",
+      "{DEVKIT_PATH}/libraries/devkit-sdk/AZ3166/src/libraries/AudioV2/src/AudioClassV2.h",
+      "{DEVKIT_PATH}/libraries/devkit-sdk/AZ3166/src/cores/arduino/Arduino.h",
+      "{DEVKIT_PATH}/mbed-os/platform/mbed_wait_api.h"
+      ]
+  },
+  "channels": {
+    "spi0" : 0,
+    "spi1" : 1
+  }
+}
