@@ -21,7 +21,7 @@ async main(chan<audio> mic, chan<audiobuf> mic_buf)
 			create transfer_buf from read_buf
      		put transfer_buf into audio queue
 			while(..)
-				HAL_buf_at(mic_buf, index)
+				data, mic_buf = HAL_buf_at(mic_buf, index)
 			}    		
 		}
 		r_mic = HAL_start(mic, mic_buf)
@@ -53,7 +53,7 @@ HAL_io_completion(chan<x> c, non_blocking){
 
 unsigned char audio_read_buf;
 
-inline HAL_buf_at(mic_buf, index){
+inline unsigned char, mic_buf HAL_buf_at(mic_buf, index){
 	if mic_buf == xx {
 		 return audio_read_buf[index]
 	}		
