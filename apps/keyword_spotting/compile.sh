@@ -3,7 +3,7 @@
 #user must give path to the above mentioned in create_commands so that paths to all dependencies are made.
 python3 create_commands.py
 
-nodejs  ../../compiler/src2/vtcompiler.js main.vt -config inc/compile-config.json -entry main -code out/main.cc
+nodejs  ../../compiler/src2/vtcompiler.js main.vt sfastrnnpipeline.vt -config inc/compile-config.json -entry main -code out/main.cc
 echo "vt compilation done"
 $(cat inc/compile_command.txt | tr '\n' ' ')
 #moving the generated object and dependency files to out folder

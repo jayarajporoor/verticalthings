@@ -15,6 +15,31 @@
 #define const_char_arr const char *
 #define char_pointer char*
 
+#define FastRNNParams_pointer struct FastRNNParams*
+#define prediction_cb_pointer prediction_cb*
+#define pred_cb_pointer pred_cb*
+#define FCParams_pointer struct FCParams*
+
+uint16_t get_statesLen(struct FastRNNParams_pointer p){
+    return p->statesLen;
+}
+
+uint16_t get_timeSteps(struct FastRNNParams_pointer p){
+    return p->timeSteps;
+}
+
+uint16_t get_featLen(struct FastRNNParams_pointer p){
+    return p->featLen;
+}
+
+uint16_t get_outputDim(struct FCParams_pointer p){
+    return p->outputDim;
+}
+
+uint16_t get_inputDim(struct FCParams_pointer p){
+    return p->inputDim;
+}
+
 int to_int(void* p){
     return *(int*)p;
 }
