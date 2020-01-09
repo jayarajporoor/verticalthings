@@ -1,0 +1,74 @@
+
+async main(chan<audio> mic, chan<audiobuf> mic_buf)
+{
+	rchan<audio> r_mic;
+	
+	r_mic = HAL_start(mic, mic_buf) 
+	while(1){
+
+	    if(qsize(audio_queue) >= FRAME_LEN){
+  			qsize = q_getSize(&audioQ);
+            for(int i = 0; i < FRAME_LEN; i++)
+                audio_frame_buffer[i] = (int32_t)(*(int16_t*)q_atN(&audioQ, i));
+            for(int i = 0; i < STRIDE; i++)
+                q_del_oldest(&audioQ);	        
+            ....
+
+	    }
+
+		mic, mic_buf, read_buf, len = await HAL_io_completion(r_mic, qsize(audio_queue) >= FRAME_LEN)
+		if len > 0{
+			create transfer_buf from read_buf
+     		put transfer_buf into audio queue
+			while(..)
+				HAL_buf_at(mic_buf, index)
+			}    		
+		}
+		r_mic = HAL_start(mic, mic_buf)
+
+	}
+}
+
+
+---
+HAL C implementation:
+
+audio_buf_available = 0
+audio_started = 0
+
+HAL_start(chan<x>, chan<xbuf>){
+	if x == audio_channel_number{
+		if !audio_started{
+		    audio_started = 1
+		    audio.start_record(audio_callback)	    
+		}
+		audio_buf_available = 1	
+	}
+}
+
+
+HAL_io_completion(chan<x> c, non_blocking){
+	
+}
+
+unsigned char audio_read_buf;
+
+inline HAL_buf_at(mic_buf, index){
+	if mic_buf == xx {
+		 return audio_read_buf[index]
+	}		
+}
+
+
+audio_callback(){
+	if !audio_buf_available {
+	   return;
+	}else{
+	   Audio.readFromRecordBuffer(audio_read_buf..)
+	   audio_buf_available = 0
+	}
+}
+
+HAL_io_completion(...){
+	
+}

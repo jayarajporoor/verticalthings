@@ -7,6 +7,14 @@ struct _arec_event {volatile int _state;};
 struct _future {void *_parec; int (*_pfn)(void *, void *);}; 
 #include "../inc/vtdefs.h"
 #include "../inc/stm32_hal_ex1.h"
+struct _arec__sys_HAL_io_completion;
+typedef void (*_t__sys_HAL_io_completion) (struct _arec__sys_HAL_io_completion* _this, int*  _ret0);
+struct _arec__sys_HAL_io_completion{
+    int _state = 0;
+    int sys_HAL_io_completion_io;
+};
+struct _arec__sys_HAL_start;
+typedef int (*_t__sys_HAL_start) (int sys_HAL_start_io);
 /*Module vars for sys*/
 /*End of module vars for sys*/
 typedef float _float__100[100];
@@ -43,6 +51,22 @@ struct _future  syntax_test5_dma;
 struct _future  syntax_test5_facq;
 float syntax_test5_buf[2][100];
 /*End of module vars for syntax_test5*/
+int _sys_HAL_io_completion(struct _arec__sys_HAL_io_completion* _this, int* _ret0)
+{
+static const void * _atbl[] = { &&lstate_0 };
+int _state = _this->_state;
+_this->_state = 0;
+if (_state > 0 && _state <= 0) goto *(_atbl[_state]);
+ lstate_0:
+{
+}
+return _this->_state;
+}
+int _sys_HAL_start(int sys_HAL_start_io)
+{
+    {
+    }
+}
 int _syntax_test5_acq(struct _arec__syntax_test5_acq* _this, struct _t__int__float__100* _ret0)
 {
 static const void * _atbl[] = { &&lstate_0, &&lstate_1, &&lstate_2 };
@@ -94,8 +118,8 @@ if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
     {
  lstate_1:
         _state = syntax_test5_facq._pfn(syntax_test5_facq._parec, (&_t__int__float__100_ret) );
-        int&  syntax_test5_main_res_chan = _t__int__float__100_ret.r0;
-        _float__100& syntax_test5_main_res_buf = *(_t__int__float__100_ret.r1);
+        int&  res_chan = _t__int__float__100_ret.r0;
+        _float__100& res_buf = *(_t__int__float__100_ret.r1);
         if (_state > 0) {_this->_state = 1; return _this->_state;} 
         _this->_arecs._arec__syntax_test5_acq._state = 0;
         _this->_arecs._arec__syntax_test5_acq.syntax_test5_acq_y = 3;

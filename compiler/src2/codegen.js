@@ -1239,11 +1239,11 @@ function code_gen(ast,ctx){
         var mod_ast = ast.modules[mod_name];
         curr.mod_ast = mod_ast;
 		
-//		if (mod_name != "sys"){
-        for(var i=0;i<mod_ast.fdefs.length;i++){
-            fdef(mod_ast.fdefs[i], code);
-        }
-//    	}
+		if (mod_name != "sys"){
+	        for(var i=0;i<mod_ast.fdefs.length;i++){
+	            fdef(mod_ast.fdefs[i], code);
+	        }
+    	}
 
 		strglobals.push("/*Module vars for " + mod_name + "*/");
 		for(var i =0;i<mod_ast.vars.length;i++){
