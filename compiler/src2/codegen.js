@@ -586,6 +586,9 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 		}
 	}else{
 		var strs = fcall(ast_fcall);
+		if (strs.length > 0 && lvalue){
+			strs[strs.length-1] = lvalue + " = " + strs[strs.length-1]
+		}
 		for(str of strs){
 			strbuf.push(str + ";");
 		}		

@@ -1,0 +1,7 @@
+int samp(){
+    return 1;
+}
+async void main(){
+    int x;
+    x = samp();
+}
