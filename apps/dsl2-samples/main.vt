@@ -1,0 +1,4 @@
+using sys;
+async void main(chan<audio> mic, chan<audiobuf>mic_buf) {
+    (a, b) = HAL_buf_at(mic, mic_buf);
+}

@@ -1,0 +1,10 @@
+{
+	"codegen":{
+		"stdincludes" :[],
+		"pathincludes" :["../inc/vtdefs.h", "../inc/stm32_hal_ex1.h"]
+	},
+	"channels": {
+		"audio" : 0,
+		"audiobuf" : 1
+	}
+}

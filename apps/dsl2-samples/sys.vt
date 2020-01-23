@@ -1,7 +1,2 @@
-async chan<x> HAL_io_completion(rchan<x> io){
-	
-}
-
-rchan<x> HAL_start(chan<x> io){
-	
-}
+(int, int) HAL_buf_at(chan<audio> mic, chan<audiobuf>mic_buf){
+} 

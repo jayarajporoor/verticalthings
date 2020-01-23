@@ -72,6 +72,17 @@ const func_info = {
 };
 
 
+function has_fdef(mod_ast, fname){
+	for(f_ast of mod_ast.fdefs)
+	{
+		if(f_ast.id === fname)
+		{
+			return true
+		}
+	}
+	return false
+}
+
 function get_func_info(qid, info_req){
 	var ast;
 	var mod_ast;
@@ -83,11 +94,23 @@ function get_func_info(qid, info_req){
 		scoped_fname = PFUNC + qid[0] + "_" + qid[1];
 		var_scope_name = PVAR + qid[0] + "_" + qid[1];
 	}else{
+		
 		if (curr.mod_async){
 			mod_ast = curr.mod_async;
 		}else{
 			mod_ast = curr.mod_ast;
 		}
+
+		if(!has_fdef(mod_ast, qid[0])){
+			for(use of curr.mod_ast.uses){
+				check_ast = curr.toplevel_ast.modules[use.name]
+				if (has_fdef(check_ast, qid[0])){
+					mod_ast = check_ast;
+					break;
+				}
+			}
+		}
+
 		fname = qid[0];		
 		if(fname === 'event'){
 			scoped_fname =  fname;
@@ -810,6 +833,7 @@ function get_tuple_ref_types(ttype){
 		}
 		tuple_types.push(type_name);
 	}
+
 	return tuple_types;
 }
 
