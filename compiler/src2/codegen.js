@@ -524,6 +524,7 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 					tuple_types = get_tuple_ref_types(f_ast.type.ttype);
 					tuple_tmp_var = tuple_name + "_ret";
 					if (!curr.tuple_locals[tuple_name]){
+						curr.tuple_locals[tuple_name] = true
 						curr.hdrbuf.push("struct " + tuple_name + " " + tuple_tmp_var + ";");						
 					}
 					lvalue_tuple = lvalue;
@@ -586,12 +587,49 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 		}
 	}else{
 		var strs = fcall(ast_fcall);
+		if (lvalue){
+			if (Array.isArray(lvalue) ) {
+				f_ast = get_func_info(ast_fcall.qid, func_info.F_AST);
+				tuple_name = get_tuple_name(f_ast.type.ttype);
+				tuple_types = get_tuple_ref_types(f_ast.type.ttype);
+				tuple_tmp_var = tuple_name + "_ret";
+				if (!curr.tuple_locals[tuple_name]){
+					curr.tuple_locals[tuple_name] = true
+					curr.hdrbuf.push("struct " + tuple_name + " " + tuple_tmp_var + ";");						
+				}
+				lvalue_tuple = lvalue;
+				lvalue = tuple_tmp_var;
+			}
+		}
+
 		if (strs.length > 0 && lvalue){
 			strs[strs.length-1] = lvalue + " = " + strs[strs.length-1]
 		}
 		for(str of strs){
 			strbuf.push(str + ";");
-		}		
+		}
+		if (tuple_tmp_var) {
+			var i = 0;
+			for (e_lvalue of lvalue_tuple) {
+				elem_ref_type = tuple_types[i];
+				var_name = tuple_tmp_var + ".r" + i;
+				if(elem_ref_type.indexOf("*") >= 0){
+					elem_ref_type = elem_ref_type.replace("*", "&");
+					var_name = "(*" + var_name + ")";
+				}
+				elem_type = elem_ref_type.replace("&", "");
+		  		var sym = symtbl.addSymbolToCurrentScope(e_lvalue, { type: {primitive: elem_type, is_const: false}
+		  			                 , src: {note: "Generated"}
+		  			                 , value: null
+		  			                 , is_dim: false
+		  			                 } );
+				var scoped_name = ast_util.get_scoped_name(sym, "_", PVAR);
+
+				strbuf.push(elem_ref_type + " " + scoped_name + " = " + var_name + ";");
+				i += 1;
+			}
+		}
+
 	}	
 	curr.mod_async = null;
 }
@@ -613,6 +651,7 @@ function stmt_await_on_id(id_expr, lvalue, strbuf){
 			tuple_types = get_tuple_ref_types(sym.info.type.future_type.ttype);
 			tuple_tmp_var = tuple_name + "_ret";
 			if (!curr.tuple_locals[tuple_name]){
+				curr.tuple_locals[tuple_name] = true
 				curr.hdrbuf.push("struct " + tuple_name + " " + tuple_tmp_var + ";");						
 			}
 			lvalue_tuple = lvalue;
