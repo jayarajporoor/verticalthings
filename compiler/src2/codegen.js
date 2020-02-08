@@ -609,6 +609,7 @@ function stmt_fcall(ast_fcall, strbuf, lvalue){
 			}
 		}
 	}else{
+		var tuple_tmp_var = null;
 		var strs = fcall(ast_fcall);
 		if (lvalue){
 			if (Array.isArray(lvalue) ) {

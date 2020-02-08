@@ -1,0 +1,15 @@
+{
+  "codegen":{
+    "stdincludes" :["Arduino.h", "AudioClassV2.h"],
+    "pathincludes" :["inc/src/lib/utils/circularq.h",
+      "inc/src/models/model.h",
+      "inc/src/lib/sfastrnn_pipeline/sfastrnnpipeline.h",
+      "inc/hot_fixes.h",
+      "inc/custom_structs.h"
+      ]
+  },
+  "channels": {
+    "audio" : 0,
+    "audiobuf" : 1
+  }
+}

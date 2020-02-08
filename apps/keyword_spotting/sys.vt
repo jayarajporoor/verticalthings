@@ -1,0 +1,11 @@
+async (int, int, char[512]&, int) HAL_io_completion(rchan<audio> rc, int non_blocking){
+
+}
+
+int HAL_start(chan<audio> io){
+
+}
+
+(int, int) HAL_buf_at(chan<audio> mic, chan<audio>mic_buf){
+
+}
