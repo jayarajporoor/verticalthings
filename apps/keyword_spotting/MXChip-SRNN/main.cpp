@@ -166,10 +166,13 @@ if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
                     main_transfer_buffer[_this->main_main_idx] = to_int16t(main_main_main_main_value) ;
                     _this->main_main_idx=(_this->main_main_idx+1);
                 }
-                sfastrnn2p_add_new_samples(main_transfer_buffer, main_main_len) ;
             }
         }
         _this->main_main_r_mic = _sys_HAL_start(main_main_MIC, main_main_MIC_BUF) ;
+        if((main_main_len>0))
+        {
+            sfastrnn2p_add_new_samples(main_transfer_buffer, main_main_len) ;
+        }
     }
 }
 return _this->_state;
