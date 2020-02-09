@@ -12,6 +12,7 @@ struct _future {void *_parec; int (*_pfn)(void *, void *);};
 #include "inc/src/lib/sfastrnn_pipeline/sfastrnnpipeline.h"
 #include "inc/hot_fixes.h"
 #include "inc/custom_structs.h"
+#include "inc/hal_buf.h"
 struct _arec__main_prediction_callback;
 typedef void (*_t__main_prediction_callback) (float_pointer main_prediction_callback_vec, int main_prediction_callback_len);
 struct _arec__main_setup;
@@ -26,6 +27,7 @@ struct _arec__main_main{
     int _state = 0;
     int main_main_mic;
     int main_main_mic_buf;
+    _t__int_int main_main_tmp;
     int main_main_idx=0;
     int main_main_non_blocking;
     int main_main_r_mic;
@@ -116,7 +118,6 @@ void _main_printStr(char_pointer main_printStr_a)
 int _main_main(struct _arec__main_main* _this)
 {
     struct _t__int_int__char__512_int _t__int_int__char__512_int_ret;
-    struct _t__int_int _t__int_int_ret;
 static const void * _atbl[] = { &&lstate_0, &&lstate_1 };
 int _state = _this->_state;
 _this->_state = 0;
@@ -160,10 +161,8 @@ if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
                 _this->main_main_idx=0;
                 while((_this->main_main_idx<main_main_len))
                 {
-                    _t__int_int_ret = _sys_HAL_buf_at(main_main_MIC_BUF, (2*_this->main_main_idx)) ;
-                    int&  main_main_main_main_value = _t__int_int_ret.r0;
-                    int&  main_main_MIC_BUF = _t__int_int_ret.r1;
-                    main_transfer_buffer[_this->main_main_idx] = to_int16t(main_main_main_main_value) ;
+                    _this->main_main_tmp = _sys_HAL_buf_at(main_main_MIC_BUF, (2*_this->main_main_idx)) ;
+                    main_transfer_buffer[_this->main_main_idx] = to_int16t(_this->main_main_tmp.r0) ;
                     _this->main_main_idx=(_this->main_main_idx+1);
                 }
             }

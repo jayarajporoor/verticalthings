@@ -5,7 +5,8 @@
       "inc/src/models/model.h",
       "inc/src/lib/sfastrnn_pipeline/sfastrnnpipeline.h",
       "inc/hot_fixes.h",
-      "inc/custom_structs.h"
+      "inc/custom_structs.h",
+      "inc/hal_buf.h"
       ]
   },
   "channels": {

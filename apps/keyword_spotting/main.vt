@@ -64,6 +64,7 @@ void printStr(char_pointer a){
 }
 
 async void main(chan<audio> mic, chan<audiobuf> mic_buf){
+    _t__int_int tmp;
     int idx = 0;
     int non_blocking;
     int r_mic;
@@ -92,8 +93,8 @@ async void main(chan<audio> mic, chan<audiobuf> mic_buf){
             if (len > 0){
                 idx = 0;
                 while(idx < len){
-                    (main_main_value, MIC_BUF) = HAL_buf_at(MIC_BUF, 2*idx);
-                    transfer_buffer[idx] = to_int16t(main_main_value);
+                    tmp = HAL_buf_at(MIC_BUF, 2*idx);
+                    transfer_buffer[idx] = to_int16t(tmp.r0);
                     idx = idx + 1;
                 }
             }
