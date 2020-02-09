@@ -93,7 +93,7 @@ async void main(chan<audio> mic, chan<audiobuf> mic_buf){
                 idx = 0;
                 while(idx < len){
                     (main_main_value, MIC_BUF) = HAL_buf_at(MIC_BUF, 2*idx);
-                    transfer_buffer[2*idx] = to_int16t(main_main_value);
+                    transfer_buffer[idx] = to_int16t(main_main_value);
                     idx = idx + 1;
                 }
                 sfastrnn2p_add_new_samples(transfer_buffer, len);

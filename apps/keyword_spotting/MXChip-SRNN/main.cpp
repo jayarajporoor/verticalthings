@@ -163,7 +163,7 @@ if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
                     _t__int_int_ret = _sys_HAL_buf_at(main_main_MIC_BUF, (2*_this->main_main_idx)) ;
                     int&  main_main_main_main_value = _t__int_int_ret.r0;
                     int&  main_main_MIC_BUF = _t__int_int_ret.r1;
-                    main_transfer_buffer[(2*_this->main_main_idx)] = to_int16t(main_main_main_main_value) ;
+                    main_transfer_buffer[_this->main_main_idx] = to_int16t(main_main_main_main_value) ;
                     _this->main_main_idx=(_this->main_main_idx+1);
                 }
                 sfastrnn2p_add_new_samples(main_transfer_buffer, main_main_len) ;
