@@ -37,6 +37,8 @@ struct _arec__main_main{
 }
 _arecs;
 };
+extern char audio_read_buf[512];
+
 /*Module vars for main*/
 int main_setup_const=1;
 FastRNNParams main_fastrnnParams0;
@@ -79,6 +81,9 @@ void _main_prediction_callback(float_pointer main_prediction_callback_vec, int m
         }
     }
 }
+inline int _sys_HAL_buf_at(int idx){
+    return ((int16_t*)audio_read_buf)[idx];
+}
 void _main_setup()
 {
     uint32_t main_setup_ret;
@@ -116,7 +121,7 @@ void _main_printStr(char_pointer main_printStr_a)
 int _main_main(struct _arec__main_main* _this)
 {
     struct _t__int_int__char__512_int _t__int_int__char__512_int_ret;
-    struct _t__int_int _t__int_int_ret;
+    int _t__int_int_ret;
 static const void * _atbl[] = { &&lstate_0, &&lstate_1 };
 int _state = _this->_state;
 _this->_state = 0;
@@ -160,10 +165,9 @@ if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
                 _this->main_main_idx=0;
                 while((_this->main_main_idx<main_main_len))
                 {
-                    _t__int_int_ret = _sys_HAL_buf_at(main_main_MIC_BUF, (2*_this->main_main_idx)) ;
-                    int&  main_main_main_main_value = _t__int_int_ret.r0;
-                    int&  main_main_MIC_BUF = _t__int_int_ret.r1;
-                    main_transfer_buffer[_this->main_main_idx] = to_int16t(main_main_main_main_value) ;
+                    _t__int_int_ret = _sys_HAL_buf_at(2*_this->main_main_idx) ;
+                    int&  main_main_main_main_value = _t__int_int_ret;
+                    main_transfer_buffer[_this->main_main_idx] = (int16_t)main_main_main_main_value;
                     _this->main_main_idx=(_this->main_main_idx+1);
                 }
             }

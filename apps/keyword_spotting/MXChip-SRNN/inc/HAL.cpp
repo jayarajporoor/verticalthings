@@ -61,15 +61,15 @@ int _sys_HAL_io_completion(void* arg1, void* arg2){
     return 1;
 }
 
-_t__int_int _sys_HAL_buf_at(int mic_buf, int index){
-    if (mic_buf == MIC_BUF) {
-        _t__int_int result;
-        int16_t* tmp_audio_read_buf = (int16_t*) audio_read_buf;
-        result.r0 = tmp_audio_read_buf[index];
-        result.r1 = mic_buf;
-        return result;
-    }
-}
+//_t__int_int _sys_HAL_buf_at(int mic_buf, int index){
+//    if (mic_buf == MIC_BUF) {
+//        _t__int_int result;
+//        int16_t* tmp_audio_read_buf = (int16_t*) audio_read_buf;
+//        result.r0 = tmp_audio_read_buf[index];
+//        result.r1 = mic_buf;
+//        return result;
+//    }
+//}
 
 void recordCallback(){
     if (audio_buf_available == 0) {
