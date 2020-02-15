@@ -1,0 +1,219 @@
+[
+    {
+        "module": "MXChip-SRNN/WakeWord-MXChip.o", 
+        "size": {
+            ".data-delta": 6440, 
+            ".text-delta": 804, 
+            ".bss": 973, 
+            ".data": 6440, 
+            ".bss-delta": 973, 
+            ".text": 804
+        }
+    }, 
+    {
+        "module": "MXChip-SRNN/cmsis", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 3524, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 3524
+        }
+    }, 
+    {
+        "module": "MXChip-SRNN/src", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 2866, 
+            ".bss": 47643, 
+            ".data": 0, 
+            ".bss-delta": 47643, 
+            ".text": 2866
+        }
+    }, 
+    {
+        "module": "[fill]", 
+        "size": {
+            ".data-delta": 20, 
+            ".text-delta": 332, 
+            ".bss": 154, 
+            ".data": 20, 
+            ".bss-delta": 154, 
+            ".text": 332
+        }
+    }, 
+    {
+        "module": "[lib]/c.a", 
+        "size": {
+            ".data-delta": 2324, 
+            ".text-delta": 53156, 
+            ".bss": 95, 
+            ".data": 2324, 
+            ".bss-delta": 95, 
+            ".text": 53156
+        }
+    }, 
+    {
+        "module": "[lib]/gcc.a", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 3344, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 3344
+        }
+    }, 
+    {
+        "module": "[lib]/m.a", 
+        "size": {
+            ".data-delta": 1, 
+            ".text-delta": 7528, 
+            ".bss": 0, 
+            ".data": 1, 
+            ".bss-delta": 0, 
+            ".text": 7528
+        }
+    }, 
+    {
+        "module": "[lib]/misc", 
+        "size": {
+            ".data-delta": 4, 
+            ".text-delta": 268, 
+            ".bss": 28, 
+            ".data": 4, 
+            ".bss-delta": 28, 
+            ".text": 268
+        }
+    }, 
+    {
+        "module": "[lib]/stsafe.a", 
+        "size": {
+            ".data-delta": 10, 
+            ".text-delta": 12004, 
+            ".bss": 114, 
+            ".data": 10, 
+            ".bss-delta": 114, 
+            ".text": 12004
+        }
+    }, 
+    {
+        "module": "[lib]/wlan.a", 
+        "size": {
+            ".data-delta": 101, 
+            ".text-delta": 28898, 
+            ".bss": 3189, 
+            ".data": 101, 
+            ".bss-delta": 3189, 
+            ".text": 28898
+        }
+    }, 
+    {
+        "module": "libraries/az3166-driver", 
+        "size": {
+            ".data-delta": 151, 
+            ".text-delta": 55078, 
+            ".bss": 30282, 
+            ".data": 151, 
+            ".bss-delta": 30282, 
+            ".text": 55078
+        }
+    }, 
+    {
+        "module": "libraries/azure-iot-sdk-c", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 382, 
+            ".bss": 176, 
+            ".data": 0, 
+            ".bss-delta": 176, 
+            ".text": 382
+        }
+    }, 
+    {
+        "module": "libraries/devkit-sdk", 
+        "size": {
+            ".data-delta": 116, 
+            ".text-delta": 19858, 
+            ".bss": 5250, 
+            ".data": 116, 
+            ".bss-delta": 5250, 
+            ".text": 19858
+        }
+    }, 
+    {
+        "module": "mbed-os/drivers", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 2144, 
+            ".bss": 132, 
+            ".data": 0, 
+            ".bss-delta": 132, 
+            ".text": 2144
+        }
+    }, 
+    {
+        "module": "mbed-os/features", 
+        "size": {
+            ".data-delta": 89, 
+            ".text-delta": 17524, 
+            ".bss": 60, 
+            ".data": 89, 
+            ".bss-delta": 60, 
+            ".text": 17524
+        }
+    }, 
+    {
+        "module": "mbed-os/hal", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 574, 
+            ".bss": 8, 
+            ".data": 0, 
+            ".bss-delta": 8, 
+            ".text": 574
+        }
+    }, 
+    {
+        "module": "mbed-os/platform", 
+        "size": {
+            ".data-delta": 4, 
+            ".text-delta": 2094, 
+            ".bss": 349, 
+            ".data": 4, 
+            ".bss-delta": 349, 
+            ".text": 2094
+        }
+    }, 
+    {
+        "module": "mbed-os/rtos", 
+        "size": {
+            ".data-delta": 24, 
+            ".text-delta": 8676, 
+            ".bss": 6879, 
+            ".data": 24, 
+            ".bss-delta": 6879, 
+            ".text": 8676
+        }
+    }, 
+    {
+        "module": "mbed-os/targets", 
+        "size": {
+            ".data-delta": 4, 
+            ".text-delta": 25318, 
+            ".bss": 1460, 
+            ".data": 4, 
+            ".bss-delta": 1460, 
+            ".text": 25318
+        }
+    }, 
+    {
+        "summary": {
+            "static_ram": 106080, 
+            "total_flash_delta": 253660, 
+            "static_ram_delta": 106080, 
+            "total_flash": 253660
+        }
+    }
+]
