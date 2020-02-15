@@ -12,7 +12,7 @@ struct _t__int_int{int r0 ; int r1 ; _t__int_int() :  r0( (int) 0 ),  r1( (int) 
 
 AudioClass& Audio = AudioClass::getInstance();
 
-int audio_buf_available = 0;
+volatile bool audio_buf_available = false;
 int audio_started = 0;
 int available_buf_length = 0;
 char audio_read_buf[512];
@@ -35,7 +35,7 @@ int _sys_HAL_start(int chan, int chan_buf){
         if (audio_started == 0){
             start_record();
         }
-        audio_buf_available = 1;
+        audio_buf_available = true;
         return RMIC;
     }
 }
@@ -48,7 +48,7 @@ int _sys_HAL_io_completion(void* arg1, void* arg2){
         return 1;
     }
     ret->r3 = 0;
-    if (audio_buf_available == 0){
+    if (not audio_buf_available){
         ret->r0 = MIC;
         ret->r1 = MIC_BUF;
         ret->r2 = &audio_read_buf;
@@ -72,9 +72,9 @@ int _sys_HAL_io_completion(void* arg1, void* arg2){
 //}
 
 void recordCallback(){
-    if (audio_buf_available == 0) {
+    if (not audio_buf_available) {
         return;
     }
     available_buf_length = Audio.readFromRecordBuffer(audio_read_buf, 512);
-    audio_buf_available = 0;
+    audio_buf_available = false;
 }

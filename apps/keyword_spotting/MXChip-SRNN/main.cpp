@@ -183,12 +183,20 @@ return _this->_state;
 }
 /*Entry point - the 'C' main function*/
 struct _arec__main_main _arec_main;
+Timer t;
+extern volatile bool audio_buf_available;
 void loop(){
     int status = -1;
     _arec_main.main_main_mic=0;
     _arec_main.main_main_mic_buf=1;
     while (status != 0){
         status = _main_main(&_arec_main);
+        t.start();
+        while (audio_buf_available);
+        t.stop();
+        char buf[100];
+        sprintf(buf, "Saved %ld",t.read());
+        Serial.println(buf);
     }
     while (true);
     return;
