@@ -184,7 +184,11 @@ return _this->_state;
 /*Entry point - the 'C' main function*/
 struct _arec__main_main _arec_main;
 Timer t;
+Ticker fcall;
 extern volatile bool audio_buf_available;
+char buf[100];
+float delay_time = 0;
+float temp_time = 0;
 void loop(){
     int status = -1;
     _arec_main.main_main_mic=0;
@@ -194,11 +198,20 @@ void loop(){
         t.start();
         while (audio_buf_available);
         t.stop();
-        char buf[100];
-        sprintf(buf, "Saved %ld",t.read());
-        Serial.println(buf);
+        temp_time = t.read();
+        if (temp_time < 0){
+            temp_time = 0;
+        }
+        delay_time += temp_time;
     }
     while (true);
     return;
 }
-void setup(){}
+void log_and_erase(){
+    sprintf(buf, "saved %f", delay_time);
+    delay_time = 0;
+    Serial.println(buf);
+}
+void setup(){
+    fcall.attach(&log_and_erase, 5.0);
+}
