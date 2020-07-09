@@ -1,0 +1,102 @@
+using sys;
+int setup_const = 1;
+FastRNNParams fastrnnParams0;
+FastRNNParams fastrnnParams1;
+FCParams fcParams;
+const_char_arr [13] labelInvArr = {"Noise", "go","no","on","up","bed","cat","dog","off","one","six","two","yes"};
+
+int len, value, current_queue_size;
+int FRAME_LEN = 400;
+int VOTE_WIN_LEN = 10;
+int VOTE_MAJORITY = 5;
+int NUM_LABELS = 13;
+FIFOCircularQ votingQ;
+static int[VOTE_WIN_LEN] votingContainer;
+static int[NUM_LABELS] votingFrequence;
+
+int TRANSFER_BUFFER_MAX_LEN = 128;
+static AudioClass& Audio = AudioClass::getInstance();
+int AUDIO_CHUNK_SIZE = 512;
+
+static int transfer_buffer_curr_len = 0;
+static int16_t[TRANSFER_BUFFER_MAX_LEN] transfer_buffer;
+
+void prediction_callback(float_pointer vec, int len){
+    int arg = argmax(vec,en);
+    int oldarg = get_q_oldest(&votingQ);
+    char[20] str;
+    if (oldarg >= NUM_LABELS || oldarg < 0){
+        oldarg = 0;
+    }
+    votingFrequence[arg]=votingFrequence[arg]+1;
+    votingFrequence[oldarg]=votingFrequence[oldarg]-1;
+    q_force_enqueue(&votingQ, &arg);
+    if (votingFrequence[arg] >= VOTE_MAJORITY){
+        sprintf(str, "Pred: %s (%d)", labelInvArr[arg], arg);
+        Screen.print(str, false);
+    }
+}
+
+void setup(){
+    uint32_t ret;
+    q_init(&votingQ, votingContainer, VOTE_WIN_LEN, cb_write_int, cb_read_int);
+    votingFrequence[0] = 5;
+    Serial.begin(115200);
+    Screen.init();
+    delay(500);
+    initFastRNN0(fastrnnParams0);
+    initFastRNN1(fastrnnParams1);
+    initFC(fcParams);
+    delay(500);
+    Screen.clean();
+    ret = sfastrnn2p_init(&fastrnnParams0, &fastrnnParams1, &fcParams, prediction_callback);
+    Serial.printf("Return code: %d (init)\n", ret);
+    if (ret != 0){
+        error("Shallow FastRNN initialization failed (code %d)", ret);
+    }
+    if (ret != 0){
+        while (1){}
+    }
+}
+
+void printStr(char_pointer a){
+    Serial.println(a);
+}
+
+async void main(chan<audio> mic, chan<audiobuf> mic_buf){
+    int idx = 0;
+    int non_blocking;
+    int r_mic;
+    int value;
+    (int, int, char[512]&, int) HAL_io_completion_result;
+    if (setup_const == 1){
+        setup_const = 0;
+        setup();
+    }
+    r_mic = HAL_start(mic, mic_buf);
+    while(1 > 0){
+        current_queue_size = pred_func();
+        if (current_queue_size >= FRAME_LEN){
+            non_blocking = 1;
+        }
+        else{
+            non_blocking = 0;
+        }
+        (MIC, MIC_BUF, readBuffer, len) = await HAL_io_completion(r_mic, non_blocking);
+        if (len > 0){
+            //create transfer_buf from read_buf
+            //put transfer_buf into audio queue
+            len = len / 2;
+            len = len - (len % 2);
+            len = len / 2;
+            if (len > 0){
+                idx = 0;
+                HAL_buf_copy(MIC_BUF, &transfer_buffer, len);
+            }
+        }
+        r_mic = HAL_start(MIC, MIC_BUF);
+        if (len > 0){
+            sfastrnn2p_add_new_samples(transfer_buffer, len);
+        }
+    }
+}
