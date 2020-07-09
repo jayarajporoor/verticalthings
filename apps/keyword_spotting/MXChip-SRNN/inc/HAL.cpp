@@ -61,15 +61,27 @@ int _sys_HAL_io_completion(void* arg1, void* arg2){
     return 1;
 }
 
-//_t__int_int _sys_HAL_buf_at(int mic_buf, int index){
-//    if (mic_buf == MIC_BUF) {
-//        _t__int_int result;
-//        int16_t* tmp_audio_read_buf = (int16_t*) audio_read_buf;
-//        result.r0 = tmp_audio_read_buf[index];
-//        result.r1 = mic_buf;
-//        return result;
-//    }
-//}
+_t__int_int _sys_HAL_buf_at(int mic_buf, int index){
+    if (mic_buf == MIC_BUF) {
+        _t__int_int result;
+        int16_t* tmp_audio_read_buf = (int16_t*) audio_read_buf;
+        result.r0 = tmp_audio_read_buf[index];
+        result.r1 = mic_buf;
+        return result;
+    }
+}
+
+void HAL_buf_copy(int buf_chan, int16_t (*buf) [128], int len){
+    int idx = 0;
+    struct _t__int_int return_value;
+    while(idx<len) {
+        return_value = _sys_HAL_buf_at(buf_chan, (2*idx)) ;
+        int&  main_main_main_main_value = return_value.r0;
+        buf_chan = return_value.r1;
+        (*buf)[idx] = (int16_t)main_main_main_main_value;
+        idx = idx + 1;
+    }
+}
 
 void recordCallback(){
     if (not audio_buf_available) {

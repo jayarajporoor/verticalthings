@@ -91,11 +91,7 @@ async void main(chan<audio> mic, chan<audiobuf> mic_buf){
             len = len / 2;
             if (len > 0){
                 idx = 0;
-                while(idx < len){
-                    (main_main_value, MIC_BUF) = HAL_buf_at(MIC_BUF, 2*idx);
-                    transfer_buffer[idx] = to_int16t(main_main_value);
-                    idx = idx + 1;
-                }
+                HAL_buf_copy(MIC_BUF, &transfer_buffer, len);
             }
         }
         r_mic = HAL_start(MIC, MIC_BUF);

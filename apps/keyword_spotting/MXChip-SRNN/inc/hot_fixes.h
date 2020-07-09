@@ -18,6 +18,7 @@
 struct _t__int_int;
 int _sys_HAL_start(int, int);
 int _sys_HAL_io_completion(void*, void*);
+void HAL_buf_copy(int, int16_t (*buf) [128], int);
 //_t__int_int _sys_HAL_buf_at(int, int);
 
 int get_q_oldest(FIFOCircularQ* q){

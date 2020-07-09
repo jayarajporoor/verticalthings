@@ -37,8 +37,6 @@ struct _arec__main_main{
 }
 _arecs;
 };
-extern char audio_read_buf[512];
-
 /*Module vars for main*/
 int main_setup_const=1;
 FastRNNParams main_fastrnnParams0;
@@ -81,9 +79,6 @@ void _main_prediction_callback(float_pointer main_prediction_callback_vec, int m
         }
     }
 }
-inline int _sys_HAL_buf_at(int idx){
-    return ((int16_t*)audio_read_buf)[idx];
-}
 void _main_setup()
 {
     uint32_t main_setup_ret;
@@ -121,7 +116,6 @@ void _main_printStr(char_pointer main_printStr_a)
 int _main_main(struct _arec__main_main* _this)
 {
     struct _t__int_int__char__512_int _t__int_int__char__512_int_ret;
-    int _t__int_int_ret;
 static const void * _atbl[] = { &&lstate_0, &&lstate_1 };
 int _state = _this->_state;
 _this->_state = 0;
@@ -163,13 +157,7 @@ if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
             if((main_main_len>0))
             {
                 _this->main_main_idx=0;
-                while((_this->main_main_idx<main_main_len))
-                {
-                    _t__int_int_ret = _sys_HAL_buf_at(2*_this->main_main_idx) ;
-                    int&  main_main_main_main_value = _t__int_int_ret;
-                    main_transfer_buffer[_this->main_main_idx] = (int16_t)main_main_main_main_value;
-                    _this->main_main_idx=(_this->main_main_idx+1);
-                }
+                HAL_buf_copy(main_main_MIC_BUF, &(main_transfer_buffer), main_main_len) ;
             }
         }
         _this->main_main_r_mic = _sys_HAL_start(main_main_MIC, main_main_MIC_BUF) ;
@@ -183,35 +171,14 @@ return _this->_state;
 }
 /*Entry point - the 'C' main function*/
 struct _arec__main_main _arec_main;
-Timer t;
-Ticker fcall;
-extern volatile bool audio_buf_available;
-char buf[100];
-float delay_time = 0;
-float temp_time = 0;
 void loop(){
     int status = -1;
     _arec_main.main_main_mic=0;
     _arec_main.main_main_mic_buf=1;
     while (status != 0){
         status = _main_main(&_arec_main);
-        t.start();
-        while (audio_buf_available);
-        t.stop();
-        temp_time = t.read();
-        if (temp_time < 0){
-            temp_time = 0;
-        }
-        delay_time += temp_time;
     }
     while (true);
     return;
 }
-void log_and_erase(){
-    sprintf(buf, "saved %f", delay_time);
-    delay_time = 0;
-    Serial.println(buf);
-}
-void setup(){
-    fcall.attach(&log_and_erase, 5.0);
-}
+void setup(){}
