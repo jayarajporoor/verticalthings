@@ -157,7 +157,7 @@ if (_state > 0 && _state <= 1) goto *(_atbl[_state]);
             if((main_main_len>0))
             {
                 _this->main_main_idx=0;
-                HAL_buf_copy(main_main_MIC_BUF, &(main_transfer_buffer), main_main_len) ;
+                HAL_buf_copy(main_main_MIC_BUF, main_transfer_buffer, main_main_len) ;
             }
         }
         _this->main_main_r_mic = _sys_HAL_start(main_main_MIC, main_main_MIC_BUF) ;
