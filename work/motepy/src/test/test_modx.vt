@@ -1,0 +1,49 @@
+module test_modx;
+use arduino;
+include data;
+
+float[30] buf;
+
+
+default flow test_func(){
+    int sum;
+    pinPeripheral(3,4);
+    mpu.getFIFOBytes(buf, size);
+    anothertemp();
+}
+
+void just_a_function(){
+    int[20][20] A;
+    int[20][20] B;
+    int[20][20] C;
+    A = 0;
+    B = 0;
+    C = 0;
+    for i in [0,10]{
+        C = A * B;
+    }
+}
+
+void anothertemp(){
+    int sum = 0;
+    int[20][20] A;
+    int[20][20] B;
+    int[20][20] C;
+    A = 0;
+    B = 0;
+    C = 0;
+    for i in [0,10]{
+        if (i > 5){
+            C = A * B;
+        }
+        else{
+            just_a_function();
+        }
+    }
+}
+
+flow temp(){
+    for i in [0,10]{
+        anothertemp();
+    }
+}

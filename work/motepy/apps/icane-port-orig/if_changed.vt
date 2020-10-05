@@ -11,6 +11,6 @@ default flow is_changed(int voteResult){
 	else
 	{
 		prevVoteResult = voteResult;
-		yield voteResult;
+		next(voteResult);
 	}
 }

@@ -1,0 +1,5 @@
+module test_pipeline;
+
+pipeline test_pipeline {
+	test_mod
+}

@@ -1,0 +1,11 @@
+module arduino;
+
+@effects {	
+	pinPeripheral(n,_) := acquire pin(n);
+
+	serial.println(s) := cpu 25000, acquire uart(0);
+
+	mpu.getFIFOBytes(buf, size), mpu:MPU :=
+		write buf, 	cpu 61440, power[HIGH] i2c(0), acquire i2c(0);
+
+}

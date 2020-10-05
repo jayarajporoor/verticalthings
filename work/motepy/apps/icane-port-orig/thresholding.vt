@@ -1,0 +1,33 @@
+module thresholding;
+
+const int[10] scoreThreshold={0,0,0,10000,10000,10000,0,10000,0,10000};
+int ring[10] vote;
+int[11] resultScores;   // Max Label Index +1
+
+default flow Threshold(int result,int32_t [10] scores){
+	int out,maxCount=-1,voteResult=1;
+	Serial.print("Result:  ");
+	Serial.println(result);	
+	if(result<0 || result>=10){
+		Serial.println("Out of Bound");	
+	}
+	else{
+		if(scores[result]<scoreThreshold[result]){
+			result=1;
+		}
+		out=vote[0];
+		vote.push(result);
+		resultScores[result]=resultScores[result]+1;
+		if(out!=0){
+			resultScores[out]=resultScores[out]-1;
+		}
+		for i in [0,10]{
+			if(resultScores[i]>maxCount)
+			{
+				maxCount=resultScores[i];
+				voteResult=i;
+			}
+		}
+		next(voteResult);
+	}
+}

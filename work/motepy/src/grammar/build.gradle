@@ -1,0 +1,21 @@
+apply plugin: 'java'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    runtime 'org.antlr:antlr4:4.5.2'
+}
+
+task parser(type:JavaExec) {
+   main = 'org.antlr.v4.Tool'
+   classpath = sourceSets.main.runtimeClasspath
+   args = ['-Dlanguage=JavaScript', 'MotePy.g4', '-visitor', '-o', 'parser']
+}
+
+task lexer(type:JavaExec) {
+   main = 'org.antlr.v4.Tool'
+   classpath = sourceSets.main.runtimeClasspath
+   args = ['-Dlanguage=JavaScript', 'MotePyLexer.g4', '-visitor', '-o', 'parser']
+}

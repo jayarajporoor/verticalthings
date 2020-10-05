@@ -1,0 +1,47 @@
+module protonn;
+
+use arduino;
+
+include model;
+include Config;
+include limit;
+int32_t [10] scores;
+
+
+default flow predict(float[FEATURE_LENGTH] x){
+	float[ldDim] x_cap;
+	float[numLabels] y_cap;
+	float weight = 0.0, maxScore;
+	int maxIndex;
+	//scores=0;
+	y_cap=0.0;
+	// Project x onto ldDim dimension
+	x_cap= ldProjectionMatrix*x;
+	for i in [0,numPrototypes]{
+		//weight=0.0;
+		weight=(x_cap-prototypeMatrix[i]) * (x_cap-prototypeMatrix[i]);
+		weight=-1*gamma*gamma*weight;
+		weight=exp(weight);
+		//Serial.println(weight);
+		for j in [0,numLabels]{
+			y_cap[j]=prototypeLabelMatrix[i][j]*weight + y_cap[j];		
+		}
+		//y_cap=prototypeLabelMatrix[i]*weight + y_cap;
+		//y_cap=y_cap+prototypeLabelMatrix[i];
+	}
+	for i in [0,numLabels]{
+		scores[i]=100000*y_cap[i];
+	//	Serial.println(scores[i]);
+	}
+	maxScore= FLT_NMIN;
+	maxIndex=0;
+	for i in [0,numLabels]{
+		if(y_cap[i] > maxScore){
+			maxIndex=i;
+			maxScore=y_cap[i];
+		}
+	}
+	//Serial.println(maxIndex);
+	next(maxIndex,scores);
+}
+
