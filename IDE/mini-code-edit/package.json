@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "bootstrap": "^4.1.1",
-    "chart.js": "^2.7.2",
+    "chart.js": "^2.9.4",
     "jquery": "^3.3.1",
     "nw": "^0.31.4",
     "popper": "^1.0.1",
