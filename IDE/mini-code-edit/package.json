@@ -17,7 +17,7 @@
     "toolbar": true
   },
   "dependencies": {
-    "bootstrap": "^4.1.1",
+    "bootstrap": "^4.3.1",
     "chart.js": "^2.7.2",
     "jquery": "^3.3.1",
     "nw": "^0.31.4",
